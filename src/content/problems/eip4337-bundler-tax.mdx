@@ -1,0 +1,74 @@
+---
+title: "The 4337 stack is a parallel mempool."
+tagline: "UserOperations, EntryPoint, bundlers, paymasters. Most teams don't want to run any of that."
+query: "eip-4337 alternatives"
+description: "Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles."
+erc: "4337"
+lsps: ["LSP0", "LSP6", "LSP25", "LSP20"]
+aliases: ["account abstraction without bundlers", "no entrypoint", "alternative to erc-4337", "smart account no bundler"]
+updated: 2026-06-22
+diff:
+  from:
+    chip: "ERC·4337"
+    code: "handleOps(UserOperation[], beneficiary)"
+    tags: ["separate mempool", "bundler stack", "paymaster"]
+  to:
+    chip: "LSP·0+6+25"
+    code: "executeRelayCall(sig, nonce, validity, payload)"
+    tags: ["account is the entrypoint", "no bundler"]
+verdict: "A Universal Profile is a contract account composed from LSP0 + LSP6 + LSP25 + LSP20. A controller signs, a relayer submits, the profile validates via LSP6 and executes. No bundler. No EntryPoint. LSPs are plain EVM contracts — what makes them useful is the LUKSO ecosystem (wallets, indexers, marketplaces) that was built around them from day one."
+docs:
+  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "docs.lukso.tech / LSP25 executeRelayCall"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "docs.lukso.tech / LSP20 Call Verification"
+    href: "https://docs.lukso.tech/standards/accounts/lsp20-call-verification/"
+related: ["problems/gasless-onboarding", "problems/wallet-permissions"]
+---
+
+## Why this breaks
+
+ERC4337 ships account abstraction **over** a transaction system designed for EOAs. The price
+is a parallel infrastructure: `UserOperation`s, `EntryPoint` contracts, bundlers, paymasters,
+signature aggregators. Most product teams do not want to run or rent any of that.
+
+The other catch: 4337 accounts are smart accounts, but the value model still runs through the
+`EntryPoint`. Debugging, tracing, and gas accounting all sit on a separate plane from regular
+tx flow. Block explorers show `handleOps`, not your function call.
+
+## What people try
+
+### Safe + relayer
+Safe is a smart account contract. A relayer submits the multisig `exec` call. No
+`UserOperation`, no bundler. Solid model, just less standardized than 4337.
+
+### EIP-7702
+EOAs temporarily delegate to a contract for one transaction, getting smart-account semantics
+without becoming a contract. Sponsorship still needs a paymaster.
+
+### Custodial backends
+Sign user actions server-side. Simplest UX, weakest custody story.
+
+### App-specific forwarders
+EIP-2771 forwarders narrow to a single product. Hard to share across protocols.
+
+## How LSP solves it
+
+A Universal Profile is a contract account composed from:
+
+- **LSP0** — the ERC725 account contract itself
+- **LSP6** — Key Manager permissions on every controller
+- **LSP25** — `executeRelayCall` for sponsored execution
+- **LSP20** — call verification so the account validates calls inline
+
+There is no bundler and no EntryPoint. A controller signs, a relayer submits, the profile
+validates via LSP6 and executes. Because the relayed call goes through the account, LSP6
+permissions still apply: the controller signing the relay payload can only authorize what its
+permissions allow.
+
+**Honest tradeoff:** LSPs are plain EVM smart contracts — they're deployable on Ethereum
+mainnet or any EVM chain. The reason to reach for them is LUKSO: an EVM L1 that started
+fresh with this set of standards in place from day one, and built the wallet, marketplace,
+and indexer ecosystem around them. Mainnet has 4337 because mainnet had to retrofit account
+abstraction onto a deployed EOA-shaped world. LUKSO didn't.

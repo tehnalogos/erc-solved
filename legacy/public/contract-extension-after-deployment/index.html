@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Extending Contracts After Deployment: Proxies, Modules, and LSP17 | ERCs, Solved</title>
+    <meta name="description" content="Upgradeable proxies, ERC2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority.">
+    <link rel="canonical" href="https://ercsolved.dev/contract-extension-after-deployment/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="Extending Contracts After Deployment: Proxies, Modules, and LSP17 | ERCs, Solved">
+    <meta property="og:description" content="Upgradeable proxies, ERC2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/contract-extension-after-deployment/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Extending contracts after deployment","item":"https://ercsolved.dev/contract-extension-after-deployment/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Extending contracts after deployment","description":"Upgradeable proxies, ERC2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["contract extension after deployment","upgradeable contracts","lsp17 extensions"],"mainEntityOfPage":"https://ercsolved.dev/contract-extension-after-deployment/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>Extending contracts after deployment</h1>
+      <p>Upgradeable proxies, ERC2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority.</p>
+      <div class="tag-row"><span>contract extension after deployment</span><span>upgradeable contracts</span><span>lsp17 extensions</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>Deployed contracts have fixed bytecode. To grow new functions you either upgrade behind a proxy (carries upgrade authority risk), split into a diamond (complex storage), or run an off-chain module pattern. LSP17 standardizes a fallback router so any LSP17-aware contract can register extension contracts per function selector.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>A deployed contract cannot grow new external functions. Adding behavior usually means a transparent or UUPS proxy, which makes upgrade authority a permanent trust assumption, or a diamond, which trades trust for storage and tooling complexity.</p><p>For account contracts, the per-account module patterns (Safe modules, ERC4337 validators) help, but they are wallet-specific extension mechanisms, not a general contract extension primitive.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>OpenZeppelin transparent / UUPS proxies — proven, but the upgrade key never goes away.</li><li>ERC2535 Diamonds — modular, expensive to author, storage requires discipline.</li><li>Safe modules and guards — scoped to Safe accounts.</li><li>Plugin patterns inside the app contract — bespoke, no shared tooling.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>LSP17 defines a fallback router: when a contract receives a call for an unknown function selector, it looks up an extension contract registered for that selector (stored in ERC725Y data keys) and forwards the call. The base contract stays immutable; new behavior is added by registering extensions.</p><p>There is no upgrade authority over base bytecode and no diamond-style storage layout problem to manage. Universal Profiles use this to grow without proxy upgrades.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>UUPS upgrade (OZ)</figcaption>
+              <pre><code class="language-solidity">function upgradeTo(address newImplementation) external onlyProxy onlyOwner;
+// Owner can swap the entire implementation forever.</code></pre>
+            </figure>
+            <figure>
+              <figcaption>LSP17 extension registration (sketch)</figcaption>
+              <pre><code class="language-solidity">// Map a function selector to an extension contract via ERC725Y.
+// On unknown selector, fallback delegates to the registered extension.
+bytes32 key = bytes32(abi.encodePacked(
+  bytes10(_LSP17_EXTENSION_PREFIX),
+  bytes2(0),
+  bytes4(selector),
+  bytes16(0)
+));
+ERC725Y(account).setData(key, abi.encodePacked(extension));</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp17-contract-extension</a>
+              <a href="https://docs.lukso.tech/standards/erc725/" rel="noopener noreferrer">docs.lukso.tech/standards/erc725</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp0-erc725account/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp0-erc725account</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/smart-contract-wallet-permissions/">
+                <strong>Smart contract wallet permissions</strong>
+                <span>Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.</span>
+              </a>
+              <a href="/wallet-vs-universal-profile/">
+                <strong>Wallet vs Universal Profile</strong>
+                <span>EOAs, Safes, ERC4337 accounts, and Universal Profiles compared. Which smart account model fits which product UX, and what the integration cost looks like.</span>
+              </a>
+              <a href="/eoa-vs-universal-profile/">
+                <strong>EOA wallet limits -&gt; Universal Profile smart accounts</strong>
+                <span>Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

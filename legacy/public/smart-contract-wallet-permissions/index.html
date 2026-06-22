@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Smart Contract Wallet Permissions: Scoping App Access Without Full Control | ERCs, Solved</title>
+    <meta name="description" content="Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.">
+    <link rel="canonical" href="https://ercsolved.dev/smart-contract-wallet-permissions/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="Smart Contract Wallet Permissions: Scoping App Access Without Full Control | ERCs, Solved">
+    <meta property="og:description" content="Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/smart-contract-wallet-permissions/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Smart contract wallet permissions","item":"https://ercsolved.dev/smart-contract-wallet-permissions/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Smart contract wallet permissions","description":"Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["smart contract wallet permissions","session keys","scoped wallet access"],"mainEntityOfPage":"https://ercsolved.dev/smart-contract-wallet-permissions/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>Smart contract wallet permissions</h1>
+      <p>Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.</p>
+      <div class="tag-row"><span>smart contract wallet permissions</span><span>session keys</span><span>scoped wallet access</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>A dapp does not need full account control to swap a token. Session keys, ERC4337 modules, and LSP6 controllers each express scoped authority. LSP6 makes the scope the account’s native vocabulary: per-controller permission bitfields, allowed calls, allowed data keys.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>EOAs sign every action with the same key. Even most smart wallets expose the full account on connect, because there is no standard way for a dapp to ask for narrower authority.</p><p>When fine-grained authority does exist, it usually lives in custom validator code per wallet — interoperability is poor, and revocation tends to be all-or-nothing.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>Argent session keys — temporary signing keys with scoped allowed contracts.</li><li>ERC4337 validation modules — pluggable validators define what each key may do.</li><li>Zodiac scope guards on Safe — module-level gating, complex to author.</li><li>Off-chain delegation (capabilities, signed permissions) — flexible, but enforcement depends on the relayer.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>LSP6 Key Manager assigns each controller a permission bitfield (CALL, SETDATA, TRANSFERVALUE, ADDCONTROLLER, …) plus optional allowed calls (target contract + standard interface + function selector) and allowed ERC725Y data keys.</p><p>Granting an app a session controller is one transaction; revoking it is one transaction. The Universal Profile checks permissions on every call, so the scope is enforced onchain, not at the wallet UI layer.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>LSP6 allowed call scope (sketch)</figcaption>
+              <pre><code class="language-text">Controller: app session key 0xabc…
+Permission: CALL
+AllowedCalls:
+  - target: 0x&lt;token&gt;, standard: LSP7, selector: transfer
+Expires: app-defined session policy</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/access-control/lsp6-key-manager/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp6-key-manager</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp20-call-verification/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp20-call-verification</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp0-erc725account/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp0-erc725account</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/guides/grant-dapp-permissions-lsp6/">
+                <strong>Grant dapp permissions with LSP6</strong>
+                <span>Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.</span>
+              </a>
+              <a href="/social-recovery-smart-wallets/">
+                <strong>Social recovery for smart wallets</strong>
+                <span>Guardian models, multisig recovery, and ERC4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase.</span>
+              </a>
+              <a href="/eoa-vs-universal-profile/">
+                <strong>EOA wallet limits -&gt; Universal Profile smart accounts</strong>
+                <span>Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

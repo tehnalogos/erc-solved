@@ -1,0 +1,299 @@
+---
+import Base from '~/layouts/Base.astro';
+import DiffArrow from '~/components/primitives/DiffArrow.astro';
+import Authorship from '~/components/primitives/Authorship.astro';
+
+const description =
+  'A spec-grade field guide for EVM developers. ERC pain points mapped to the LUKSO LSP standards that were designed instead of layered.';
+
+const verticals = [
+  { label: 'Token economics',         stack: 'LSP·7 + LSP·4',                href: '/build/token-economics/' },
+  { label: 'Dynamic NFTs',            stack: 'LSP·8 + LSP·4 + ERC·725Y',     href: '/build/dynamic-nfts/' },
+  { label: 'Smart wallet UX',         stack: 'LSP·0 + LSP·6',                href: '/build/smart-wallet-ux/' },
+  { label: 'Gasless onboarding',      stack: 'LSP·25 + LSP·6',               href: '/build/gasless-onboarding/' },
+  { label: 'Profile-native apps',     stack: 'LSP·0 + LSP·3 + LSP·26',       href: '/build/profile-native-apps/' },
+  { label: 'Extending deployed code', stack: 'LSP·17 (+ LSP·14)',            href: '/build/extending-deployed-contracts/' },
+];
+
+const topQueries = [
+  { q: 'erc20 approval risks',          a: 'LSP·7 + LSP·6',           href: '/problems/erc20-approval-risks/' },
+  { q: 'erc721 dynamic metadata',       a: 'LSP·8 + LSP·4 + ERC·725Y', href: '/problems/erc721-dynamic-metadata/' },
+  { q: 'eip-4337 alternatives',         a: 'LSP·0 + LSP·6 + LSP·25',   href: '/problems/eip4337-bundler-tax/' },
+  { q: 'erc20 transfer hooks',          a: 'LSP·7 + LSP·1',            href: '/problems/erc20-transfer-hooks/' },
+  { q: 'social recovery smart wallets', a: 'LSP·6 controllers',        href: '/problems/social-recovery/' },
+  { q: 'safetransferfrom problems',     a: 'LSP·1 universal receiver', href: '/problems/erc721-safe-transfer/' },
+];
+---
+
+<Base
+  title="ERCs, Solved."
+  description={description}
+>
+  <section class="hero" data-pagefind-body data-pagefind-meta="title:ERCs, Solved.">
+    <div class="hero-inner">
+      <span class="eyebrow">EVM developer field manual</span>
+      <h1>ERCs are interfaces. <span class="dim">LSPs are the system.</span></h1>
+      <p class="lede">
+        ERC-20, 721, and 1155 won by underspecifying. Every team since has paid the integration
+        tax — approval phishing, NFTs stranded in vaults, tokenURI servers offline, EOAs you
+        can't recover, 4337 stacks bolted on to fake what an account should be. This is the
+        reference for the standards that were designed instead of layered.
+      </p>
+      <div class="cta-row">
+        <a class="cta" href="/problems/">
+          <span class="bracket">[</span>
+          <span class="label">start with your problem</span>
+          <span class="arrow">→</span>
+          <span class="bracket">]</span>
+        </a>
+        <span class="cta-meta">or browse <a href="/standards/matrix/">the ERC ↔ LSP matrix</a></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="example">
+    <div class="example-inner">
+      <div class="example-head">
+        <span class="eyebrow">the pattern, in one example</span>
+        <h2 class="example-title">The approval problem, <span class="solved">solved.</span></h2>
+        <p class="dim">
+          A signature comparison. Every problem page on this site opens with one of these. The
+          <span class="amber">−</span> line is what ERC gives you. The <span class="pink">+</span> line is what LSP designed instead.
+        </p>
+      </div>
+      <DiffArrow
+        size="lg"
+        framed
+        from={{
+          chip: 'ERC·20',
+          code: 'approve(spender, amount)',
+          tags: ['unbounded', 'phishable', 'split-intent'],
+        }}
+        to={{
+          chip: 'LSP·7',
+          code: 'authorizeOperator(op, amount, data)',
+          tags: ['scoped', 'revocable', 'LSP6 account permissions'],
+        }}
+      />
+      <p class="example-foot dim">
+        Read the full page →
+        <a href="/problems/erc20-approval-risks/">erc20 approval risks</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="band verticals">
+    <div class="band-inner">
+      <div class="band-head">
+        <span class="eyebrow">what are you building?</span>
+        <h2>Pick a vertical. Get a reading list.</h2>
+      </div>
+      <ul class="vert-grid">
+        {verticals.map(v => (
+          <li>
+            <a class="vert" href={v.href}>
+              <span class="vert-label">{v.label}</span>
+              <span class="vert-stack">{v.stack}</span>
+              <span class="vert-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="band queries">
+    <div class="band-inner">
+      <div class="band-head">
+        <span class="eyebrow">top search queries this month</span>
+        <h2>The pain you came here for.</h2>
+      </div>
+      <ul class="query-list">
+        {topQueries.map(({ q, a, href }) => (
+          <li>
+            <a class="query-row" href={href}>
+              <span class="q">{q}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+              <span class="a">{a}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="footnote">
+    <div class="footnote-inner">
+      <Authorship
+        author="ercs-solved maintainers"
+        updated="2026-06-22"
+        editHref="https://github.com/lukso-network/ercs-solved"
+      />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding: var(--s-8) var(--s-5) var(--s-6);
+  }
+  .hero-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  h1 {
+    max-width: 22ch;
+    font-size: clamp(36px, 5.5vw, 68px);
+    font-variation-settings: 'opsz' 60;
+    line-height: 1.02;
+  }
+  h1 .dim { color: var(--ink-bone-dim); }
+
+  .lede {
+    max-width: 72ch;
+    font-size: var(--t-mono-md);
+    color: var(--ink-bone-dim);
+  }
+
+  .cta-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-5);
+    flex-wrap: wrap;
+    margin-top: var(--s-3);
+  }
+  .cta {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--ink-bone);
+    color: var(--ink-bone);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .cta:hover, .cta:focus-visible {
+    background: var(--signal-pink);
+    color: var(--ink-black);
+    border-color: var(--signal-pink);
+    outline: none;
+  }
+  .cta .bracket { color: var(--ink-fog); }
+  .cta:hover .bracket { color: var(--ink-black); }
+  .cta-meta { font-size: var(--t-mono-sm); color: var(--ink-fog); }
+  .cta-meta a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .cta-meta a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  .example {
+    padding: var(--s-7) var(--s-5) var(--s-9);
+    border-top: 1px solid var(--ink-line);
+  }
+  .example-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    gap: var(--s-5);
+  }
+  .example-head { display: grid; gap: var(--s-3); }
+  .example-title {
+    font-size: clamp(28px, 3.5vw, 44px);
+    max-width: 18ch;
+  }
+  .example-title .solved { color: var(--signal-pink); }
+  .example-head p { max-width: 64ch; }
+  .amber { color: var(--erc-sand); font-family: var(--font-mono); }
+  .pink  { color: var(--signal-pink); font-family: var(--font-mono); }
+
+  .example-foot { font-size: var(--t-mono-sm); }
+  .example-foot a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .example-foot a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  .band { padding: var(--s-9) var(--s-5); border-top: 1px solid var(--ink-line); }
+  .band-inner { max-width: var(--container); margin: 0 auto; display: grid; gap: var(--s-6); }
+  .band-head { display: grid; gap: var(--s-3); }
+  .band-head h2 { font-size: clamp(28px, 3.5vw, 44px); }
+
+  .vert-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--ink-line);
+    border-left: 1px solid var(--ink-line);
+  }
+  .vert {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: baseline;
+    column-gap: var(--s-3);
+    padding: var(--s-5);
+    border-right: 1px solid var(--ink-line);
+    border-bottom: 1px solid var(--ink-line);
+    transition: background 150ms ease;
+  }
+  .vert:hover, .vert:focus-visible { background: var(--ink-paper); outline: none; }
+  .vert-label {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: 22px;
+    color: var(--ink-bone);
+    line-height: 1.15;
+  }
+  .vert-arrow {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    color: var(--ink-fog);
+    font-size: 20px;
+  }
+  .vert:hover .vert-arrow { color: var(--signal-pink); }
+  .vert-stack {
+    grid-column: 1;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--signal-pink);
+    margin-top: var(--s-2);
+  }
+
+  .query-list {
+    display: grid;
+    border-top: 1px solid var(--ink-line);
+  }
+  .query-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--s-4);
+    padding: var(--s-4) var(--s-2);
+    border-bottom: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+  }
+  .query-row .q { color: var(--erc-sand); font-size: var(--t-mono-md); }
+  .query-row .arrow { color: var(--ink-line); }
+  .query-row .a { color: var(--signal-pink); font-size: var(--t-mono-md); }
+  .query-row:hover { background: var(--ink-paper); }
+  .query-row:hover .arrow { color: var(--ink-bone); }
+
+  .footnote { padding: 0 var(--s-5); }
+  .footnote-inner { max-width: var(--container); margin: 0 auto; }
+
+  @media (max-width: 900px) {
+    .vert-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .hero { padding: var(--s-7) var(--s-4) var(--s-5); }
+    .example { padding: var(--s-6) var(--s-4) var(--s-7); }
+    .band { padding: var(--s-7) var(--s-4); }
+    .query-row { grid-template-columns: 1fr; gap: var(--s-1); padding: var(--s-3) 0; }
+    .query-row .arrow { display: none; }
+  }
+</style>

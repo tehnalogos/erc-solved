@@ -1,0 +1,46 @@
+---
+kind: LSP
+id: "6"
+title: "Key Manager"
+oneLine: "The permission layer. Many controllers per account, each with a scoped permission bitfield."
+description: "LSP6 sits in front of a Universal Profile (LSP0) and gates every call by a per-controller permission bitfield, allowed calls, and allowed ERC725Y data keys."
+purpose: Permission
+updated: 2026-06-22
+abi: |
+  // Controllers call the Key Manager; the Key Manager calls the account.
+  function execute(bytes calldata payload)
+    external payable returns (bytes memory);
+
+  // Permissions are stored as ERC725Y data on the account:
+  //   AddressPermissions[]                                 → array of controller addresses
+  //   AddressPermissions:Permissions:<controller>          → 32-byte bitfield
+  //   AddressPermissions:AllowedCalls:<controller>         → list of (standard, target, selector)
+  //   AddressPermissions:AllowedERC725YDataKeys:<controller> → list of data keys
+solves:
+  - pain: "smart contract wallet permissions"
+    href: "/problems/wallet-permissions/"
+  - pain: "ERC20 approval risks"
+    href: "/problems/erc20-approval-risks/"
+  - pain: "social recovery"
+    href: "/problems/social-recovery/"
+companions: ["LSP·0", "LSP·20", "LSP·25"]
+doesNotSolve:
+  - "LSP6 doesn't decide your recovery policy. You compose it from permissions."
+  - "It doesn't expire keys on its own — time-bound sessions are app-level (or via a recovery contract)."
+  - "Permissions are on-chain state. Frequent rotation costs gas."
+docs:
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+---
+
+LSP6 turns the account permission question into a structured grant: this controller can do
+**these** things, on **these** contracts, with **these** data keys. The whole vocabulary lives
+on-chain. Granting an app a narrow session controller is `setData` calls; revoking is
+`setData` calls. The wallet UI can't bypass it, because the Key Manager checks every call
+before it reaches the account.
+
+The permission bitfield includes `CALL`, `SUPER_CALL`, `STATICCALL`, `DELEGATECALL`,
+`TRANSFERVALUE`, `SIGN`, `ADDCONTROLLER`, `EDITPERMISSIONS`, `SETDATA`, and several scoped
+variants. `AllowedCalls` constrains *which* contracts a controller can invoke;
+`AllowedERC725YDataKeys` constrains which data keys it can write. Use both for real session
+scoping; use neither and you've handed over a permanent app key.

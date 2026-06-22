@@ -1,0 +1,63 @@
+---
+title: "Migrate from Safe (Gnosis Safe) to Universal Profile"
+from: "Safe"
+to: "LSP·0"
+description: "Move custody and ownership from a Safe multisig to a Universal Profile with LSP6 controllers. The permission model maps cleanly; the recovery model needs to be designed."
+estimate: "~1 day for a small Safe; longer if the Safe owns many assets"
+verdict: "Migrate when you want the per-controller permission scope LSP6 ships, profile-native metadata, or LSP25 relay execution — and your product is shipping on LUKSO. Stay on Safe when multi-chain reach across mature mainnet ecosystems is the requirement."
+updated: 2026-06-22
+gotchas:
+  - "Safe has mature deployments on mainnet + many L2s; the Universal Profile ecosystem (wallet, indexers, marketplaces) lives on LUKSO. This is usually also a chain migration."
+  - "Multi-sig threshold semantics don't map 1:1 to LSP6 — model it as a recovery controller contract that enforces the threshold."
+  - "Asset transfer is many separate transactions unless the Safe owns the assets through a sweep contract."
+  - "Anything connected to the Safe's address (subscriptions, vesting, DAO membership) needs to be updated."
+verify:
+  - "All assets transferred to the Universal Profile"
+  - "Old Safe paused (no longer holds material assets)"
+  - "Controllers + permissions configured on the new profile"
+  - "Recovery policy in place — at least one cold controller with EDITPERMISSIONS"
+  - "Off-chain integrations updated to the new address"
+docs:
+  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+related: ["compare/eoa-universal-profile", "problems/wallet-permissions"]
+---
+
+### Step 1 — model the Safe as permissions
+
+Take your Safe's owner set and threshold and translate it into LSP6 vocabulary. A threshold
+of "3 of 5" doesn't directly exist in LSP6 (controllers are individual, not aggregated).
+Two patterns:
+
+- **Recovery contract** — deploy a contract that enforces the threshold and is itself
+  registered as the controller with `EDITPERMISSIONS` on the profile. Day-to-day controllers
+  do day-to-day work; the recovery contract handles ownership-level changes.
+- **Day-to-day single controller + cold multisig** — flatten the daily workflow to one
+  controller; keep the Safe (or a new threshold contract) as the cold recovery layer.
+
+### Step 2 — deploy the Universal Profile
+
+Use the standard `lsp-factory.js` or equivalent deploy script. Set LSP3 profile metadata.
+Add controllers per the design from step 1.
+
+### Step 3 — transfer assets
+
+For each asset class:
+
+- **Native LYX** — `Safe.execTransaction → profile.execute(0, profile, value, "")`
+- **ERC20 / LSP7** — `Safe → token.transfer(profile, balance)`
+- **NFTs** — `Safe → token.safeTransferFrom(safe, profile, id)` (or LSP8 equivalent)
+
+If the Safe holds many assets, write a sweep contract that batches the transfers.
+
+### Step 4 — update integrations
+
+Identify every protocol that knows the Safe's address: vesting contracts, multi-sig DAOs,
+subscriptions, allowance grants. Update each one to point to the new profile address.
+
+### Step 5 — sunset the Safe
+
+Once nothing material lives in the Safe, transfer its remaining gas dust out and consider it
+historical. Leave it deployed — destroying multisig contracts is unsupported and dangerous.

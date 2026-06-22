@@ -1,0 +1,67 @@
+---
+title: "Wallets don't know how to ask for less."
+tagline: "Connect a dapp and it gets the whole account. Session scoping isn't standard."
+query: "smart contract wallet permissions"
+description: "Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps."
+erc: "4337"
+lsps: ["LSP6", "LSP20"]
+aliases: ["session keys", "scoped wallet access", "dapp permissions", "smart account permissions"]
+updated: 2026-06-22
+diff:
+  from:
+    chip: "EOA"
+    code: "wallet_signTransaction(tx)"
+    tags: ["full account every time"]
+  to:
+    chip: "LSP·6"
+    code: "permissions[controller] + allowedCalls[controller]"
+    tags: ["per-controller", "per-call", "revocable"]
+verdict: "LSP6 assigns each controller a permission bitfield plus optional allowed calls (target + standard + selector) and allowed data keys. Granting a session controller is one tx. Revoking it is one tx. Scope is enforced on-chain."
+docs:
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "docs.lukso.tech / LSP20 Call Verification"
+    href: "https://docs.lukso.tech/standards/accounts/lsp20-call-verification/"
+related: ["problems/erc20-approval-risks", "problems/social-recovery", "problems/eoa-key-risk"]
+---
+
+## Why this breaks
+
+EOAs sign every action with the same key. Even most smart wallets expose the full account on
+connect, because there is no standard way for a dapp to ask for narrower authority.
+
+When fine-grained authority does exist, it usually lives in custom validator code per wallet.
+Interoperability is poor. Revocation tends to be all-or-nothing.
+
+## What people try
+
+### Argent session keys
+Temporary signing keys with scoped allowed contracts. Vendor-specific.
+
+### ERC4337 validation modules
+Pluggable validators define what each key may do. Standardizes the mechanism, not the policy
+vocabulary.
+
+### Zodiac scope guards on Safe
+Module-level gating. Complex to author. Scoped to Safe accounts.
+
+### Off-chain delegation (capabilities, signed permissions)
+Flexible. Enforcement depends on the relayer believing the capability.
+
+## How LSP solves it
+
+LSP6 Key Manager assigns each controller a permission bitfield (`CALL`, `SETDATA`,
+`TRANSFERVALUE`, `ADDCONTROLLER`, `SIGN`, …) plus optional allowed calls (target contract +
+standard interface + function selector) and allowed ERC725Y data keys.
+
+```
+Controller: app session key 0xabc...
+Permission: CALL
+AllowedCalls:
+  - target: 0x<token>, standard: LSP7, selector: transfer
+Expires: app-defined session policy
+```
+
+Granting an app a session controller is one transaction. Revoking it is one transaction. The
+Universal Profile checks permissions on every call, so the scope is enforced **on-chain**,
+not at the wallet UI layer where it can be bypassed.

@@ -1,0 +1,61 @@
+# ERCs, Solved
+
+A field manual for Ethereum developers comparing ERC pain points with LUKSO LSP standards for tokens, NFTs, metadata, permissions, receiver awareness, and onboarding.
+
+## Core framing
+
+- ERCs are successful minimum interfaces for Ethereum composability.
+- LSPs add surrounding systems for metadata, permissions, receiver awareness, smart accounts, and onboarding.
+- This site maps common ERC developer problems to LUKSO LSP design patterns and official docs.
+
+## Pages
+
+- https://ercsolved.dev/ - EVM Problems, LSP Solutions: A field manual for Ethereum developers comparing ERC pain points with LUKSO LSP standards for tokens, NFTs, metadata, permissions, receiver awareness, and onboarding.
+- https://ercsolved.dev/erc-problems/ - Find your ERC problem: A practical index of ERC20, ERC721, ERC1155, wallet, metadata, receiver, and onboarding problems mapped to LUKSO LSP patterns.
+- https://ercsolved.dev/erc20-vs-lsp7/ - ERC20 vs LSP7: Compare ERC20 with LUKSO LSP7 for token transfers, approvals, metadata, receiver hooks, transfer context, and migration decisions.
+- https://ercsolved.dev/erc20-approve-vs-lsp7-authorize-operator/ - ERC20 approve problem -> LSP7 operator authorization: Understand ERC20 approve and transferFrom pain points, then compare them with LSP7 authorizeOperator and Universal Profile permissions.
+- https://ercsolved.dev/erc721-vs-lsp8/ - ERC721 vs LSP8: Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.
+- https://ercsolved.dev/erc721-tokenuri-vs-lsp4-metadata/ - ERC721 tokenURI problem -> LSP4 metadata: Learn why dynamic NFT metadata is hard with tokenURI alone and how LSP8, LSP4, and ERC725Y provide a richer metadata model.
+- https://ercsolved.dev/erc1155-vs-lsp7-lsp8/ - ERC1155 vs LSP7 and LSP8: Compare ERC1155 multi-asset contracts with LSP7 and LSP8 when product semantics, indexing, metadata, and profile UX matter.
+- https://ercsolved.dev/eoa-vs-universal-profile/ - EOA wallet limits -> Universal Profile smart accounts: Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.
+- https://ercsolved.dev/guides/migrate-erc20-to-lsp7/ - Migrate ERC20 token logic to LSP7: A practical migration guide for mapping ERC20 balances, transfers, approvals, metadata, and receiver behavior to LSP7.
+- https://ercsolved.dev/guides/migrate-erc721-to-lsp8/ - Migrate ERC721 NFT collections to LSP8: A practical migration guide for mapping ERC721 ownership, token IDs, tokenURI metadata, and safe transfers to LSP8.
+- https://ercsolved.dev/guides/dynamic-nft-metadata-lsp8/ - Build dynamic NFT metadata with LSP8: Use LSP8, LSP4 metadata, and ERC725Y data keys to model dynamic NFT metadata for LUKSO apps.
+- https://ercsolved.dev/guides/gasless-transactions-universal-profile/ - Gasless transactions with Universal Profiles: Design sponsored and gasless onboarding flows with LUKSO Universal Profiles, LSP25 relay calls, nonces, and relayers.
+- https://ercsolved.dev/guides/grant-dapp-permissions-lsp6/ - Grant dapp permissions with LSP6: Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.
+- https://ercsolved.dev/erc20-transfer-hooks/ - How to add ERC20 transfer hooks: ERC20 has no receiver hook. Compare ERC777, ERC1363, transferAndCall wrappers, and the LSP7 plus LSP1 receiver model for reacting to token transfers onchain.
+- https://ercsolved.dev/erc20-approval-risks/ - ERC20 approval risks: Unlimited allowances, stale approvals, and split-intent UX make ERC20 approve a known security problem. Compare Permit2, EIP-2612, revoke flows, and LSP7 operator authorization with LSP6 account permissions.
+- https://ercsolved.dev/erc721-dynamic-metadata/ - ERC721 dynamic metadata: tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC4906, fully onchain SVG, and LSP8 plus ERC725Y key/value metadata.
+- https://ercsolved.dev/erc721-safe-transfer-problems/ - ERC721 safe transfer problems: safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types.
+- https://ercsolved.dev/gasless-transactions-smart-accounts/ - Gasless transactions for smart accounts: EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys.
+- https://ercsolved.dev/social-recovery-smart-wallets/ - Social recovery for smart wallets: Guardian models, multisig recovery, and ERC4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase.
+- https://ercsolved.dev/smart-contract-wallet-permissions/ - Smart contract wallet permissions: Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.
+- https://ercsolved.dev/eip-4337-alternatives/ - EIP-4337 alternatives: Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles.
+- https://ercsolved.dev/wallet-vs-universal-profile/ - Wallet vs Universal Profile: EOAs, Safes, ERC4337 accounts, and Universal Profiles compared. Which smart account model fits which product UX, and what the integration cost looks like.
+- https://ercsolved.dev/erc1155-complexity/ - ERC1155 complexity: ERC1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7/LSP8 split.
+- https://ercsolved.dev/contract-extension-after-deployment/ - Extending contracts after deployment: Upgradeable proxies, ERC2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority.
+
+## Official LUKSO docs
+
+- https://docs.lukso.tech/
+- https://docs.lukso.tech/learn/benefits-lukso-standards/
+- https://docs.lukso.tech/standards/erc725/
+- https://docs.lukso.tech/standards/accounts/lsp0-erc725account/
+- https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/
+- https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/
+- https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/
+- https://docs.lukso.tech/standards/metadata/lsp5-received-assets/
+- https://docs.lukso.tech/standards/access-control/lsp6-key-manager/
+- https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/
+- https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/
+- https://docs.lukso.tech/standards/metadata/lsp12-issued-assets/
+- https://docs.lukso.tech/standards/access-control/lsp14-ownable-2-step/
+- https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/
+- https://docs.lukso.tech/standards/accounts/lsp20-call-verification/
+- https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/
+- https://docs.lukso.tech/standards/accounts/lsp26-follower-system/
+- https://docs.lukso.tech/learn/migrate/migrate-erc20-to-lsp7/
+- https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/
+- https://docs.lukso.tech/learn/universal-profile/metadata/read-profile-data/
+- https://docs.lukso.tech/tools/dapps/transaction-relay-api/
+

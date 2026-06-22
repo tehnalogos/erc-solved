@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERC20 vs LSP7: Transfer Hooks, Metadata, and Safer Token UX | ERCs, Solved</title>
+    <meta name="description" content="Compare ERC20 with LUKSO LSP7 for token transfers, approvals, metadata, receiver hooks, transfer context, and migration decisions.">
+    <link rel="canonical" href="https://ercsolved.dev/erc20-vs-lsp7/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERC20 vs LSP7: Transfer Hooks, Metadata, and Safer Token UX | ERCs, Solved">
+    <meta property="og:description" content="Compare ERC20 with LUKSO LSP7 for token transfers, approvals, metadata, receiver hooks, transfer context, and migration decisions.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/erc20-vs-lsp7/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"ERC20 vs LSP7","item":"https://ercsolved.dev/erc20-vs-lsp7/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"ERC20 vs LSP7","description":"Compare ERC20 with LUKSO LSP7 for token transfers, approvals, metadata, receiver hooks, transfer context, and migration decisions.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["ERC20","LSP7","token transfers","metadata","receiver hooks"],"mainEntityOfPage":"https://ercsolved.dev/erc20-vs-lsp7/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Comparison</p>
+      <h1>ERC20 vs LSP7</h1>
+      <p>Compare ERC20 with LUKSO LSP7 for token transfers, approvals, metadata, receiver hooks, transfer context, and migration decisions.</p>
+      <div class="tag-row"><span>ERC20</span><span>LSP7</span><span>token transfers</span><span>metadata</span><span>receiver hooks</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>ERC20 is the minimal fungible token interface that made tokens composable. LSP7 keeps the familiar balance and transfer model, then adds ERC725Y metadata, LSP1 receiver notifications, a force parameter, transfer data, and operator authorization so token movement can carry context.</p></section>
+      
+        <section class="content-section">
+          <h2>What ERC20 gets right</h2>
+          <p>ERC20 works because it is small. Balances, transfers, approvals, and transferFrom are easy for exchanges, wallets, DeFi contracts, and indexers to support.</p><p>That minimal interface is also why so many products build extra layers around it: allowlists, metadata APIs, spam filters, wrapper contracts, transfer routers, and off-chain explanations of what a transfer means.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>Where developers hit limits</h2>
+          
+          <ul><li>Approvals can be stale, unlimited, or hard for users to review.</li><li>Transfers do not include a standard data payload for context.</li><li>Recipient contracts are not notified through ERC20 itself.</li><li>Metadata is mostly limited to name, symbol, and decimals conventions.</li><li>Wallets often need event indexing to infer what assets an account owns.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LSP7 changes the model</h2>
+          <p>LSP7 is LUKSO&#39;s Digital Asset standard for fungible and semi-fungible assets. It uses ERC725Y for extensible metadata, LSP1 Universal Receiver notifications for sender and recipient reactions, and a transfer function that carries a force flag and arbitrary bytes data.</p><p>The operator model is still amount-scoped authorization, so it should not be described as magic protection against every approval risk. The difference is that LSP7 is designed to work with account-level permissions, receiver notifications, and richer transfer context.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>ERC20 transferFrom</figcaption>
+              <pre><code class="language-solidity">function transferFrom(address from, address to, uint256 amount) external returns (bool);</code></pre>
+            </figure>
+            <figure>
+              <figcaption>LSP7 transfer</figcaption>
+              <pre><code class="language-solidity">function transfer(
+  address from,
+  address to,
+  uint256 amount,
+  bool force,
+  bytes calldata data
+) external;</code></pre>
+            </figure>
+    </section>
+      
+    <section class="content-section table-section">
+      <h2>Decision table</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Use ERC20 when</th><th>Use LSP7 when</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>You need direct compatibility with existing ERC20-only infrastructure.</td><td>You want token transfers with receiver awareness, context, and richer metadata.</td></tr><tr><td>Basic fungible balances and DeFi integration are the whole product surface.</td><td>The token is part of a profile, creator, membership, or app UX that needs reactions.</td></tr><tr><td>The app already relies on ERC20 wrappers and mature off-chain indexing.</td><td>You want the asset standard to participate in the account and metadata system.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP7-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp1-universal-receiver</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP4-Digital-Asset-Metadata</a>
+              <a href="https://docs.lukso.tech/learn/migrate/migrate-erc20-to-lsp7/" rel="noopener noreferrer">docs.lukso.tech/migrate/migrate-erc20-to-lsp7</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc20-approve-vs-lsp7-authorize-operator/">
+                <strong>ERC20 approve problem -&gt; LSP7 operator authorization</strong>
+                <span>Understand ERC20 approve and transferFrom pain points, then compare them with LSP7 authorizeOperator and Universal Profile permissions.</span>
+              </a>
+              <a href="/guides/migrate-erc20-to-lsp7/">
+                <strong>Migrate ERC20 token logic to LSP7</strong>
+                <span>A practical migration guide for mapping ERC20 balances, transfers, approvals, metadata, and receiver behavior to LSP7.</span>
+              </a>
+              <a href="/erc-problems/">
+                <strong>Find your ERC problem</strong>
+                <span>A practical index of ERC20, ERC721, ERC1155, wallet, metadata, receiver, and onboarding problems mapped to LUKSO LSP patterns.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

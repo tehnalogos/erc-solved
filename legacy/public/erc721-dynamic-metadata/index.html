@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERC721 Dynamic Metadata: The tokenURI Trap and Onchain Alternatives | ERCs, Solved</title>
+    <meta name="description" content="tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC4906, fully onchain SVG, and LSP8 plus ERC725Y key/value metadata.">
+    <link rel="canonical" href="https://ercsolved.dev/erc721-dynamic-metadata/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERC721 Dynamic Metadata: The tokenURI Trap and Onchain Alternatives | ERCs, Solved">
+    <meta property="og:description" content="tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC4906, fully onchain SVG, and LSP8 plus ERC725Y key/value metadata.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/erc721-dynamic-metadata/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"ERC721 dynamic metadata","item":"https://ercsolved.dev/erc721-dynamic-metadata/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"ERC721 dynamic metadata","description":"tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC4906, fully onchain SVG, and LSP8 plus ERC725Y key/value metadata.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["erc721 dynamic metadata","dynamic nft","tokenuri"],"mainEntityOfPage":"https://ercsolved.dev/erc721-dynamic-metadata/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>ERC721 dynamic metadata</h1>
+      <p>tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC4906, fully onchain SVG, and LSP8 plus ERC725Y key/value metadata.</p>
+      <div class="tag-row"><span>erc721 dynamic metadata</span><span>dynamic nft</span><span>tokenuri</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>ERC721 tokenURI returns a string. Dynamic traits depend on server-side logic and marketplace refresh buttons. LSP8 plus ERC725Y exposes per-token metadata through standard data keys that apps and indexers read directly, with VerifiableURI when the source needs integrity proofs.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>tokenURI(tokenId) returns one string. The contract has no opinion on what changes, when, or by whom. If metadata is dynamic, the truth lives in whatever server hosts the JSON — and marketplaces, wallets, and explorers each cache it on their own schedule.</p><p>&quot;Refresh metadata&quot; buttons exist because there is no standard signal for what changed. ERC4906 added a MetadataUpdate event, but consumers still have to ask the server what the new state actually is.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>Mutable IPFS pointers behind tokenURI — convenient, but the JSON is still off-chain and trust-anchored to the host.</li><li>Server-rendered metadata APIs — works at scale, but couples the NFT to your infra and falls over when the server does.</li><li>ERC4906 MetadataUpdate events — signals &quot;something changed&quot;, does not say what.</li><li>Fully onchain SVG generators — strong integrity, expensive, awkward for rich media.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>LSP8 assets store per-token metadata through ERC725Y data keys, not through one tokenURI string. LSP4 defines metadata conventions (name, symbol, JSON schema). VerifiableURI lets a key point to an off-chain payload with a hash, so the chain enforces what the off-chain blob must be.</p><p>Apps read getDataForTokenId(tokenId, key) and get a typed value back. Dynamic updates are setData calls, gated by whatever account permissions you want.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>ERC721 tokenURI</figcaption>
+              <pre><code class="language-solidity">function tokenURI(uint256 tokenId) external view returns (string memory);</code></pre>
+            </figure>
+            <figure>
+              <figcaption>LSP8 per-token data key</figcaption>
+              <pre><code class="language-solidity">function getDataForTokenId(bytes32 tokenId, bytes32 dataKey)
+  external
+  view
+  returns (bytes memory);</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP8-Identifiable-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP4-Digital-Asset-Metadata</a>
+              <a href="https://docs.lukso.tech/standards/erc725/" rel="noopener noreferrer">docs.lukso.tech/standards/erc725</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc721-tokenuri-vs-lsp4-metadata/">
+                <strong>ERC721 tokenURI problem -&gt; LSP4 metadata</strong>
+                <span>Learn why dynamic NFT metadata is hard with tokenURI alone and how LSP8, LSP4, and ERC725Y provide a richer metadata model.</span>
+              </a>
+              <a href="/guides/dynamic-nft-metadata-lsp8/">
+                <strong>Build dynamic NFT metadata with LSP8</strong>
+                <span>Use LSP8, LSP4 metadata, and ERC725Y data keys to model dynamic NFT metadata for LUKSO apps.</span>
+              </a>
+              <a href="/erc721-vs-lsp8/">
+                <strong>ERC721 vs LSP8</strong>
+                <span>Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

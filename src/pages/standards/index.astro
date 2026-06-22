@@ -1,0 +1,96 @@
+---
+import Base from '~/layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import StandardChip from '~/components/brand/StandardChip.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+
+const all = await getCollection('standards');
+const order = ['Account', 'Permission', 'Execution', 'Token', 'Metadata', 'Social', 'Substrate'] as const;
+const groups = order
+  .map(purpose => ({
+    purpose,
+    entries: all.filter(e => e.data.purpose === purpose).sort((a, b) => a.data.id.localeCompare(b.data.id, undefined, { numeric: true })),
+  }))
+  .filter(g => g.entries.length > 0);
+
+const description =
+  'The LUKSO standard set, grouped by purpose. Each explainer ships an ABI block, what it solves, and what it deliberately does not solve.';
+---
+<Base title="Standards" description={description}>
+  <section class="hub" data-pagefind-body data-pagefind-meta="title:Standards">
+    <header class="head">
+      <span class="eyebrow">standards index</span>
+      <h1>Standards.</h1>
+      <p class="dim">
+        Every LSP and the ERC substrate it builds on. Grouped by purpose so the composition is
+        visible: an account contract (LSP0) + a permission layer (LSP6) + a metadata store
+        (ERC725Y) is not "one big spec" — it's a stack.
+      </p>
+      <p class="cta">
+        Looking for the one-glance answer?
+        <Crossref href="/standards/matrix/" chip="matrix">the ERC ↔ LSP matrix</Crossref>
+      </p>
+    </header>
+
+    {groups.map(g => (
+      <section class="group">
+        <h2 class="group-head">{g.purpose}</h2>
+        <ul class="rows">
+          {g.entries.map(e => (
+            <li>
+              <a class="row" href={`/standards/${e.slug}/`}>
+                <StandardChip kind={e.data.kind === 'LSP' ? 'lsp' : 'erc'} id={e.data.id} />
+                <span class="title">{e.data.title}</span>
+                <span class="one">{e.data.oneLine}</span>
+                <span class="caret" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </section>
+</Base>
+
+<style>
+  .hub { max-width: var(--container); margin: 0 auto; padding: var(--s-8) var(--s-5); display: grid; gap: var(--s-7); }
+  .head { display: grid; gap: var(--s-3); max-width: 64ch; }
+  .head h1 { font-size: clamp(40px, 6vw, 80px); }
+  .head .dim { color: var(--ink-bone-dim); }
+  .head .cta { color: var(--ink-fog); font-family: var(--font-mono); font-size: var(--t-mono-sm); }
+  .head .cta :global(.crossref) { margin-left: var(--s-2); }
+
+  .group { display: grid; gap: var(--s-4); }
+  .group-head {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-fog);
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .rows { display: grid; }
+  .rows li { border-bottom: 1px solid var(--ink-line); }
+  .row {
+    display: grid;
+    grid-template-columns: 7ch minmax(0, 1.2fr) minmax(0, 2fr) 1.5ch;
+    gap: var(--s-4);
+    align-items: baseline;
+    padding: var(--s-4) 0;
+    font-family: var(--font-mono);
+    transition: background 150ms ease;
+  }
+  .row:hover, .row:focus-visible { background: var(--ink-paper); outline: none; }
+  .title { color: var(--ink-bone); font-size: var(--t-mono-md); }
+  .one { color: var(--ink-fog); font-size: var(--t-mono-sm); }
+  .caret { color: var(--ink-line); }
+  .row:hover .title { color: var(--signal-pink); }
+  .row:hover .caret { color: var(--ink-bone); }
+
+  @media (max-width: 720px) {
+    .hub { padding: var(--s-6) var(--s-4); }
+    .row { grid-template-columns: 1fr; gap: var(--s-1); }
+    .caret { display: none; }
+  }
+</style>

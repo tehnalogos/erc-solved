@@ -1,0 +1,30 @@
+---
+kind: LSP
+id: "14"
+title: "Ownable 2-Step"
+oneLine: "Ownership transfer is two steps — set pending, then accept. No more send-to-wrong-address."
+description: "LSP14 standardizes the two-step ownership transfer pattern. Pending owner accepts before the change takes effect."
+purpose: Permission
+updated: 2026-06-22
+abi: |
+  function transferOwnership(address newOwner) external;     // sets pending
+  function acceptOwnership() external;                       // pending claims
+  function renounceOwnership() external;                     // 2-step renunciation
+  function pendingOwner() external view returns (address);
+solves:
+  - pain: "OZ Ownable's one-step transfer (typo = catastrophe)"
+companions: ["LSP·0", "LSP·6"]
+doesNotSolve:
+  - "LSP14 isn't a multisig. It's a safer single-owner pattern."
+  - "If your account uses LSP6 controllers, ownership rotation is a separate, more powerful tool."
+docs:
+  - label: "docs.lukso.tech / LSP14 Ownable 2-Step"
+    href: "https://docs.lukso.tech/standards/access-control/lsp14-ownable-2-step/"
+---
+
+LSP14 is the smallest possible safety upgrade to OpenZeppelin's `Ownable`. Transferring
+ownership doesn't take effect until the new owner actively accepts it — so a typo in the new
+owner address can't permanently lock the contract.
+
+For a Universal Profile, day-to-day controller management goes through LSP6; LSP14 is the
+two-step the *underlying* ownership change uses (e.g. when an LSP6 Key Manager is migrated).

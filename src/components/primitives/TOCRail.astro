@@ -1,0 +1,41 @@
+---
+interface Item { depth: number; text: string; slug: string }
+interface Props { items: Item[] }
+const { items } = Astro.props;
+const filtered = items.filter(i => i.depth >= 2 && i.depth <= 3);
+---
+{filtered.length > 0 && (
+  <nav class="toc" aria-label="On this page">
+    <span class="eyebrow">on this page</span>
+    <ol>
+      {filtered.map(i => (
+        <li class={`d-${i.depth}`}>
+          <a href={`#${i.slug}`}>{i.text}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .toc {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+    display: grid;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+  }
+  ol { display: grid; gap: var(--s-2); }
+  .toc a {
+    color: var(--ink-fog);
+    border-bottom: 1px solid transparent;
+  }
+  .toc a:hover, .toc a:focus-visible {
+    color: var(--ink-bone);
+    border-color: var(--ink-line);
+  }
+  .d-3 { padding-left: var(--s-3); }
+</style>

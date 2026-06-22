@@ -1,0 +1,63 @@
+---
+title: "New users need gas before they can do anything."
+tagline: "EIP-2771 forwarders, 4337 paymasters, LSP25 relay calls — three families, three costs."
+query: "gasless transactions smart accounts"
+description: "EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys."
+erc: "4337"
+lsps: ["LSP25", "LSP6", "LSP20"]
+aliases: ["meta transactions", "sponsored transactions", "gasless onboarding", "pay user gas", "relay call"]
+updated: 2026-06-22
+diff:
+  from:
+    chip: "ERC·4337"
+    code: "UserOp + paymaster + bundler"
+    tags: ["parallel infra", "external EntryPoint"]
+  to:
+    chip: "LSP·25"
+    code: "executeRelayCall(sig, nonce, validity, payload)"
+    tags: ["on the account itself"]
+verdict: "LSP25 puts relay execution on the Universal Profile. A controller signs, a relayer submits and pays. No bundler, no EntryPoint, no separate mempool. LSP6 permissions still apply to the relayed call."
+docs:
+  - label: "docs.lukso.tech / LSP25 executeRelayCall"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "docs.lukso.tech / Transaction Relay API"
+    href: "https://docs.lukso.tech/tools/dapps/transaction-relay-api/"
+related: ["problems/eip4337-bundler-tax", "problems/wallet-permissions"]
+---
+
+## Why this breaks
+
+A new user needs native ETH before they can do anything. EOAs sign and pay together, so any
+sponsorship has to add a layer that separates the signer from the payer.
+
+Every popular pattern adds infrastructure: a trusted forwarder you have to trust, an ERC4337
+EntryPoint and bundler you have to run or rent, a third-party relayer with its own SDK. The
+cost lands on the builder, not the spec.
+
+## What people try
+
+### EIP-2771 trusted forwarder
+Contracts extract `msg.sender` from calldata. Cheap, but every protected contract must be
+2771-aware and trust the forwarder.
+
+### ERC4337 + paymaster
+`UserOperation` pool, bundler, `EntryPoint`, paymaster. Powerful. You ship or pay for the
+bundler stack.
+
+### Gelato / Biconomy / Defender
+Turnkey relayers that wrap one of the above. Convenient. Vendor coupling.
+
+### EIP-7702
+EOA temporarily acts like a smart account for the duration of a tx. Sponsorship still needs
+a paymaster.
+
+## How LSP solves it
+
+LSP25 defines `executeRelayCall` **on the Universal Profile itself**. A controller signs a
+payload (with a nonce channel for ordering and replay protection), a relayer submits the
+transaction and pays gas. No bundler, no `EntryPoint`, no separate mempool — the account
+contract **is** the entry point.
+
+Because the relayed call goes through the account, LSP6 permissions still apply: the
+controller signing the relay payload can only authorize what its permissions allow. The
+sponsoring relayer cannot escalate the controller's authority by virtue of paying gas.

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERC721 Safe Transfer Problems: Why safeTransferFrom Isn’t Enough | ERCs, Solved</title>
+    <meta name="description" content="safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types.">
+    <link rel="canonical" href="https://ercsolved.dev/erc721-safe-transfer-problems/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERC721 Safe Transfer Problems: Why safeTransferFrom Isn’t Enough | ERCs, Solved">
+    <meta property="og:description" content="safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/erc721-safe-transfer-problems/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"ERC721 safe transfer problems","item":"https://ercsolved.dev/erc721-safe-transfer-problems/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"ERC721 safe transfer problems","description":"safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["erc721 safe transfer problems","safeTransferFrom","nfts stuck in contract"],"mainEntityOfPage":"https://ercsolved.dev/erc721-safe-transfer-problems/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>ERC721 safe transfer problems</h1>
+      <p>safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types.</p>
+      <div class="tag-row"><span>erc721 safe transfer problems</span><span>safeTransferFrom</span><span>nfts stuck in contract</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>ERC721 safeTransferFrom checks IERC721Receiver and reverts if missing, but only for ERC721. A vault holding ETH, ERC20, ERC721, and ERC1155 needs four different receiver patterns, and plain ERC20.transfer never asks the recipient anything. LSP1 Universal Receiver gives one entry point for all asset types.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>safeTransferFrom is real safety, but it is narrow. It only checks IERC721Receiver, only for that one call, and only when the caller chose the &quot;safe&quot; variant. The non-safe transferFrom still ships, and most ERC20 transfers go straight to a balance update with no recipient interaction at all.</p><p>In practice, every asset standard has its own receiver shape (IERC721Receiver, IERC1155Receiver, ERC777 tokensReceived). Multi-asset contracts must implement each one — and there is still no general &quot;I received value of some kind&quot; hook.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>Implement each receiver interface (IERC721Receiver, IERC1155Receiver, ERC777 tokensReceived) — boilerplate that grows per asset standard.</li><li>Use OpenZeppelin Holder mixins — accepts everything, defers the policy question.</li><li>Defensive transferFrom-then-call patterns — ad hoc, not interoperable.</li><li>Sweeper / rescue contracts — recover stranded assets after the fact.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>LSP1 defines one universalReceiver(bytes32 typeId, bytes data) hook. LSP7 and LSP8 transfers call it on both sender and recipient, with a typeId that tells the receiver what kind of interaction it is (token sent, token received, asset registered, etc.).</p><p>A Universal Profile uses a Universal Receiver Delegate to dispatch: register received assets in LSP5, reject spam by typeId, or run app-specific logic. One hook, every asset type, declared policy.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>ERC721 IERC721Receiver</figcaption>
+              <pre><code class="language-solidity">function onERC721Received(
+  address operator,
+  address from,
+  uint256 tokenId,
+  bytes calldata data
+) external returns (bytes4);</code></pre>
+            </figure>
+            <figure>
+              <figcaption>LSP1 universalReceiver (one hook for everything)</figcaption>
+              <pre><code class="language-solidity">function universalReceiver(bytes32 typeId, bytes calldata data)
+  external
+  payable
+  returns (bytes memory);</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp1-universal-receiver</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP7-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP8-Identifiable-Digital-Asset</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc721-vs-lsp8/">
+                <strong>ERC721 vs LSP8</strong>
+                <span>Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.</span>
+              </a>
+              <a href="/erc20-transfer-hooks/">
+                <strong>How to add ERC20 transfer hooks</strong>
+                <span>ERC20 has no receiver hook. Compare ERC777, ERC1363, transferAndCall wrappers, and the LSP7 plus LSP1 receiver model for reacting to token transfers onchain.</span>
+              </a>
+              <a href="/guides/migrate-erc721-to-lsp8/">
+                <strong>Migrate ERC721 NFT collections to LSP8</strong>
+                <span>A practical migration guide for mapping ERC721 ownership, token IDs, tokenURI metadata, and safe transfers to LSP8.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

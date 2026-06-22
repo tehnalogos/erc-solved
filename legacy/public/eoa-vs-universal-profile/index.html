@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EOA Wallets vs Universal Profiles: Smart Account UX for Ethereum Developers | ERCs, Solved</title>
+    <meta name="description" content="Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.">
+    <link rel="canonical" href="https://ercsolved.dev/eoa-vs-universal-profile/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="EOA Wallets vs Universal Profiles: Smart Account UX for Ethereum Developers | ERCs, Solved">
+    <meta property="og:description" content="Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/eoa-vs-universal-profile/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"EOA wallet limits -> Universal Profile smart accounts","item":"https://ercsolved.dev/eoa-vs-universal-profile/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"EOA wallet limits -> Universal Profile smart accounts","description":"Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["EOA","Universal Profile","smart accounts","permissions"],"mainEntityOfPage":"https://ercsolved.dev/eoa-vs-universal-profile/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Comparison</p>
+      <h1>EOA wallet limits -&gt; Universal Profile smart accounts</h1>
+      <p>Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.</p>
+      <div class="tag-row"><span>EOA</span><span>Universal Profile</span><span>smart accounts</span><span>permissions</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>EOAs are simple, portable, and foundational, but they bind identity, funds, and authority to one private key. Universal Profiles are smart accounts that separate the account from controllers and add ERC725Y metadata, LSP6 permissions, LSP1 notifications, LSP25 relay calls, and safer ownership flows.</p></section>
+      
+        <section class="content-section">
+          <h2>What EOAs get right</h2>
+          <p>Externally owned accounts are easy for every EVM app to support. A private key signs a transaction, and the account address is the user address.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>Where app builders hit limits</h2>
+          
+          <ul><li>One key often controls identity, assets, and every transaction.</li><li>Dapps cannot ask for limited authority in a standard account-level way.</li><li>Profile information usually lives in app databases or separate protocols.</li><li>Gas, recovery, and device management become product problems outside the account.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>The LSP pattern</h2>
+          <p>A Universal Profile is an account contract. It can store profile metadata through ERC725Y and LSP3, delegate control through LSP6 Key Manager, react to interactions through LSP1, and support relay execution patterns through LSP25.</p><p>That makes the account a user-owned object apps can read and interact with, rather than just an address controlled by one key.</p>
+          
+        </section>
+      
+      
+    <section class="content-section table-section">
+      <h2>Account model comparison</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Capability</th><th>EOA</th><th>Universal Profile</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Portable profile metadata</td><td>No standard account storage</td><td>LSP3 plus ERC725Y</td></tr><tr><td>Multiple controllers</td><td>Handled outside the EOA</td><td>LSP6 permissions</td></tr><tr><td>Gasless onboarding</td><td>Requires app-specific relays</td><td>LSP25 relay call pattern</td></tr><tr><td>Receiver notifications</td><td>No account-level hook</td><td>LSP1 Universal Receiver</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/accounts/lsp0-erc725account/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp0-erc725account</a>
+              <a href="https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/" rel="noopener noreferrer">docs.lukso.tech/metadata/lsp3-profile-metadata</a>
+              <a href="https://docs.lukso.tech/standards/access-control/lsp6-key-manager/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp6-key-manager</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp25-execute-relay-call</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/guides/grant-dapp-permissions-lsp6/">
+                <strong>Grant dapp permissions with LSP6</strong>
+                <span>Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.</span>
+              </a>
+              <a href="/guides/gasless-transactions-universal-profile/">
+                <strong>Gasless transactions with Universal Profiles</strong>
+                <span>Design sponsored and gasless onboarding flows with LUKSO Universal Profiles, LSP25 relay calls, nonces, and relayers.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

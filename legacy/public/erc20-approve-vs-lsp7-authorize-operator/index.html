@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERC20 approve Problem vs LSP7 authorizeOperator | ERCs, Solved</title>
+    <meta name="description" content="Understand ERC20 approve and transferFrom pain points, then compare them with LSP7 authorizeOperator and Universal Profile permissions.">
+    <link rel="canonical" href="https://ercsolved.dev/erc20-approve-vs-lsp7-authorize-operator/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERC20 approve Problem vs LSP7 authorizeOperator | ERCs, Solved">
+    <meta property="og:description" content="Understand ERC20 approve and transferFrom pain points, then compare them with LSP7 authorizeOperator and Universal Profile permissions.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/erc20-approve-vs-lsp7-authorize-operator/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"ERC20 approve problem -> LSP7 operator authorization","item":"https://ercsolved.dev/erc20-approve-vs-lsp7-authorize-operator/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"ERC20 approve problem -> LSP7 operator authorization","description":"Understand ERC20 approve and transferFrom pain points, then compare them with LSP7 authorizeOperator and Universal Profile permissions.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["ERC20 approve","allowance","LSP7 operators","permissions"],"mainEntityOfPage":"https://ercsolved.dev/erc20-approve-vs-lsp7-authorize-operator/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Diagnosis</p>
+      <h1>ERC20 approve problem -&gt; LSP7 operator authorization</h1>
+      <p>Understand ERC20 approve and transferFrom pain points, then compare them with LSP7 authorizeOperator and Universal Profile permissions.</p>
+      <div class="tag-row"><span>ERC20 approve</span><span>allowance</span><span>LSP7 operators</span><span>permissions</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>ERC20 approvals separate permission from action, which makes users review allowances without seeing the final transfer. LSP7 authorizeOperator is still an amount-based token authorization, but it fits into a broader LUKSO model with explicit operator events, receiver notifications, transfer data, and optional LSP6 account permissions.</p></section>
+      
+        <section class="content-section">
+          <h2>The ERC pattern</h2>
+          <p>ERC20 approve lets an owner set an allowance for a spender. The spender later calls transferFrom. That pattern made DeFi possible, but it also means user intent is split across multiple transactions and often multiple interfaces.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>Where it breaks down</h2>
+          
+          <ul><li>Users approve a spender before seeing every future transfer.</li><li>Unlimited approvals become a standing risk if a spender is compromised.</li><li>Dapps often ask for approval amounts that are larger than the current action.</li><li>Wallets struggle to explain what future transferFrom calls will do.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>The LSP pattern</h2>
+          <p>LSP7 uses authorizeOperator and revokeOperator for token-level authorization. That is not the same as LSP6 account permissions, and it should not be oversold as replacing every approval security concern.</p><p>The stronger pattern appears when LSP7 is used with Universal Profiles: the account can restrict controllers with LSP6 permissions and allowed calls, while LSP7 transfers can carry data and notify senders and recipients through LSP1.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>ERC20 approval</figcaption>
+              <pre><code class="language-solidity">function approve(address spender, uint256 amount) external returns (bool);
+function transferFrom(address from, address to, uint256 amount) external returns (bool);</code></pre>
+            </figure>
+            <figure>
+              <figcaption>LSP7 operator authorization</figcaption>
+              <pre><code class="language-solidity">function authorizeOperator(
+  address operator,
+  uint256 amount,
+  bytes calldata operatorNotificationData
+) external;
+
+function revokeOperator(address operator, bytes calldata operatorNotificationData) external;</code></pre>
+            </figure>
+    </section>
+      
+    <section class="content-section table-section">
+      <h2>Safer authorization checklist</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Question</th><th>ERC20 approve</th><th>LSP7 plus Universal Profile</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Can the token transfer carry context?</td><td>Not in the ERC20 transfer functions.</td><td>Yes, LSP7 transfer includes bytes data.</td></tr><tr><td>Can the account limit what an app controller may call?</td><td>Not at the token standard level.</td><td>Yes, with LSP6 Key Manager permissions and allowed calls.</td></tr><tr><td>Does the recipient get a standard notification?</td><td>No.</td><td>Yes, through LSP1 when supported.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP7-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/access-control/lsp6-key-manager/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp6-key-manager</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp1-universal-receiver</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc20-vs-lsp7/">
+                <strong>ERC20 vs LSP7</strong>
+                <span>Compare ERC20 with LUKSO LSP7 for token transfers, approvals, metadata, receiver hooks, transfer context, and migration decisions.</span>
+              </a>
+              <a href="/guides/grant-dapp-permissions-lsp6/">
+                <strong>Grant dapp permissions with LSP6</strong>
+                <span>Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

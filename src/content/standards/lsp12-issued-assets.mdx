@@ -1,0 +1,23 @@
+---
+kind: LSP
+id: "12"
+title: "Issued Assets"
+oneLine: "The dual of LSP5 — the data keys for assets a profile created or curated."
+description: "LSP12 mirrors LSP5 but for the issuance side. A profile's issued assets are listed in standard ERC725Y keys."
+purpose: Metadata
+updated: 2026-06-22
+abi: |
+  //   LSP12IssuedAssets[]   → bytes (length)
+  //   LSP12IssuedAssets[]<index> → address
+  //   LSP12IssuedAssetsMap:<address> → bytes12 (interfaceId + index)
+companions: ["LSP·5", "LSP·3", "LSP·0"]
+doesNotSolve:
+  - "LSP12 doesn't authenticate authorship. The list says 'this profile claimed these'; verify off-chain if it matters."
+docs:
+  - label: "docs.lukso.tech / LSP12 Issued Assets"
+    href: "https://docs.lukso.tech/standards/metadata/lsp12-issued-assets/"
+---
+
+LSP12 is the issuer-side complement to LSP5. Together they let any reader ask "what does
+this profile hold?" and "what did this profile create?" without indexing the chain. Identity
+becomes a graph the account itself maintains, not state every app rebuilds from events.

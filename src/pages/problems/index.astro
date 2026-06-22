@@ -1,0 +1,196 @@
+---
+import Base from '~/layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import StandardChip from '~/components/brand/StandardChip.astro';
+
+const problems = await getCollection('problems');
+problems.sort((a, b) => a.data.query.localeCompare(b.data.query));
+
+const ercOrder = ['20', '721', '1155', 'EOA', '4337', '725', '165', 'other'];
+const ercs = Array.from(new Set(problems.map(p => p.data.erc))).sort(
+  (a, b) => ercOrder.indexOf(a) - ercOrder.indexOf(b),
+);
+
+const description =
+  'Every ERC pain point developers hit, mapped to the LUKSO LSP pattern that handles it. Filter by ERC, scan, click.';
+---
+<Base title="Problems" description={description}>
+  <section class="hub" data-pagefind-body data-pagefind-meta="title:Problems">
+    <header class="hub-head">
+      <span class="eyebrow">problem index</span>
+      <h1>Problems.</h1>
+      <p class="dim">
+        Every recurring ERC pain point, in the words EVM developers actually search for. Each
+        row links to a verdict-first problem page with the LSP pattern, the code, and the next
+        route. Filter by the ERC you use today.
+      </p>
+    </header>
+
+    <div class="filters" role="group" aria-label="Filter by ERC">
+      <span class="filter-label">filter</span>
+      <a href="#" class="chip chip-all active" data-filter="all">All</a>
+      {ercs.map(erc => (
+        <a href={`#erc-${erc}`} class={`chip chip-erc`} data-filter={erc}>
+          <StandardChip kind="erc" id={erc} />
+        </a>
+      ))}
+    </div>
+
+    <ol class="rows" id="problem-list">
+      {problems.map(p => (
+        <li class="row-wrap" data-erc={p.data.erc}>
+          <a class="row" href={`/problems/${p.slug}/`}>
+            <span class="erc-chip">
+              <StandardChip kind="erc" id={p.data.erc} />
+            </span>
+            <span class="query">{p.data.query}</span>
+            <span class="sep" aria-hidden="true">→</span>
+            <span class="answer">
+              {p.data.lsps.map((lsp, i) => (
+                <>
+                  {i > 0 && <span class="plus" aria-hidden="true"> + </span>}
+                  <span class="lsp">{lsp}</span>
+                </>
+              ))}
+            </span>
+            <span class="caret" aria-hidden="true">→</span>
+          </a>
+          <p class="tagline">{p.data.tagline}</p>
+        </li>
+      ))}
+    </ol>
+
+    <footer class="hub-foot">
+      <span>Don't see your problem?</span>
+      <a href="https://github.com/lukso-network/ercs-solved/issues/new" rel="noopener noreferrer" target="_blank">
+        [ propose one on github → ]
+      </a>
+    </footer>
+  </section>
+</Base>
+
+<script>
+  const filters = document.querySelectorAll<HTMLAnchorElement>('.filters .chip');
+  const rows = document.querySelectorAll<HTMLLIElement>('.row-wrap');
+  filters.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = btn.dataset.filter || 'all';
+      filters.forEach(b => b.classList.toggle('active', b === btn));
+      rows.forEach(row => {
+        const erc = row.dataset.erc;
+        row.style.display = target === 'all' || erc === target ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .hub {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-8) var(--s-5);
+    display: grid;
+    gap: var(--s-7);
+  }
+  .hub-head {
+    display: grid;
+    gap: var(--s-3);
+    max-width: 64ch;
+  }
+  .hub-head h1 {
+    font-size: clamp(40px, 6vw, 80px);
+  }
+  .hub-head .dim { color: var(--ink-bone-dim); }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    align-items: center;
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .filter-label {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    text-transform: lowercase;
+    margin-right: var(--s-2);
+  }
+  .filters .chip {
+    padding: 4px var(--s-3);
+    border: 1px solid var(--ink-line);
+    color: var(--ink-fog);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    cursor: pointer;
+    transition: border-color 150ms ease, color 150ms ease;
+  }
+  .filters .chip:hover { color: var(--ink-bone); border-color: var(--ink-bone-dim); }
+  .filters .chip.active {
+    color: var(--ink-black);
+    background: var(--signal-pink);
+    border-color: var(--signal-pink);
+  }
+  .filters .chip.active :global(.chip) { color: var(--ink-black); }
+
+  .rows {
+    display: grid;
+    border-top: 1px solid var(--ink-line);
+  }
+  .row-wrap { border-bottom: 1px solid var(--ink-line); padding: var(--s-4) 0; }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1.4fr) 1.5ch minmax(0, 1fr) 1.5ch;
+    align-items: baseline;
+    gap: var(--s-4);
+    font-family: var(--font-mono);
+  }
+  .erc-chip { display: inline-flex; }
+  .query {
+    color: var(--ink-bone);
+    font-size: var(--t-mono-md);
+  }
+  .sep, .caret { color: var(--ink-line); }
+  .answer { color: var(--signal-pink); font-size: var(--t-mono-md); }
+  .plus { color: var(--ink-line); }
+  .row:hover .query { color: var(--erc-sand); }
+  .row:hover .caret { color: var(--ink-bone); }
+  .row:hover .sep { color: var(--ink-bone); }
+
+  .tagline {
+    margin-top: var(--s-1);
+    padding-left: calc(2ch + var(--s-4) + 5ch + var(--s-4));
+    color: var(--ink-fog);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+  }
+
+  .hub-foot {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    align-items: baseline;
+    padding-top: var(--s-4);
+    color: var(--ink-fog);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+  }
+  .hub-foot a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .hub-foot a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  @media (max-width: 720px) {
+    .hub { padding: var(--s-6) var(--s-4); }
+    .row {
+      grid-template-columns: 1fr;
+      gap: var(--s-1);
+    }
+    .sep, .caret { display: none; }
+    .tagline { padding-left: 0; }
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+kind: LSP
+id: "1"
+title: "Universal Receiver"
+oneLine: "One receiver hook for every asset type, every transfer, every contract-to-contract notification."
+description: "LSP1 standardizes a single universalReceiver(typeId, data) hook on any contract that wants to react when something happens to it — value sent, token received, asset registered, follow event, anything routed by typeId."
+purpose: Execution
+updated: 2026-06-22
+abi: |
+  // The single hook every LSP1-aware contract implements.
+  function universalReceiver(bytes32 typeId, bytes memory receivedData)
+    external payable returns (bytes memory);
+
+  // typeId is a fixed selector (e.g. LSP7Tokens_RecipientNotification)
+  // data carries the call-site payload (transfer details, asset address, etc.)
+solves:
+  - pain: "ERC20 transfer hooks (no recipient call)"
+    href: "/problems/erc20-transfer-hooks/"
+  - pain: "ERC721 safeTransferFrom is only one asset's receiver"
+    href: "/problems/erc721-safe-transfer/"
+companions: ["LSP·0", "LSP·7", "LSP·8", "LSP·5", "LSP·12"]
+doesNotSolve:
+  - "LSP1 does not specify *what* to do when receiving. That's the Universal Receiver Delegate's job."
+  - "Reentrancy guarantees are the implementer's responsibility, same as any onERC*Received hook."
+  - "Senders that don't call universalReceiver get nothing — adoption matters."
+docs:
+  - label: "docs.lukso.tech / LSP1 Universal Receiver"
+    href: "https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/"
+---
+
+LSP1 is the structural fix to the "one receiver interface per asset standard" problem. Every
+LSP that moves value or transfers ownership calls `universalReceiver` on both sides with a
+fixed `typeId` and a payload. A contract that wants to react implements one function and
+dispatches on `typeId` — there is no `onLSP7Received` / `onLSP8Received` / `onLSPxxReceived`.
+
+Universal Profiles pair LSP1 with a **Universal Receiver Delegate**: a small companion
+contract the profile delegates to, where you write the actual policy (register asset in LSP5,
+reject by typeId, route to a sub-contract, etc.). The delegate is replaceable per profile.

@@ -1,0 +1,52 @@
+---
+kind: LSP
+id: "8"
+title: "Identifiable Digital Asset"
+oneLine: "NFTs and identifiable items. bytes32 IDs, per-token ERC725Y data, LSP1 hooks."
+description: "LSP8 is the LUKSO NFT standard. It keeps ERC721's ownership model, then adds bytes32 token IDs, per-token ERC725Y storage, LSP4 metadata conventions, and LSP1 receiver notifications."
+purpose: Token
+updated: 2026-06-22
+abi: |
+  function tokenOwnerOf(bytes32 tokenId) external view returns (address);
+
+  function transfer(
+    address from,
+    address to,
+    bytes32 tokenId,
+    bool force,
+    bytes calldata data
+  ) external;
+
+  // Per-token metadata via ERC725Y-on-tokenId
+  function getDataForTokenId(bytes32 tokenId, bytes32 dataKey)
+    external view returns (bytes memory);
+
+  function setDataForTokenId(bytes32 tokenId, bytes32 dataKey, bytes calldata dataValue)
+    external;
+solves:
+  - pain: "ERC721 dynamic metadata"
+    href: "/problems/erc721-dynamic-metadata/"
+  - pain: "ERC721 tokenId limited to uint256"
+    href: "/problems/erc721-tokenid-limits/"
+  - pain: "ERC721 safe transfer problems"
+    href: "/problems/erc721-safe-transfer/"
+companions: ["LSP·1", "LSP·4", "LSP·6", "LSP·7"]
+doesNotSolve:
+  - "LSP8 doesn't make off-chain media verifiable on its own — use VerifiableURI in LSP4."
+  - "Existing ERC721 marketplaces don't speak LSP8. Migration is a product decision."
+  - "Bytes32 IDs are powerful but require schema discipline — pick the encoding deliberately."
+docs:
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+  - label: "docs.lukso.tech / migrate ERC721 to LSP8"
+    href: "https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/"
+---
+
+LSP8 makes one structural change to ERC721: token IDs are `bytes32`, not `uint256`. The
+integer case still works — cast and proceed. The new cases (content hashes, encoded serials,
+structured references) become first-class instead of side mappings.
+
+The other meaningful add is `getDataForTokenId(tokenId, key)`. Per-token metadata is a typed
+key-value store, not a URL. Dynamic updates are `setData` calls; trust comes from whoever has
+permission to make them (LSP6); off-chain media still works (with VerifiableURI when you want
+integrity).

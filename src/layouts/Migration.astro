@@ -1,0 +1,81 @@
+---
+import Article from './Article.astro';
+import Verdict from '~/components/primitives/Verdict.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+
+interface Props { entry: any; }
+const { entry } = Astro.props;
+const { data, slug } = entry;
+---
+<Article
+  title={data.title}
+  description={data.description}
+  pageTitle={`Migrate ${data.from} → ${data.to} · ERCs, Solved`}
+  eyebrow={`migration · ${data.from} → ${data.to}`}
+  author={data.author}
+  updated={data.updated}
+  editPath={`src/content/migrate/${slug}.mdx`}
+>
+  <Verdict tone="use-lsp" label={`estimate · ${data.estimate}`}>
+    <p>{data.verdict}</p>
+  </Verdict>
+
+  <section class="prose">
+    <slot />
+  </section>
+
+  {data.gotchas?.length > 0 && (
+    <section class="gotchas">
+      <h2>Gotchas.</h2>
+      <ul>{data.gotchas.map((g: string) => <li>{g}</li>)}</ul>
+    </section>
+  )}
+
+  {data.verify?.length > 0 && (
+    <section class="verify">
+      <h2>Verify before ship.</h2>
+      <ul class="checklist">
+        {data.verify.map((v: string) => <li><span class="box" aria-hidden="true">[ ]</span> {v}</li>)}
+      </ul>
+    </section>
+  )}
+
+  {data.docs?.length > 0 && (
+    <section class="docs">
+      <h2>Continue at docs.lukso.tech.</h2>
+      <ul>{data.docs.map((d: any) => <li><Crossref href={d.href}>{d.label}</Crossref></li>)}</ul>
+    </section>
+  )}
+</Article>
+
+<style>
+  .prose { max-width: var(--reading); display: grid; gap: var(--s-5); }
+  .prose :global(h2) { font-size: var(--t-serif-1); }
+  .prose :global(h3) {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-lg);
+    color: var(--signal-pink);
+    text-transform: lowercase;
+    letter-spacing: 0;
+    margin-top: var(--s-3);
+  }
+  .prose :global(p) { color: var(--ink-bone-dim); }
+  .prose :global(code) { background: var(--ink-paper); border: 1px solid var(--ink-line); padding: 0 4px; color: var(--signal-pink); font-size: 0.95em; }
+  .prose :global(ul) { display: grid; gap: var(--s-2); padding-left: var(--s-4); list-style: '— '; color: var(--ink-bone-dim); }
+  .prose :global(strong) { color: var(--ink-bone); }
+
+  .gotchas, .verify, .docs {
+    display: grid;
+    gap: var(--s-3);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .gotchas h2, .verify h2, .docs h2 { font-size: var(--t-serif-1); }
+  .gotchas ul, .docs ul { display: grid; gap: var(--s-2); }
+  .gotchas li { color: var(--erc-sand); font-family: var(--font-mono); font-size: var(--t-mono-md); padding-left: var(--s-4); position: relative; }
+  .gotchas li::before { content: '!'; position: absolute; left: 0; color: var(--erc-sand); }
+
+  .checklist { display: grid; gap: var(--s-2); font-family: var(--font-mono); font-size: var(--t-mono-md); color: var(--ink-bone-dim); }
+  .checklist .box { color: var(--signal-pink); margin-right: var(--s-2); }
+</style>

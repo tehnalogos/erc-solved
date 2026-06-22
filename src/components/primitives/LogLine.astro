@@ -1,0 +1,49 @@
+---
+interface Props {
+  n: string | number;
+  label?: string;
+}
+const { n, label } = Astro.props;
+const num = typeof n === 'number' ? String(n).padStart(2, '0') : n;
+---
+<div class="logline">
+  <span class="num" aria-hidden="true">[ {num} ]</span>
+  {label && <span class="label">{label}</span>}
+  <div class="body"><slot /></div>
+</div>
+
+<style>
+  .logline {
+    display: grid;
+    grid-template-columns: 6ch 1fr;
+    column-gap: var(--s-4);
+    padding: var(--s-4) 0;
+    border-top: 1px solid var(--ink-line);
+    align-items: baseline;
+  }
+  .logline:last-child { border-bottom: 1px solid var(--ink-line); }
+  .num {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--signal-pink);
+    letter-spacing: 0;
+  }
+  .label {
+    grid-column: 2;
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 30;
+    font-size: 22px;
+    color: var(--ink-bone);
+    line-height: 1.2;
+  }
+  .body {
+    grid-column: 2;
+    margin-top: var(--s-2);
+    color: var(--ink-bone-dim);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    line-height: 1.65;
+  }
+  .body :global(p + p) { margin-top: var(--s-3); }
+  .body :global(ul) { display: grid; gap: var(--s-1); padding-left: var(--s-4); list-style: '— '; }
+</style>

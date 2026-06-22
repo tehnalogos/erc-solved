@@ -1,0 +1,33 @@
+---
+title: "Extending deployed contracts."
+vertical: "Extending deployed contracts"
+description: "Add new function selectors to a contract without an upgrade key. LSP17 ships a fallback router; register an extension contract per selector."
+stack: ["LSP·17", "LSP·14"]
+updated: 2026-06-22
+reading:
+  - { chip: "problem", label: "Deployed contracts can't grow without a key holder", href: "/problems/contract-extension/" }
+  - { chip: "LSP·17", label: "Contract Extension", href: "/standards/lsp17-contract-extension/" }
+  - { chip: "LSP·14", label: "Ownable 2-Step", href: "/standards/lsp14-ownable-2-step/" }
+  - { chip: "compare", label: "ERC2535 Diamonds vs LSP17", href: "/standards/compare/erc2535-lsp17/" }
+docs:
+  - label: "docs.lukso.tech / LSP17 Contract Extension"
+    href: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
+---
+
+A Universal Profile is the canonical use case, but LSP17 is a general primitive. The base
+bytecode stays immutable; new selectors hit the fallback; the fallback looks up an extension
+contract registered in ERC725Y data; the call is forwarded.
+
+## When this vertical fits
+
+You're shipping a contract that will need to grow — new asset receivers, new signature
+verifiers, new app-specific entry points — without surrendering a permanent upgrade key over
+the base bytecode. Or you're extending a Universal Profile with custom behavior that should
+be registered per profile, not coded into the account.
+
+## The minimum stack
+
+- **LSP17** on the base contract (the fallback router)
+- **Extension contracts** — one per selector you want to add
+- **LSP14** for safer ownership rotation of whoever can register extensions
+- **LSP6** when the registrant is a controller of a Universal Profile (the permission to write the registration key)

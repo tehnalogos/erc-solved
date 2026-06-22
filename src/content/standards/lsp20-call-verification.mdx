@@ -1,0 +1,40 @@
+---
+kind: LSP
+id: "20"
+title: "Call Verification"
+oneLine: "Inline verification — the account validates the call before it executes, no separate guard contract."
+description: "LSP20 lets a Universal Profile delegate inline call verification. The verifier returns a magic value (success) or reverts. Removes the need for a Key Manager wrapper in many flows."
+purpose: Execution
+updated: 2026-06-22
+abi: |
+  // The account contract calls the verifier inline:
+  function lsp20VerifyCall(
+    address requestor,
+    address target,
+    uint256 value,
+    bytes calldata callData
+  ) external returns (bytes4 magicValue);
+
+  function lsp20VerifyCallResult(
+    bytes32 callHash,
+    bytes calldata callResult
+  ) external returns (bytes4 magicValue);
+solves:
+  - pain: "Key Manager indirection — controllers calling LSP6 calling LSP0"
+companions: ["LSP·0", "LSP·6", "LSP·25"]
+doesNotSolve:
+  - "LSP20 doesn't replace LSP6's permission model. It changes how that model is *invoked*."
+  - "If the verifier is itself a contract, you still need to think about its trust assumptions."
+docs:
+  - label: "docs.lukso.tech / LSP20 Call Verification"
+    href: "https://docs.lukso.tech/standards/accounts/lsp20-call-verification/"
+---
+
+LSP20 is the change that lets controllers call the Universal Profile *directly* — the
+profile asks the verifier ("is this controller allowed to do this?") and acts on the answer.
+Without LSP20, every controller call has to route through the Key Manager first; with LSP20,
+the Key Manager is the verifier and the profile is the entry point.
+
+The behavioral consequence is small but UX-meaningful: `msg.sender` inside a called contract
+is the profile, not the Key Manager wrapper. Token contracts, marketplaces, and on-chain
+integrations see the *account*.

@@ -1,0 +1,37 @@
+---
+title: "Profile-native apps."
+vertical: "Profile-native apps"
+description: "Apps where identity is the account, the inventory is on-chain, and the social graph is portable. Built on the LSP3 + LSP5 + LSP12 + LSP26 surface."
+stack: ["LSP·0", "LSP·3", "LSP·5", "LSP·12", "LSP·26"]
+updated: 2026-06-22
+reading:
+  - { chip: "problem", label: "An EOA is one key for everything", href: "/problems/eoa-key-risk/" }
+  - { chip: "LSP·0", label: "ERC725 Account", href: "/standards/lsp0-erc725-account/" }
+  - { chip: "LSP·3", label: "Profile Metadata", href: "/standards/lsp3-profile-metadata/" }
+  - { chip: "LSP·5", label: "Received Assets", href: "/standards/lsp5-received-assets/" }
+  - { chip: "LSP·12", label: "Issued Assets", href: "/standards/lsp12-issued-assets/" }
+  - { chip: "LSP·26", label: "Follower System", href: "/standards/lsp26-follower-system/" }
+docs:
+  - label: "docs.lukso.tech / LSP3 Profile Metadata"
+    href: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
+  - label: "docs.lukso.tech / read profile data"
+    href: "https://docs.lukso.tech/learn/universal-profile/metadata/read-profile-data/"
+---
+
+A profile-native app reads the account, not its own database. Name, avatar, owned assets,
+created assets, followers — all live on the profile under LSP3, LSP5, LSP12, and LSP26 keys.
+Your app composes these primitives instead of mirroring them.
+
+## When this vertical fits
+
+You're building anything social-shaped on LUKSO: a feed reader, a creator marketplace, a
+collector index, a follow-based discovery surface. The product *is* a way to consume what
+the profile graph already publishes.
+
+## The minimum stack
+
+- **LSP0** as the account
+- **LSP3** for profile-level metadata (name, image, links)
+- **LSP5** + **LSP12** for received + issued asset inventories
+- **LSP26** for the follower graph
+- **LSP1** on the receiver side so the profile reacts to new assets (LSP5 entries get written automatically)

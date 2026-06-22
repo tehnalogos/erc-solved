@@ -1,0 +1,64 @@
+---
+title: "Recovery shouldn't be one phrase to lose."
+tagline: "Express recovery as a permission graph — guardians, thresholds, time locks — not a seed."
+query: "social recovery smart wallets"
+description: "Guardian models, multisig recovery, and ERC4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase."
+erc: "EOA"
+lsps: ["LSP6"]
+aliases: ["guardian wallet", "account recovery", "lost seed phrase", "wallet recovery"]
+updated: 2026-06-22
+diff:
+  from:
+    chip: "EOA"
+    code: "seed phrase"
+    tags: ["single point of failure"]
+  to:
+    chip: "LSP·6"
+    code: "controllers + recovery policy"
+    tags: ["guardian set", "threshold", "time lock"]
+verdict: "A Universal Profile is one account with many controllers. LSP6 lets you register a recovery controller (or a recovery contract enforcing a threshold or delay) with exactly the permissions it needs — typically the ability to add and remove other controllers."
+docs:
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "docs.lukso.tech / LSP14 Ownable 2-Step"
+    href: "https://docs.lukso.tech/standards/access-control/lsp14-ownable-2-step/"
+related: ["problems/wallet-permissions", "problems/eoa-key-risk"]
+---
+
+## Why this breaks
+
+An EOA has one private key. Lose it, lose everything. There is no social fallback, no
+time-locked recovery, no rotating authority — those are product problems wallet vendors have
+to solve outside the account.
+
+Smart-account recovery is possible, but every model encodes its own rules and most are
+non-interoperable. Migrating recovery from one wallet to another usually means migrating the
+whole account.
+
+## What people try
+
+### Argent guardians
+Guardian set signs a recovery request. Time-locked. Custom contract logic. The reference
+implementation, hard to port.
+
+### Safe owner rotation
+Multisig owners vote to add or remove owners. The multisig is the recovery primitive.
+
+### ERC4337 recovery modules
+Validator modules attached to a 4337 account expose recovery flows. Module-by-module, not a
+shared vocabulary.
+
+### Custodial recovery
+Privy, Magic, Web3Auth. Reset-password UX. Trades some self-custody for predictability.
+
+## How LSP solves it
+
+A Universal Profile is one account with many controllers. LSP6 lets you register a recovery
+controller — or a recovery contract that enforces a guardian threshold, a delay, or a voting
+policy — with exactly the permissions it needs. Typically: the ability to add and remove
+other controllers.
+
+Recovery becomes a **design choice expressed as permissions**, not a hardcoded wallet feature.
+Day-to-day controllers stay narrow. The recovery controller stays cold. If a daily key is
+lost, the recovery controller adds a new one and removes the old one. The account address
+never changes.

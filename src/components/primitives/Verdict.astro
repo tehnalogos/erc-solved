@@ -1,0 +1,49 @@
+---
+interface Props {
+  tone?: 'use-erc' | 'use-lsp' | 'either' | 'neutral';
+  label?: string;
+}
+const { tone = 'neutral', label } = Astro.props;
+const toneLabel = label ?? {
+  'use-erc': 'verdict — stay on ERC',
+  'use-lsp': 'verdict — reach for LSP',
+  'either':  'verdict — either is fine',
+  'neutral': 'verdict',
+}[tone];
+---
+<aside class:list={['verdict', `tone-${tone}`]} role="note">
+  <span class="label">{toneLabel}</span>
+  <div class="body"><slot /></div>
+</aside>
+
+<style>
+  .verdict {
+    border-left: 2px solid var(--ink-line);
+    padding: var(--s-3) var(--s-4);
+    background: var(--ink-paper);
+    display: grid;
+    gap: var(--s-2);
+  }
+  .tone-use-erc { border-left-color: var(--erc-sand); }
+  .tone-use-lsp { border-left-color: var(--signal-pink); }
+  .tone-either  { border-left-color: var(--ok-quiet); }
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-fog);
+  }
+  .tone-use-erc .label { color: var(--erc-sand); }
+  .tone-use-lsp .label { color: var(--signal-pink); }
+
+  .body {
+    color: var(--ink-bone);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    line-height: 1.65;
+  }
+  .body :global(p) { margin: 0; }
+  .body :global(p + p) { margin-top: var(--s-2); }
+  .body :global(strong) { color: var(--ink-bone); font-weight: 500; }
+</style>

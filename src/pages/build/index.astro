@@ -1,0 +1,139 @@
+---
+import Base from '~/layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import Crossref from '~/components/primitives/Crossref.astro';
+
+const verticals = await getCollection('build');
+const migrations = await getCollection('migrate');
+
+const order = ['token-economics', 'dynamic-nfts', 'smart-wallet-ux', 'gasless-onboarding', 'profile-native-apps', 'extending-deployed-contracts'];
+verticals.sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug));
+
+const description =
+  'Pick what you\'re building. Get a curated reading list — problems, standards, migrations — and the minimum LSP stack to reach for.';
+---
+<Base title="Build" description={description}>
+  <section class="hub" data-pagefind-body data-pagefind-meta="title:Build">
+    <header class="head">
+      <span class="eyebrow">what are you building?</span>
+      <h1>Build.</h1>
+      <p class="dim">
+        Six verticals. Each one names the LSP stack and gives you a reading list. Use this
+        when "find me a standard" is too narrow and "show me the whole site" is too wide.
+      </p>
+    </header>
+
+    <ul class="verticals">
+      {verticals.map(v => (
+        <li>
+          <a class="vert" href={`/build/${v.slug}/`}>
+            <span class="label">{v.data.title}</span>
+            <span class="stack">{v.data.stack.join(' + ')}</span>
+            <span class="desc">{v.data.description}</span>
+            <span class="caret" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {migrations.length > 0 && (
+      <section class="migrations">
+        <h2 class="group-head">migration guides</h2>
+        <p class="dim">Step-by-step paths when the right call is to move existing code.</p>
+        <ul class="migs">
+          {migrations.map(m => (
+            <li>
+              <a class="row" href={`/build/migrate/${m.slug}/`}>
+                <span class="from">{m.data.from}</span>
+                <span class="arrow" aria-hidden="true">→</span>
+                <span class="to">{m.data.to}</span>
+                <span class="t">{m.data.title}</span>
+                <span class="caret" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </section>
+</Base>
+
+<style>
+  .hub { max-width: var(--container); margin: 0 auto; padding: var(--s-8) var(--s-5); display: grid; gap: var(--s-7); }
+  .head { display: grid; gap: var(--s-3); max-width: 64ch; }
+  .head h1 { font-size: clamp(40px, 6vw, 80px); }
+  .head .dim { color: var(--ink-bone-dim); }
+
+  .verticals {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--ink-line);
+    border-left: 1px solid var(--ink-line);
+  }
+  .vert {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    column-gap: var(--s-3);
+    row-gap: var(--s-2);
+    padding: var(--s-5);
+    border-right: 1px solid var(--ink-line);
+    border-bottom: 1px solid var(--ink-line);
+    transition: background 150ms ease;
+  }
+  .vert:hover, .vert:focus-visible { background: var(--ink-paper); outline: none; }
+  .label {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 40;
+    font-size: 26px;
+    color: var(--ink-bone);
+    line-height: 1.15;
+  }
+  .caret {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: center;
+    color: var(--ink-fog);
+    font-size: 20px;
+  }
+  .vert:hover .caret { color: var(--signal-pink); }
+  .stack { grid-column: 1; font-family: var(--font-mono); font-size: var(--t-mono-sm); color: var(--signal-pink); }
+  .desc { grid-column: 1; font-family: var(--font-mono); font-size: var(--t-mono-sm); color: var(--ink-fog); line-height: 1.55; }
+
+  .migrations { display: grid; gap: var(--s-4); }
+  .group-head {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-fog);
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .migrations .dim { color: var(--ink-fog); font-size: var(--t-mono-sm); }
+  .migs { display: grid; border-top: 1px solid var(--ink-line); }
+  .migs li { border-bottom: 1px solid var(--ink-line); }
+  .row {
+    display: grid;
+    grid-template-columns: 8ch 1.5ch 8ch minmax(0, 1fr) 1.5ch;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-4) 0;
+    font-family: var(--font-mono);
+    transition: background 150ms ease;
+  }
+  .row:hover { background: var(--ink-paper); outline: none; }
+  .from { color: var(--erc-sand); }
+  .arrow { color: var(--ink-line); }
+  .to { color: var(--signal-pink); }
+  .t { color: var(--ink-bone); font-size: var(--t-mono-md); }
+  .row .caret { color: var(--ink-line); }
+  .row:hover .caret { color: var(--ink-bone); }
+
+  @media (max-width: 720px) {
+    .hub { padding: var(--s-6) var(--s-4); }
+    .verticals { grid-template-columns: 1fr; }
+    .row { grid-template-columns: 1fr; gap: var(--s-1); }
+    .row .arrow, .row .caret { display: none; }
+  }
+</style>

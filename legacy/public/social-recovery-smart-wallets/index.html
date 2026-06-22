@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Social Recovery for Smart Wallets: Patterns and Tradeoffs | ERCs, Solved</title>
+    <meta name="description" content="Guardian models, multisig recovery, and ERC4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase.">
+    <link rel="canonical" href="https://ercsolved.dev/social-recovery-smart-wallets/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="Social Recovery for Smart Wallets: Patterns and Tradeoffs | ERCs, Solved">
+    <meta property="og:description" content="Guardian models, multisig recovery, and ERC4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/social-recovery-smart-wallets/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Social recovery for smart wallets","item":"https://ercsolved.dev/social-recovery-smart-wallets/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Social recovery for smart wallets","description":"Guardian models, multisig recovery, and ERC4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["social recovery smart wallets","account recovery","guardian wallet"],"mainEntityOfPage":"https://ercsolved.dev/social-recovery-smart-wallets/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>Social recovery for smart wallets</h1>
+      <p>Guardian models, multisig recovery, and ERC4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase.</p>
+      <div class="tag-row"><span>social recovery smart wallets</span><span>account recovery</span><span>guardian wallet</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>Seed phrases are a single point of failure. Smart accounts can express recovery as a permission graph — guardians, thresholds, time locks — instead of one phrase to lose. Argent, Safe, and ERC4337 modules each ship a flavor. LSP6 makes the controller graph the native account model.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>An EOA has one private key. Lose it, lose everything. There is no social fallback, no time-locked recovery, no rotating authority — those are product problems wallet vendors have to solve outside the account.</p><p>Smart-account recovery is possible, but every model encodes its own rules and most are non-interoperable. Migrating recovery from one wallet to another usually means migrating the whole account.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>Argent guardians — guardian set signs a recovery request, time-locked, custom contract logic.</li><li>Safe owner rotation — multisig owners vote to add/remove owners; the multisig is the recovery primitive.</li><li>ERC4337 recovery modules — validator modules attached to a 4337 account expose recovery flows.</li><li>Custodial recovery (Privy, Magic, Web3Auth) — trade some self-custody for a familiar reset-password experience.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>A Universal Profile is one account with many controllers. LSP6 lets you register a recovery controller (or a recovery contract enforcing a guardian threshold, a delay, or a voting policy) with exactly the permissions it needs — typically the ability to add and remove other controllers.</p><p>Recovery becomes a design choice expressed as permissions, not a hardcoded wallet feature. Day-to-day controllers stay narrow; the recovery controller stays cold.</p>
+          
+        </section>
+      
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/access-control/lsp6-key-manager/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp6-key-manager</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp0-erc725account/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp0-erc725account</a>
+              <a href="https://docs.lukso.tech/standards/access-control/lsp14-ownable-2-step/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp14-ownable-2-step</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/smart-contract-wallet-permissions/">
+                <strong>Smart contract wallet permissions</strong>
+                <span>Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.</span>
+              </a>
+              <a href="/eoa-vs-universal-profile/">
+                <strong>EOA wallet limits -&gt; Universal Profile smart accounts</strong>
+                <span>Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.</span>
+              </a>
+              <a href="/guides/grant-dapp-permissions-lsp6/">
+                <strong>Grant dapp permissions with LSP6</strong>
+                <span>Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+---
+interface Props {
+  chip?: string;
+  chipKind?: 'erc' | 'lsp';
+  caption?: string;
+  lang?: string;
+}
+const { chip, chipKind = 'lsp', caption, lang = 'solidity' } = Astro.props;
+---
+<figure class="spec">
+  {(chip || caption) && (
+    <figcaption>
+      {chip && <span class:list={['chip', `chip-${chipKind}`]}>{chip}</span>}
+      {caption && <span class="caption">{caption}</span>}
+      {lang && <span class="lang">{lang}</span>}
+    </figcaption>
+  )}
+  <pre><code class={`language-${lang}`}><slot /></code></pre>
+</figure>
+
+<style>
+  .spec {
+    margin: 0;
+    border: 1px solid var(--ink-line);
+    background: var(--ink-paper);
+    overflow: hidden;
+  }
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-4);
+    border-bottom: 1px solid var(--ink-line);
+    background: var(--ink-black);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+  }
+  .chip {
+    padding: 1px var(--s-2);
+    border: 1px solid currentColor;
+  }
+  .chip-erc { color: var(--erc-sand); }
+  .chip-lsp { color: var(--signal-pink); }
+  .caption { color: var(--ink-bone-dim); }
+  .lang { margin-left: auto; color: var(--ink-fog); }
+
+  pre {
+    margin: 0;
+    padding: var(--s-4);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    line-height: 1.6;
+    color: var(--ink-bone);
+  }
+  code { font-family: inherit; }
+</style>

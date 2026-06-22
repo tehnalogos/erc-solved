@@ -1,0 +1,70 @@
+---
+title: "safeTransferFrom is only half a hook."
+tagline: "It checks IERC721Receiver — only, only, only. Every other asset type strands silently."
+query: "erc721 safe transfer problems"
+description: "safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types."
+erc: "721"
+lsps: ["LSP1", "LSP7", "LSP8"]
+aliases: ["safetransferfrom problems", "nfts stuck in contract", "ierc721receiver", "ierc1155receiver", "tokens stranded"]
+updated: 2026-06-22
+diff:
+  from:
+    chip: "ERC·721"
+    code: "onERC721Received(...) returns (bytes4)"
+    tags: ["one asset type", "narrow hook"]
+  to:
+    chip: "LSP·1"
+    code: "universalReceiver(typeId, data)"
+    tags: ["one hook for everything", "typeId-routed"]
+verdict: "LSP1 is a single universalReceiver hook with a typeId discriminator. LSP7, LSP8, and value transfers all call it. Multi-asset contracts stop implementing four receiver interfaces; account contracts react through a Universal Receiver Delegate."
+docs:
+  - label: "docs.lukso.tech / LSP1 Universal Receiver"
+    href: "https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/"
+  - label: "docs.lukso.tech / LSP7 Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+related: ["problems/erc20-transfer-hooks", "problems/erc721-dynamic-metadata"]
+---
+
+## Why this breaks
+
+`safeTransferFrom` is real safety, but it is narrow. It only checks `IERC721Receiver`, only
+for that one call, only when the caller chose the "safe" variant. The non-safe `transferFrom`
+still ships, and most ERC20 transfers go straight to a balance update with no recipient
+interaction at all.
+
+In practice, every asset standard has its own receiver shape — `IERC721Receiver`,
+`IERC1155Receiver`, ERC777 `tokensReceived`. A multi-asset contract implements each one. And
+there is still no general "I received value of some kind" hook.
+
+## What people try
+
+### Implement every receiver interface
+Boilerplate that grows per asset standard. Required for compliance, doesn't compose into
+shared policy.
+
+### OpenZeppelin Holder mixins
+`ERC721Holder`, `ERC1155Holder`. Accepts everything, defers the policy question.
+
+### Defensive transfer-then-call patterns
+Ad hoc per integration. Not interoperable.
+
+### Sweeper / rescue contracts
+Recovers stranded assets after the fact. Treats the symptom.
+
+## How LSP solves it
+
+LSP1 defines one hook:
+
+```solidity
+function universalReceiver(bytes32 typeId, bytes calldata data)
+  external payable returns (bytes memory);
+```
+
+LSP7 and LSP8 transfers call it on both sender and recipient, with a `typeId` that tells the
+receiver what kind of interaction it is (token sent, token received, asset registered, etc.).
+
+A Universal Profile uses a **Universal Receiver Delegate** to dispatch: register received
+assets in LSP5, reject spam by `typeId`, or run app-specific logic. **One hook, every asset
+type, declared policy.**

@@ -1,0 +1,61 @@
+@import '@fontsource-variable/fraunces/index.css';
+@import '@fontsource-variable/jetbrains-mono/index.css';
+
+h1, h2, h3, .serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.04;
+  font-variation-settings: 'opsz' 88, 'SOFT' 50;
+}
+
+h1 {
+  font-size: clamp(40px, 8vw, var(--t-serif-4));
+}
+
+h2 {
+  font-size: clamp(28px, 4vw, var(--t-serif-2));
+}
+
+h3 {
+  font-size: var(--t-serif-1);
+}
+
+p, li, dd, dt, td, th, label, input, button, .mono {
+  font-family: var(--font-mono);
+}
+
+p {
+  font-size: var(--t-mono-md);
+  line-height: 1.65;
+  color: var(--ink-bone);
+}
+
+p.dim, .dim {
+  color: var(--ink-fog);
+}
+
+small, .ui {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono-sm);
+  letter-spacing: 0;
+  color: var(--ink-fog);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono-xs);
+  text-transform: lowercase;
+  color: var(--ink-fog);
+  letter-spacing: 0;
+}
+
+.eyebrow::before {
+  content: '// ';
+  color: var(--ink-line);
+}
+
+code, kbd, pre {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono-md);
+}

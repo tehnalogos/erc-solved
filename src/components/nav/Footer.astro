@@ -1,0 +1,79 @@
+---
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="inner">
+    <div class="col stance">
+      <span class="eyebrow">field manual</span>
+      <p>ERCs are interfaces. LSPs are the system. A field manual for the LUKSO standards that were designed instead of layered.</p>
+    </div>
+    <div class="col links">
+      <span class="eyebrow">resources</span>
+      <ul>
+        <li><a href="/problems/">Problems</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/standards/matrix/">ERC ↔ LSP matrix</a></li>
+        <li><a href="/build/">Build verticals</a></li>
+      </ul>
+    </div>
+    <div class="col links">
+      <span class="eyebrow">handoff</span>
+      <ul>
+        <li><a href="https://docs.lukso.tech/" rel="noopener noreferrer" target="_blank">docs.lukso.tech ↗</a></li>
+        <li><a href="https://github.com/lukso-network" rel="noopener noreferrer" target="_blank">github / lukso-network ↗</a></li>
+        <li><a href="/changelog/">Changelog</a></li>
+        <li><a href="/changelog.xml" rel="alternate" type="application/rss+xml">RSS feed</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="meta">
+    <span>© {year} ERCs, Solved.</span>
+    <span class="sep">·</span>
+    <span>independent reference, unaffiliated with the LUKSO foundation</span>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--s-10);
+    border-top: 1px solid var(--ink-line);
+    background: var(--ink-black);
+  }
+  .inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-8) var(--s-5) var(--s-6);
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+    gap: var(--s-7);
+  }
+  .col { display: flex; flex-direction: column; gap: var(--s-3); }
+  .stance p { color: var(--ink-bone-dim); max-width: 38ch; }
+  .col ul { display: grid; gap: var(--s-2); }
+  .col a {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone-dim);
+    border-bottom: 1px solid transparent;
+  }
+  .col a:hover { color: var(--signal-pink); border-bottom-color: var(--signal-pink); }
+
+  .meta {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-4) var(--s-5) var(--s-6);
+    border-top: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+  }
+  .sep { color: var(--ink-line); }
+
+  @media (max-width: 720px) {
+    .inner { grid-template-columns: 1fr; gap: var(--s-5); padding: var(--s-7) var(--s-4) var(--s-5); }
+    .meta { padding: var(--s-4); }
+  }
+</style>

@@ -1,0 +1,81 @@
+---
+import Article from './Article.astro';
+import Verdict from '~/components/primitives/Verdict.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+import SpecBlock from '~/components/primitives/SpecBlock.astro';
+
+interface Props { entry: any; }
+const { entry } = Astro.props;
+const { data, slug } = entry;
+---
+<Article
+  title={data.title}
+  description={data.description}
+  pageTitle={`Build · ${data.vertical} · ERCs, Solved`}
+  eyebrow={`build vertical · ${data.vertical.toLowerCase()}`}
+  author={data.author}
+  updated={data.updated}
+  editPath={`src/content/build/${slug}.mdx`}
+>
+  <Verdict tone="use-lsp" label="the LSP stack for this vertical">
+    <p><strong>{data.stack.join(' + ')}</strong></p>
+  </Verdict>
+
+  <section class="prose">
+    <slot />
+  </section>
+
+  {data.reading?.length > 0 && (
+    <section class="reading">
+      <h2>Reading list.</h2>
+      <p class="dim">A curated path — problem → standard → migration.</p>
+      <ol class="list">
+        {data.reading.map((r: any, i: number) => (
+          <li>
+            <span class="n">[ {String(i + 1).padStart(2, '0')} ]</span>
+            <Crossref href={r.href} chip={r.chip}>{r.label}</Crossref>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
+
+  {data.docs?.length > 0 && (
+    <section class="docs">
+      <h2>Continue at docs.lukso.tech.</h2>
+      <ul>{data.docs.map((d: any) => <li><Crossref href={d.href}>{d.label}</Crossref></li>)}</ul>
+    </section>
+  )}
+</Article>
+
+<style>
+  .prose { max-width: var(--reading); display: grid; gap: var(--s-5); }
+  .prose :global(h2) { font-size: var(--t-serif-1); }
+  .prose :global(p) { color: var(--ink-bone-dim); }
+  .prose :global(code) { background: var(--ink-paper); border: 1px solid var(--ink-line); padding: 0 4px; color: var(--signal-pink); font-size: 0.95em; }
+
+  .reading, .docs {
+    display: grid;
+    gap: var(--s-3);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .reading h2 { font-size: var(--t-serif-1); }
+  .reading .dim { color: var(--ink-fog); font-size: var(--t-mono-sm); }
+  .list { display: grid; gap: var(--s-2); }
+  .list li {
+    display: grid;
+    grid-template-columns: 6ch 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .list .n {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--signal-pink);
+  }
+  .docs ul { display: grid; gap: var(--s-2); }
+</style>

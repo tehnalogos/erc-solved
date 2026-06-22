@@ -1,0 +1,97 @@
+---
+import Wordmark from '~/components/brand/Wordmark.astro';
+
+const pathname = Astro.url.pathname;
+const nav = [
+  { label: 'Problems', href: '/problems/' },
+  { label: 'Standards', href: '/standards/' },
+  { label: 'Build', href: '/build/' },
+];
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+<header class="site-header">
+  <div class="inner">
+    <Wordmark />
+    <nav aria-label="Primary navigation">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class:list={['nav-link', { active: isActive(item.href) }]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+      <button class="search-trigger" type="button" aria-label="Open search" data-open-search>
+        <span class="key" aria-hidden="true">⌘K</span>
+        <span class="label">Search</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-open-search]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('ercs:open-search'));
+    });
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--ink-black) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-4) var(--s-5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    min-height: 64px;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+  }
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-fog);
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid transparent;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .nav-link:hover, .nav-link:focus-visible { color: var(--ink-bone); outline: none; }
+  .nav-link.active { color: var(--ink-bone); border-color: var(--signal-pink); }
+
+  .search-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: 4px var(--s-2);
+    border: 1px solid var(--ink-line);
+    color: var(--ink-fog);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .search-trigger:hover { color: var(--ink-bone); border-color: var(--ink-bone-dim); }
+  .search-trigger .key { color: var(--signal-pink); }
+
+  @media (max-width: 720px) {
+    .inner { flex-direction: column; align-items: flex-start; gap: var(--s-3); padding: var(--s-3) var(--s-4); }
+    nav { width: 100%; gap: var(--s-4); flex-wrap: wrap; }
+    .search-trigger { margin-left: auto; }
+  }
+</style>

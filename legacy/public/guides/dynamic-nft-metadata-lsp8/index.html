@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guide: Dynamic NFT Metadata with LSP8 and ERC725Y | ERCs, Solved</title>
+    <meta name="description" content="Use LSP8, LSP4 metadata, and ERC725Y data keys to model dynamic NFT metadata for LUKSO apps.">
+    <link rel="canonical" href="https://ercsolved.dev/guides/dynamic-nft-metadata-lsp8/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="Guide: Dynamic NFT Metadata with LSP8 and ERC725Y | ERCs, Solved">
+    <meta property="og:description" content="Use LSP8, LSP4 metadata, and ERC725Y data keys to model dynamic NFT metadata for LUKSO apps.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/guides/dynamic-nft-metadata-lsp8/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Build dynamic NFT metadata with LSP8","item":"https://ercsolved.dev/guides/dynamic-nft-metadata-lsp8/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Build dynamic NFT metadata with LSP8","description":"Use LSP8, LSP4 metadata, and ERC725Y data keys to model dynamic NFT metadata for LUKSO apps.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["dynamic NFTs","LSP8","ERC725Y","metadata"],"mainEntityOfPage":"https://ercsolved.dev/guides/dynamic-nft-metadata-lsp8/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Code-first guide</p>
+      <h1>Build dynamic NFT metadata with LSP8</h1>
+      <p>Use LSP8, LSP4 metadata, and ERC725Y data keys to model dynamic NFT metadata for LUKSO apps.</p>
+      <div class="tag-row"><span>dynamic NFTs</span><span>LSP8</span><span>ERC725Y</span><span>metadata</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>Dynamic NFT metadata should not be only a hidden server rule behind tokenURI. With LSP8, collection and token metadata can be exposed through standard data keys that apps can read consistently.</p></section>
+      
+        <section class="content-section">
+          <h2>Start from the metadata lifecycle</h2>
+          
+          <ul><li>Which fields are static at mint?</li><li>Which fields can change?</li><li>Who is allowed to change them?</li><li>Does the user need to verify the source or history of a metadata update?</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>Use ERC725Y for standard reads</h2>
+          <p>ERC725Y gives contracts a generic data key-value store. LSP4 defines metadata conventions for digital assets, while LSP8 adds token-specific metadata support for identifiable assets.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>Keep media storage practical</h2>
+          <p>LSP metadata does not require every asset to be fully onchain. Use the chain for the standard data entry point and integrity model, then point to media or JSON where that is still the right engineering tradeoff.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>Read an ERC725Y data key</figcaption>
+              <pre><code class="language-typescript">const key = ERC725YDataKeys.LSP4[&#39;LSP4Metadata&#39;];
+const value = await asset.getData(key);</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/erc725/" rel="noopener noreferrer">docs.lukso.tech/standards/erc725</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP4-Digital-Asset-Metadata</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP8-Identifiable-Digital-Asset</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc721-tokenuri-vs-lsp4-metadata/">
+                <strong>ERC721 tokenURI problem -&gt; LSP4 metadata</strong>
+                <span>Learn why dynamic NFT metadata is hard with tokenURI alone and how LSP8, LSP4, and ERC725Y provide a richer metadata model.</span>
+              </a>
+              <a href="/erc721-vs-lsp8/">
+                <strong>ERC721 vs LSP8</strong>
+                <span>Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

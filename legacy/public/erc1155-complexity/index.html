@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERC1155 Complexity: When Multi-Asset Contracts Become a Tax | ERCs, Solved</title>
+    <meta name="description" content="ERC1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7/LSP8 split.">
+    <link rel="canonical" href="https://ercsolved.dev/erc1155-complexity/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERC1155 Complexity: When Multi-Asset Contracts Become a Tax | ERCs, Solved">
+    <meta property="og:description" content="ERC1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7/LSP8 split.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/erc1155-complexity/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"ERC1155 complexity","item":"https://ercsolved.dev/erc1155-complexity/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"ERC1155 complexity","description":"ERC1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7/LSP8 split.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["erc1155 complexity","multi-asset contracts","erc1155 vs lsp7 lsp8"],"mainEntityOfPage":"https://ercsolved.dev/erc1155-complexity/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>ERC1155 complexity</h1>
+      <p>ERC1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7/LSP8 split.</p>
+      <div class="tag-row"><span>erc1155 complexity</span><span>multi-asset contracts</span><span>erc1155 vs lsp7 lsp8</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>ERC1155 saves gas by packing many item types into one contract. The cost lands on apps: per-id metadata, type detection, batch logic, mixed indexing, custom marketplace rules. LSP7 and LSP8 separate fungible from identifiable at the standard level, so the semantic split lives in the protocol, not in your code.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>One ERC1155 contract can hold currency-like tokens, edition NFTs, and unique items at once. Wallets and indexers have to decode the intent of each id from per-collection rules. Marketplaces add custom logic per contract because there is no standard way to know which ids are fungible vs unique.</p><p>Batch transfer is genuinely useful, but it composes badly with receiver hooks (every receiver must implement IERC1155Receiver, including for batches).</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>High-bit token id conventions to encode &quot;this id range is fungible&quot; — works only inside one collection.</li><li>One-contract-per-game patterns — gives back the boundary ERC1155 erased.</li><li>Off-chain id registries — moves the typing problem to your backend.</li><li>Custom subgraphs per collection — every collection needs its own indexer logic.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>LSP7 covers fungible and semi-fungible assets. LSP8 covers identifiable assets. They share transfer naming (force flag, bytes data), the same LSP1 receiver hook, and the same LSP4 metadata pattern.</p><p>When you need multi-asset packing, you ship multiple LSP7/LSP8 contracts. The semantic boundary is in the standard, not encoded in token id bit ranges.</p>
+          
+        </section>
+      
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP7-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP8-Identifiable-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp1-universal-receiver</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc1155-vs-lsp7-lsp8/">
+                <strong>ERC1155 vs LSP7 and LSP8</strong>
+                <span>Compare ERC1155 multi-asset contracts with LSP7 and LSP8 when product semantics, indexing, metadata, and profile UX matter.</span>
+              </a>
+              <a href="/erc20-vs-lsp7/">
+                <strong>ERC20 vs LSP7</strong>
+                <span>Compare ERC20 with LUKSO LSP7 for token transfers, approvals, metadata, receiver hooks, transfer context, and migration decisions.</span>
+              </a>
+              <a href="/erc721-vs-lsp8/">
+                <strong>ERC721 vs LSP8</strong>
+                <span>Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

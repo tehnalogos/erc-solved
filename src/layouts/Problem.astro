@@ -1,0 +1,167 @@
+---
+import Article from './Article.astro';
+import StandardChip from '~/components/brand/StandardChip.astro';
+import DiffArrow from '~/components/primitives/DiffArrow.astro';
+import Verdict from '~/components/primitives/Verdict.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+import { getEntry } from 'astro:content';
+
+interface Props {
+  entry: any;
+}
+const { entry } = Astro.props;
+const { data, slug } = entry;
+
+async function resolveRelated() {
+  if (!data.related?.length) return [];
+  const items = await Promise.all(
+    data.related.map(async (slug: string) => {
+      const [collection, ...rest] = slug.split('/');
+      const targetSlug = rest.join('/');
+      try {
+        const e = await getEntry(collection as any, targetSlug);
+        if (!e) return null;
+        return {
+          href: `/${collection}/${targetSlug}/`,
+          title: e.data.title,
+          chip: e.data.diff?.to?.chip || e.data.lsps?.[0] || null,
+        };
+      } catch {
+        return null;
+      }
+    }),
+  );
+  return items.filter(Boolean) as { href: string; title: string; chip: string | null }[];
+}
+const related = await resolveRelated();
+---
+<Article
+  title={data.title}
+  description={data.description}
+  pageTitle={`${data.query} · ERCs, Solved`}
+  eyebrow={`problem · ${data.query}`}
+  author={data.author}
+  updated={data.updated}
+  editPath={`src/content/problems/${slug}.mdx`}
+>
+  <div slot="header-extras" class="head-extras">
+    <div class="chips">
+      <StandardChip kind="erc" id={data.erc} />
+      <span class="op">→</span>
+      {data.lsps.map((lsp: string) => (
+        <StandardChip kind="lsp" id={lsp.replace(/^LSP/i, '')} />
+      ))}
+    </div>
+    {data.tagline && <p class="tagline">{data.tagline}</p>}
+  </div>
+
+  <DiffArrow
+    size="lg"
+    framed
+    from={data.diff.from}
+    to={data.diff.to}
+  />
+
+  <Verdict tone="use-lsp" label="verdict">
+    <p>{data.verdict}</p>
+  </Verdict>
+
+  <section class="prose">
+    <slot />
+  </section>
+
+  {data.docs?.length > 0 && (
+    <section class="handoff">
+      <span class="eyebrow">continue at the source</span>
+      <ul>
+        {data.docs.map((d: any) => (
+          <li>
+            <Crossref href={d.href}>{d.label}</Crossref>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {related.length > 0 && (
+    <section class="related">
+      <span class="eyebrow">next routes</span>
+      <ul>
+        {related.map(r => (
+          <li>
+            <Crossref href={r.href} chip={r.chip ?? undefined}>{r.title}</Crossref>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Article>
+
+<style>
+  .head-extras { display: grid; gap: var(--s-3); }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    align-items: center;
+  }
+  .op { color: var(--ink-fog); font-family: var(--font-mono); font-size: var(--t-mono-sm); }
+  .tagline {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(20px, 2.5vw, 28px);
+    color: var(--ink-bone-dim);
+    max-width: 36ch;
+    line-height: 1.25;
+  }
+
+  .prose {
+    max-width: var(--reading);
+    display: grid;
+    gap: var(--s-5);
+  }
+  .prose :global(h2) {
+    font-size: var(--t-serif-1);
+    margin-top: var(--s-4);
+  }
+  .prose :global(h3) {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-lg);
+    color: var(--signal-pink);
+    text-transform: lowercase;
+    letter-spacing: 0;
+    margin-top: var(--s-3);
+  }
+  .prose :global(p) { color: var(--ink-bone-dim); }
+  .prose :global(ul) {
+    display: grid;
+    gap: var(--s-2);
+    padding-left: var(--s-4);
+    list-style: '— ';
+    color: var(--ink-bone-dim);
+  }
+  .prose :global(strong) { color: var(--ink-bone); }
+  .prose :global(code) {
+    background: var(--ink-paper);
+    border: 1px solid var(--ink-line);
+    padding: 0 4px;
+    color: var(--signal-pink);
+    font-size: 0.95em;
+  }
+  .prose :global(a) {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .prose :global(a:hover) {
+    color: var(--signal-pink);
+    border-color: var(--signal-pink);
+  }
+
+  .handoff, .related {
+    display: grid;
+    gap: var(--s-3);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--ink-line);
+  }
+  .handoff ul, .related ul { display: grid; gap: var(--s-3); }
+</style>

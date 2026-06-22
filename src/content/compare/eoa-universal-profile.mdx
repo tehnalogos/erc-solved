@@ -1,0 +1,65 @@
+---
+title: "EOA vs Universal Profile"
+left: { chip: "EOA", label: "externally owned account" }
+right: { chip: "LSP·0", label: "Universal Profile" }
+description: "EOAs are foundational and portable. Universal Profiles are contract accounts that ship with metadata, permissions, hooks, and relay execution. The right answer depends on whether you're shipping a portable signer or an account-shaped product."
+updated: 2026-06-22
+verdict:
+  useLeft: "Pure signer use cases. Cross-chain plumbing, hardware-wallet-anchored signing, applications where 'one private key controls one address' is a feature."
+  useRight: "Anything user-facing on LUKSO. The profile carries identity, permissions, recovery, and gasless flows — features wallet teams normally ship as product."
+matrix:
+  - row: "account type"
+    left: "key pair"
+    right: "smart contract (LSP0)"
+  - row: "identity model"
+    left: "address only (off-chain profile)"
+    right: "LSP3 profile metadata + LSP5/12 inventories"
+  - row: "controllers"
+    left: "one private key"
+    right: "many, each with scoped LSP6 permissions"
+  - row: "recovery"
+    left: "seed phrase (single point of failure)"
+    right: "policy expressed as controllers / contracts"
+  - row: "signing"
+    left: "ecrecover"
+    right: "isValidSignature (ERC-1271, contract-native)"
+  - row: "gasless UX"
+    left: "needs forwarder / paymaster"
+    right: "LSP25 executeRelayCall on the account"
+  - row: "receiver hooks"
+    left: "none"
+    right: "LSP1 universalReceiver + delegate"
+  - row: "ecosystem"
+    left: "every EVM chain + mature wallets"
+    right: "LUKSO (wallets, indexers, marketplaces designed around it)"
+docs:
+  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "docs.lukso.tech / LSP3 Profile Metadata"
+    href: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+related: ["problems/eoa-key-risk", "problems/social-recovery", "problems/wallet-permissions"]
+---
+
+## The structural difference
+
+An EOA is the simplest account a chain can express — `address = keccak(pubkey)[12:]` — and
+the limits flow from that simplicity. One key, one signer, no native metadata, no native
+permissions, no native hook.
+
+A Universal Profile is the inverse: a contract that *is* the account, composed from a
+documented set of standards. LSP0 for the account itself. LSP6 for permissioned control.
+LSP3 for profile metadata. LSP1 for incoming-call handling. LSP25 for relay execution.
+LSP14 for safer ownership rotation. The account is a graph, not a key.
+
+## Ecosystem is the honest cost
+
+A Universal Profile is a smart contract — it could deploy on any EVM chain. The reason to
+reach for it is LUKSO: an EVM L1 that started fresh with the LSP standards built in and
+shipped wallets, indexers, and marketplaces designed around them from day one. An EOA, by
+contrast, is supported by every wallet ever made on every EVM chain — the network effects
+are the moat.
+
+Pick LSP0 when the account model is the product and you're shipping on LUKSO. Pick
+EOA-or-Safe when chain-agnostic reach across mature ecosystems is the requirement.

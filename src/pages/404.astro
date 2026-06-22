@@ -1,0 +1,83 @@
+---
+import Base from '~/layouts/Base.astro';
+---
+<Base
+  title="404. // not found"
+  description="The page you were looking for doesn't exist. Try the search."
+>
+  <section class="nf">
+    <span class="eyebrow">404 · route not found</span>
+    <h1>
+      <span class="num">404.</span>
+      <span class="sep" aria-hidden="true">//</span>
+      <span class="msg">search instead?</span>
+    </h1>
+    <p class="dim">
+      Whatever this URL used to be, it isn't here now. We took a free hand to URLs in the
+      redesign — the search index knows where everything moved.
+    </p>
+
+    <div class="cta-row">
+      <button class="cta" data-open-search type="button">
+        <span class="bracket">[</span>
+        <span class="label">open ⌘K search</span>
+        <span class="arrow">→</span>
+        <span class="bracket">]</span>
+      </button>
+      <span class="cta-meta">or jump to <a href="/problems/">/problems/</a>, <a href="/standards/">/standards/</a>, <a href="/build/">/build/</a></span>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Auto-open search on 404
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('ercs:open-search'));
+  }, 400);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-open-search]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('ercs:open-search'));
+    });
+  });
+</script>
+
+<style>
+  .nf {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-9) var(--s-5);
+    display: grid;
+    gap: var(--s-5);
+  }
+  h1 {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s-3);
+    font-size: clamp(48px, 8vw, 96px);
+    font-variation-settings: 'opsz' 80;
+    line-height: 1;
+  }
+  .num { color: var(--erc-sand); }
+  .sep { color: var(--ink-line); font-family: var(--font-mono); font-size: 0.5em; }
+  .msg { color: var(--ink-bone); }
+  .dim { color: var(--ink-bone-dim); max-width: 60ch; }
+
+  .cta-row { display: flex; gap: var(--s-5); align-items: baseline; flex-wrap: wrap; }
+  .cta {
+    display: inline-flex; align-items: baseline; gap: var(--s-2);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--ink-bone);
+    color: var(--ink-bone);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    transition: background 150ms ease, color 150ms ease;
+  }
+  .cta:hover { background: var(--signal-pink); color: var(--ink-black); }
+  .cta .bracket { color: var(--ink-fog); }
+  .cta:hover .bracket { color: var(--ink-black); }
+  .cta-meta { font-size: var(--t-mono-sm); color: var(--ink-fog); }
+  .cta-meta a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .cta-meta a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+</style>

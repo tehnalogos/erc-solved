@@ -1,0 +1,51 @@
+:root {
+  --ink-black: #0b0a0d;
+  --ink-paper: #15141c;
+  --ink-line: #25232f;
+  --ink-fog: #7a7585;
+  --ink-bone: #ebe5d8;
+  --ink-bone-dim: #b6b0a3;
+
+  /* The LUKSO bright pink. Reserve for brand moments only (logo dot, hero accents). */
+  --signal-pink-bright: #fe005b;
+  /* Working pink — readable at body sizes on dark canvas. Used for links, hovers, chips. */
+  --signal-pink: #ff5388;
+  /* Subtle pink — visited/pressed, dim backgrounds. */
+  --signal-pink-dim: #8a2348;
+
+  /* ERC side: desaturated warm sandstone. Doesn't fight pink, still warm + grounded. */
+  --erc-sand: #c8a47a;
+  --erc-sand-dim: #8b7553;
+
+  --ok-quiet: #8a8f7a;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  --t-mono-xs: 12px;
+  --t-mono-sm: 13px;
+  --t-mono-md: 15px;
+  --t-mono-lg: 17px;
+
+  --t-serif-1: 32px;
+  --t-serif-2: 48px;
+  --t-serif-3: 64px;
+  --t-serif-4: 88px;
+  --t-serif-5: 120px;
+
+  --container: 1200px;
+  --reading: 68ch;
+
+  --font-serif: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  color-scheme: dark;
+}

@@ -1,0 +1,38 @@
+---
+kind: LSP
+id: "17"
+title: "Contract Extension"
+oneLine: "Fallback router by function selector. Grow a deployed contract without an upgrade key."
+description: "LSP17 lets any contract register extension contracts per function selector. Calls to unknown selectors are routed (CALL) or delegated (DELEGATECALL) to the registered extension."
+purpose: Execution
+updated: 2026-06-22
+abi: |
+  // The base contract's fallback() looks up an extension per selector.
+  // Extensions are registered via ERC725Y data keys:
+  //
+  //   LSP17Extension:<selector>  → address (the extension contract)
+  //
+  // Two flavors:
+  //   Extendable  → CALL into the extension (clean separation)
+  //   Extension   → DELEGATECALL (shared storage; advanced)
+solves:
+  - pain: "contract extension after deployment"
+    href: "/problems/contract-extension/"
+companions: ["LSP·0", "ERC·725"]
+doesNotSolve:
+  - "LSP17 isn't an upgrade primitive for the base bytecode. It adds *new* functions; it doesn't change existing ones."
+  - "DELEGATECALL extensions share storage — you still need storage-layout discipline if you use that flavor."
+  - "Registering an extension is a permissioned action. Who can do it depends on LSP6."
+docs:
+  - label: "docs.lukso.tech / LSP17 Contract Extension"
+    href: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
+---
+
+LSP17 is the "grow without an upgrade key" primitive. When a call lands on an unknown
+function selector, the base contract's fallback looks up the registered extension address in
+ERC725Y data and forwards the call. The base bytecode is immutable; new behavior is a
+separate, individually permissioned contract.
+
+This is the design choice that lets Universal Profiles add features (signature
+verification, hook delegates, new asset receivers) without proxies and without the permanent
+upgrade authority a UUPS proxy carries.

@@ -1,0 +1,28 @@
+---
+kind: LSP
+id: "26"
+title: "Follower System"
+oneLine: "Follow / unfollow as on-chain primitives — social state, not platform state."
+description: "LSP26 standardizes a follower registry. Any address (EOA, profile, contract) can follow any other; the relationship lives on-chain, readable by any app."
+purpose: Social
+updated: 2026-06-22
+abi: |
+  function follow(address addr) external;
+  function unfollow(address addr) external;
+  function isFollowing(address follower, address addr) external view returns (bool);
+  function followerCount(address addr) external view returns (uint256);
+  function followingCount(address follower) external view returns (uint256);
+solves:
+  - pain: "social graphs that live in app databases (vendor lock)"
+companions: ["LSP·0", "LSP·3"]
+doesNotSolve:
+  - "LSP26 doesn't deliver content. It's a follow graph, not a feed protocol."
+  - "It doesn't gate access — apps decide what 'followers see' means for them."
+docs:
+  - label: "docs.lukso.tech / LSP26 Follower System"
+    href: "https://docs.lukso.tech/standards/accounts/lsp26-follower-system/"
+---
+
+LSP26 is the small social primitive that means a profile's follower graph isn't owned by any
+one app. Follow on app A, the relationship is visible to app B. Useful when identity is
+already on-chain (LSP0 + LSP3) and you want the social layer to compose the same way.

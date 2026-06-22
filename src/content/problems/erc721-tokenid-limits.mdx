@@ -1,0 +1,56 @@
+---
+title: "uint256 tokenIds were always a compromise."
+tagline: "Efficient for counters, awkward for hashes, serials, or anything you'd actually want to encode."
+query: "erc721 tokenid uint256 limitation"
+description: "uint256 token IDs are efficient but force you into a single integer namespace. LSP8 uses bytes32, which can represent hashes, serials, encoded references, or numeric IDs."
+erc: "721"
+lsps: ["LSP8"]
+aliases: ["erc721 tokenid", "bytes32 token id", "nft id namespace", "non-numeric tokenid"]
+updated: 2026-06-22
+diff:
+  from:
+    chip: "ERC·721"
+    code: "uint256 tokenId"
+    tags: ["one number", "needs extra mappings"]
+  to:
+    chip: "LSP·8"
+    code: "bytes32 tokenId"
+    tags: ["hash · serial · ref · number"]
+verdict: "LSP8 uses bytes32 token IDs. The integer case still works (cast a uint256). When you need a hash, a serial, or a structured reference, you encode it directly into the ID instead of maintaining a side mapping."
+docs:
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+related: ["problems/erc721-dynamic-metadata", "problems/erc721-safe-transfer"]
+---
+
+## Why this breaks
+
+`uint256 tokenId` is a deliberate primitive. It's cheap and predictable, and for sequential
+mints it's the right answer. The cost shows up when you want the ID to **mean** something —
+a content hash, a serial number, a structured reference to another contract — and you end up
+maintaining side mappings to translate.
+
+The downstream consequence: token IDs are no longer self-describing. You read `42` and have
+to consult the contract (or a backend) to know what it points to.
+
+## What people try
+
+### Off-chain registries
+Map `uint256` IDs to richer identifiers in a database. Works. Couples the asset to your infra.
+
+### Hash-truncation conventions
+Cast a 32-byte hash to `uint256`. Functions. Marketplace UIs still display a 78-digit number
+with no semantic content.
+
+### Multiple side mappings
+One mapping per dimension you wanted to encode. Storage cost grows linearly with what should
+have been one ID.
+
+## How LSP solves it
+
+LSP8 uses `bytes32` token IDs. The integer case still works — cast your `uint256` to `bytes32`
+and you have the same sequential model. When you need a content hash, you store the hash. When
+you need a structured serial, you encode it. When you need a reference, you encode the address
+plus selector.
+
+The ID becomes a typed value, not a counter pretending to be a name.

@@ -1,0 +1,38 @@
+---
+kind: ERC
+id: "725"
+title: "Smart Account Substrate"
+oneLine: "The ERC at the bottom of every LSP — execute calls (725X) and store typed data (725Y)."
+description: "ERC725 defines two minimal interfaces every LUKSO standard builds on: ERC725X for arbitrary call execution from a contract, and ERC725Y for typed key-value data storage."
+purpose: Substrate
+updated: 2026-06-22
+abi: |
+  // ERC725X — execute a call from this contract as msg.sender
+  function execute(uint256 operationType, address target, uint256 value, bytes data)
+    external payable returns (bytes memory);
+
+  // ERC725Y — typed key-value storage
+  function getData(bytes32 dataKey) external view returns (bytes memory);
+  function setData(bytes32 dataKey, bytes memory dataValue) external;
+
+  // Batch variants exist for both.
+solves:
+  - pain: "no standard way to store on-chain metadata as typed key-value pairs"
+  - pain: "no standard contract-as-caller primitive (vs custom forwarders)"
+companions: ["LSP·0", "LSP·4", "LSP·3", "LSP·5", "LSP·12", "LSP·6"]
+doesNotSolve:
+  - "ERC725 is a *substrate*. It doesn't define any meaning — that's what LSP3, LSP4, LSP5, LSP6, etc. do on top."
+  - "Storage costs are real. ERC725Y data keys cost gas to set, same as any storage."
+docs:
+  - label: "docs.lukso.tech / ERC725"
+    href: "https://docs.lukso.tech/standards/erc725/"
+---
+
+ERC725 is the substrate. ERC725X gives a contract the ability to make outbound calls *as
+itself* — the foundation of any account contract. ERC725Y gives it a typed key-value store —
+the foundation of every LSP that names a data key (LSP3 profile metadata, LSP4 asset
+metadata, LSP5 received assets, LSP6 permissions, LSP12 issued assets, LSP17 extensions).
+
+When you read a Universal Profile, you're calling `getData(key)` against ERC725Y. When the
+profile sends value, it's calling `execute(...)` against ERC725X. Everything LUKSO-shaped is
+ERC725 underneath.

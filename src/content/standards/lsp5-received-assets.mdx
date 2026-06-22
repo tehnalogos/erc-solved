@@ -1,0 +1,30 @@
+---
+kind: LSP
+id: "5"
+title: "Received Assets"
+oneLine: "The data keys that let an account list every asset it has ever received."
+description: "LSP5 defines ERC725Y keys for the array of received assets. Universal Profiles register incoming LSP7 / LSP8 assets through their Universal Receiver Delegate."
+purpose: Metadata
+updated: 2026-06-22
+abi: |
+  // Array stored at:
+  //   LSP5ReceivedAssets[]   → bytes (length)
+  //   LSP5ReceivedAssets[]<index> → address
+  //   LSP5ReceivedAssetsMap:<address> → bytes12 (interfaceId + index)
+solves:
+  - pain: "no account-level asset inventory without a subgraph"
+companions: ["LSP·1", "LSP·7", "LSP·8", "LSP·0"]
+doesNotSolve:
+  - "LSP5 doesn't validate that the asset is one you wanted. Spam filtering lives in the Universal Receiver Delegate."
+  - "It records the *contract*, not balances — that's still on the asset contract."
+docs:
+  - label: "docs.lukso.tech / LSP5 Received Assets"
+    href: "https://docs.lukso.tech/standards/metadata/lsp5-received-assets/"
+---
+
+LSP5 is small and quietly important. Because LSP1 fires on transfer, and because Universal
+Profiles ship with a Universal Receiver Delegate that writes to LSP5, an account knows the
+full list of asset contracts that have ever sent it value — without an off-chain indexer.
+
+The same companion shape (LSP12) does the dual: assets this account *issued*. Together,
+LSP5 + LSP12 give a profile a self-contained inventory.

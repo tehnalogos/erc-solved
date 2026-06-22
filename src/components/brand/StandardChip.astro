@@ -1,0 +1,27 @@
+---
+interface Props {
+  kind: 'erc' | 'lsp';
+  id: string | number;
+  emphasis?: 'normal' | 'strong';
+}
+const { kind, id, emphasis = 'normal' } = Astro.props;
+const label = kind === 'erc' ? `ERC·${id}` : `LSP·${id}`;
+---
+<span class={`chip chip-${kind} chip-${emphasis}`}>{label}</span>
+
+<style>
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--s-2);
+    border: 1px solid currentColor;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    line-height: 1.4;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .chip-erc { color: var(--erc-sand); }
+  .chip-lsp { color: var(--signal-pink); }
+  .chip-strong { font-weight: 500; }
+</style>

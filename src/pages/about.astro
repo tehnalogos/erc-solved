@@ -1,0 +1,156 @@
+---
+import Base from '~/layouts/Base.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+import Authorship from '~/components/primitives/Authorship.astro';
+
+const description =
+  'Why ERCs, Solved exists, who writes it, and how to contribute. An independent, spec-grade reference for the LUKSO LSP standards.';
+---
+
+<Base title="About" description={description}>
+  <article class="article">
+    <header class="page-head">
+      <span class="eyebrow">colophon</span>
+      <h1>About this field manual.</h1>
+    </header>
+
+    <section class="prose">
+      <p class="lede">
+        ERCs, Solved is a reference for the standards LUKSO designed instead of layered. It is
+        written for the EVM developer who already knows what is broken on Ethereum and wants the
+        decision support to move — verdict-first, not marketing-first.
+      </p>
+
+      <h2>The stance, in one paragraph.</h2>
+      <p>
+        <strong>ERCs are interfaces. LSPs are the system.</strong> ERC-20, 721, and 1155 won by
+        underspecifying — they handed everyone a balance sheet and a transfer function and went
+        home. Every team since has paid the integration tax: approval phishing, dead NFTs in
+        vaults, tokenURI servers that go offline, EOAs nobody can recover, 4337 stacks bolted on
+        to fake what an account should be. LSPs aren't a competing token spec — they're the
+        surrounding system: receiver awareness, profile metadata, key-scoped permissions, relay
+        execution, contract extension. This site exists to make that decision legible.
+      </p>
+
+      <h2>Editorial rules.</h2>
+      <ul class="rules">
+        <li>
+          <span class="n">01</span>
+          <span>One claim per page. The verdict goes above the fold.</span>
+        </li>
+        <li>
+          <span class="n">02</span>
+          <span>No exclamation points. No "powerful." No "next-generation." If a standard needs a marketing word it isn't ready.</span>
+        </li>
+        <li>
+          <span class="n">03</span>
+          <span>Every standard explainer includes a <em>what it does not solve</em> section. Anti-overselling is a feature.</span>
+        </li>
+        <li>
+          <span class="n">04</span>
+          <span>Every page lists the author, the last-updated date, and an edit-on-github link.</span>
+        </li>
+        <li>
+          <span class="n">05</span>
+          <span>We link to <code>docs.lukso.tech</code> for the canonical spec. We do not duplicate the spec — we make the decision around it.</span>
+        </li>
+      </ul>
+
+      <h2>How content is organized.</h2>
+      <p>
+        Two entry models converge on the same library: enter by the ERC you use today through
+        <Crossref href="/problems/" chip="hub">Problems</Crossref>, or enter by what you're building
+        through <Crossref href="/build/" chip="hub">Build</Crossref>. Both route to
+        <Crossref href="/standards/" chip="hub">Standards</Crossref> explainers and side-by-side
+        <Crossref href="/standards/compare/erc20-lsp7/" chip="LSP·7">comparisons</Crossref>.
+        The single most-linkable page is the
+        <Crossref href="/standards/matrix/" chip="LSP·*">ERC ↔ LSP matrix</Crossref>.
+      </p>
+
+      <h2>Independence.</h2>
+      <p>
+        This is an independent reference. It is unaffiliated with the LUKSO foundation. We don't
+        publish anything we wouldn't ship in production ourselves, and we link to the official
+        docs from every page so the spec stays canonical there.
+      </p>
+
+      <h2>Contribute.</h2>
+      <p>
+        Found a bug, a sharper verdict, a missing pattern? Every page has an{' '}
+        <em>edit on github</em> link. Open a PR — issues are also fine. The content collection
+        schemas are typed; reviewers will catch shape errors before merge.
+      </p>
+    </section>
+
+    <Authorship
+      author="ercs-solved maintainers"
+      updated="2026-06-22"
+      editHref="https://github.com/lukso-network/ercs-solved/edit/main/src/pages/about.astro"
+    />
+  </article>
+</Base>
+
+<style>
+  .article {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-8) var(--s-5);
+    display: grid;
+    gap: var(--s-7);
+  }
+  .page-head {
+    display: grid;
+    gap: var(--s-3);
+  }
+  .page-head h1 {
+    font-size: clamp(36px, 6vw, var(--t-serif-3));
+  }
+
+  .prose {
+    max-width: var(--reading);
+    display: grid;
+    gap: var(--s-5);
+  }
+  .prose .lede {
+    font-size: var(--t-mono-lg);
+    color: var(--ink-bone);
+  }
+  .prose h2 {
+    font-size: var(--t-serif-1);
+    margin-top: var(--s-4);
+  }
+  .prose p { color: var(--ink-bone-dim); }
+  .prose em { color: var(--ink-bone); font-style: italic; }
+  .prose code {
+    background: var(--ink-paper);
+    border: 1px solid var(--ink-line);
+    padding: 0 4px;
+    font-size: 0.95em;
+    color: var(--signal-pink);
+  }
+
+  .rules {
+    display: grid;
+    gap: var(--s-3);
+  }
+  .rules li {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding: var(--s-3) 0;
+    border-top: 1px solid var(--ink-line);
+    color: var(--ink-bone-dim);
+  }
+  .rules li:last-child { border-bottom: 1px solid var(--ink-line); }
+  .rules .n {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--signal-pink);
+    letter-spacing: 0;
+  }
+
+  @media (max-width: 640px) {
+    .article { padding: var(--s-6) var(--s-4); }
+  }
+</style>

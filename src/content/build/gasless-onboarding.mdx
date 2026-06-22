@@ -1,0 +1,35 @@
+---
+title: "Gasless onboarding."
+vertical: "Gasless onboarding"
+description: "Sponsored execution flows where a relayer pays gas and the user just signs. No bundler, no EntryPoint — relay execution lives on the account."
+stack: ["LSP·25", "LSP·6", "LSP·20"]
+updated: 2026-06-22
+reading:
+  - { chip: "problem", label: "New users need gas before they can do anything", href: "/problems/gasless-onboarding/" }
+  - { chip: "problem", label: "The 4337 stack is a parallel mempool", href: "/problems/eip4337-bundler-tax/" }
+  - { chip: "LSP·25", label: "Execute Relay Call", href: "/standards/lsp25-execute-relay-call/" }
+  - { chip: "LSP·6", label: "Key Manager", href: "/standards/lsp6-key-manager/" }
+  - { chip: "compare", label: "ERC4337 vs the LSP account stack", href: "/standards/compare/erc4337-lsp-stack/" }
+docs:
+  - label: "docs.lukso.tech / LSP25 executeRelayCall"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "docs.lukso.tech / Transaction Relay API"
+    href: "https://docs.lukso.tech/tools/dapps/transaction-relay-api/"
+---
+
+Gasless UX is a separation: the *signer* and the *payer* are different actors. LSP25 puts
+that separation on the account itself. A controller signs a payload, a relayer submits it
+and pays gas, the profile validates via LSP6 and executes.
+
+## When this vertical fits
+
+You're onboarding users who don't already hold LYX. You want to sponsor the first N actions,
+or all actions for a given app session, or just the costly ones (recovery operations,
+expensive setData calls). You don't want to run a bundler.
+
+## The minimum stack
+
+- **LSP25** on the account for `executeRelayCall`
+- **LSP6** to constrain what the signing controller may authorize
+- **LSP20** when controllers should call the account directly inline
+- **Nonce channels** — use higher channels for parallel session streams instead of serializing through channel 0

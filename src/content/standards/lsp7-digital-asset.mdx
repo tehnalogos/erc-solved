@@ -1,0 +1,57 @@
+---
+kind: LSP
+id: "7"
+title: "Digital Asset"
+oneLine: "Fungible and semi-fungible tokens, with native receiver hooks and operator authorization."
+description: "LSP7 is the LUKSO Digital Asset standard. It keeps ERC20's balance model, then adds a force flag, a data payload, LSP1 receiver notifications, and amount-scoped operators with explicit events."
+purpose: Token
+updated: 2026-06-22
+abi: |
+  function balanceOf(address tokenOwner) external view returns (uint256);
+
+  function transfer(
+    address from,
+    address to,
+    uint256 amount,
+    bool force,
+    bytes calldata data
+  ) external;
+
+  function authorizeOperator(
+    address operator,
+    uint256 amount,
+    bytes calldata operatorNotificationData
+  ) external;
+
+  function revokeOperator(
+    address operator,
+    bytes calldata operatorNotificationData
+  ) external;
+solves:
+  - pain: "ERC20 transfer hooks"
+    href: "/problems/erc20-transfer-hooks/"
+  - pain: "ERC20 approval risks"
+    href: "/problems/erc20-approval-risks/"
+  - pain: "ERC1155 complexity (split by asset shape)"
+    href: "/problems/erc1155-complexity/"
+companions: ["LSP·1", "LSP·4", "LSP·6", "LSP·8"]
+doesNotSolve:
+  - "LSP7 operators are still amount-scoped — that's honest, it's not magic."
+  - "It doesn't replace DeFi-grade ERC20 compatibility. If your asset must trade on every CEX, ERC20 is the path."
+  - "It doesn't auto-prevent stranding for non-LSP1 recipients. The `force` flag is *your* decision."
+docs:
+  - label: "docs.lukso.tech / LSP7 Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+  - label: "docs.lukso.tech / migrate ERC20 to LSP7"
+    href: "https://docs.lukso.tech/learn/migrate/migrate-erc20-to-lsp7/"
+---
+
+LSP7 is what ERC20 would look like if it had been designed with receiver awareness and
+account integration from day one. Every transfer carries `data`, every transfer calls
+`universalReceiver` on both sides, every operator authorization fires a typed event, and
+every asset's metadata lives in ERC725Y under LSP4 keys.
+
+The `force` parameter is the small detail with the biggest behavior shift: pass `false` and a
+recipient that doesn't implement LSP1 will revert (no more stranded balances); pass `true`
+and you've consciously decided to bypass the check. Either way it's a decision *you* made,
+not a side effect of which transfer variant the caller picked.

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gasless Transactions for Smart Accounts: Patterns Compared | ERCs, Solved</title>
+    <meta name="description" content="EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys.">
+    <link rel="canonical" href="https://ercsolved.dev/gasless-transactions-smart-accounts/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="Gasless Transactions for Smart Accounts: Patterns Compared | ERCs, Solved">
+    <meta property="og:description" content="EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/gasless-transactions-smart-accounts/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Gasless transactions for smart accounts","item":"https://ercsolved.dev/gasless-transactions-smart-accounts/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Gasless transactions for smart accounts","description":"EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["gasless transactions smart accounts","meta transactions","sponsored transactions"],"mainEntityOfPage":"https://ercsolved.dev/gasless-transactions-smart-accounts/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>Gasless transactions for smart accounts</h1>
+      <p>EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys.</p>
+      <div class="tag-row"><span>gasless transactions smart accounts</span><span>meta transactions</span><span>sponsored transactions</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>Three families dominate: EIP-2771 trusted forwarders, ERC4337 bundlers + paymasters, and account-native relay calls. The first leaks msg.sender semantics, the second introduces a separate transaction pool, the third bakes relay execution into the account itself. LSP25 takes the third approach for Universal Profiles.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>A new user needs native ETH before they can do anything. EOAs sign and pay together, so any sponsorship has to add a layer that separates the signer from the payer.</p><p>Every popular pattern adds infrastructure: a trusted forwarder you have to trust, an ERC4337 EntryPoint and bundler you have to run or rent, a third-party relayer with its own SDK. The cost lands on the builder.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>EIP-2771 trusted forwarder — contracts extract msg.sender from calldata. Cheap, but every protected contract must be 2771-aware and trust the forwarder.</li><li>ERC4337 + paymaster — UserOperation pool, bundler, EntryPoint, paymaster. Powerful, but you ship or pay for the bundler stack.</li><li>Gelato / Biconomy / OpenZeppelin Defender — turnkey relayers that wrap one of the above.</li><li>EIP-7702 (recent) — EOA temporarily acts like a smart account for the duration of a tx; sponsorship still needs a paymaster.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>LSP25 defines executeRelayCall on the Universal Profile itself. A controller signs a payload (with a nonce channel for ordering and replay protection), a relayer submits the transaction and pays gas. No bundler, no EntryPoint, no separate mempool — the account contract is the entry point.</p><p>Because the relayed call goes through the account, LSP6 permissions still apply: the controller signing the relay payload can only authorize what its permissions allow.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>ERC4337 UserOperation (sketch)</figcaption>
+              <pre><code class="language-solidity">// User signs a UserOperation, bundler posts it to EntryPoint,
+// paymaster pays gas, EntryPoint calls the account.
+function handleOps(UserOperation[] calldata ops, address beneficiary) external;</code></pre>
+            </figure>
+            <figure>
+              <figcaption>LSP25 executeRelayCall</figcaption>
+              <pre><code class="language-solidity">function executeRelayCall(
+  bytes calldata signature,
+  uint256 nonce,
+  uint256 validityTimestamps,
+  bytes calldata payload
+) external payable returns (bytes memory);</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp25-execute-relay-call</a>
+              <a href="https://docs.lukso.tech/standards/access-control/lsp6-key-manager/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp6-key-manager</a>
+              <a href="https://docs.lukso.tech/tools/dapps/transaction-relay-api/" rel="noopener noreferrer">docs.lukso.tech/dapps/transaction-relay-api</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/guides/gasless-transactions-universal-profile/">
+                <strong>Gasless transactions with Universal Profiles</strong>
+                <span>Design sponsored and gasless onboarding flows with LUKSO Universal Profiles, LSP25 relay calls, nonces, and relayers.</span>
+              </a>
+              <a href="/eip-4337-alternatives/">
+                <strong>EIP-4337 alternatives</strong>
+                <span>Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles.</span>
+              </a>
+              <a href="/eoa-vs-universal-profile/">
+                <strong>EOA wallet limits -&gt; Universal Profile smart accounts</strong>
+                <span>Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

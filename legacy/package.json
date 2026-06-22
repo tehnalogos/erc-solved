@@ -1,0 +1,11 @@
+{
+  "name": "ercs-solved",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "dev": "node server.mjs"
+  }
+}

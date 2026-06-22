@@ -1,0 +1,25 @@
+---
+interface Props {
+  href?: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+const { href = '/', size = 'md' } = Astro.props;
+---
+<a class={`wordmark wordmark-${size}`} href={href} aria-label="ERCs, Solved home">
+  ERCs, Solved<span aria-hidden="true">.</span>
+</a>
+
+<style>
+  .wordmark {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--ink-bone);
+    font-variation-settings: 'opsz' 14;
+  }
+  .wordmark-sm { font-size: var(--t-mono-lg); }
+  .wordmark-md { font-size: 22px; }
+  .wordmark-lg { font-size: var(--t-serif-1); }
+  .wordmark span { color: var(--signal-pink); }
+  .wordmark:hover span { color: var(--erc-sand); transition: color 200ms ease; }
+</style>

@@ -1,0 +1,40 @@
+---
+interface Props {
+  href: string;
+  chip?: string;
+  external?: boolean;
+}
+const { href, chip, external = href.startsWith('http') } = Astro.props;
+const rel = external ? 'noopener noreferrer' : undefined;
+const target = external ? '_blank' : undefined;
+---
+<a class="crossref" href={href} rel={rel} target={target}>
+  {chip && <span class="chip-text">{chip}</span>}
+  <span class="label"><slot /></span>
+  <span class="caret" aria-hidden="true">{external ? '↗' : '→'}</span>
+</a>
+
+<style>
+  .crossref {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding: 2px 0;
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+    transition: border-color 150ms ease, color 150ms ease;
+    font-family: var(--font-mono);
+  }
+  .crossref:hover, .crossref:focus-visible {
+    color: var(--signal-pink);
+    border-color: var(--signal-pink);
+    outline: none;
+  }
+  .chip-text {
+    font-size: var(--t-mono-xs);
+    color: var(--signal-pink);
+    text-transform: uppercase;
+  }
+  .label { font-size: inherit; }
+  .caret { color: var(--ink-fog); font-size: 0.9em; }
+</style>

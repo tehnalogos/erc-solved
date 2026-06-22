@@ -1,0 +1,56 @@
+---
+import Base from '~/layouts/Base.astro';
+import DecisionMatrix from '~/components/matrix/DecisionMatrix.astro';
+import Authorship from '~/components/primitives/Authorship.astro';
+import { matrixRows } from '~/lib/matrix.ts';
+---
+<Base
+  title="The ERC ↔ LSP matrix"
+  description="Every Ethereum standard developers reach for, mapped to the LUKSO LSP equivalent in one row. The canonical decision page."
+>
+  <section class="matrix-page" data-pagefind-body data-pagefind-meta="title:The ERC ↔ LSP matrix">
+    <header class="head">
+      <span class="eyebrow">decision page · share this one</span>
+      <h1>The ERC ↔ LSP matrix.</h1>
+      <p class="dim">
+        One row per ERC. The LSP column shows what the standard would look like if it were
+        designed instead of layered. The verdict is one line. Click through for the comparison
+        page when you want the spec diff.
+      </p>
+    </header>
+
+    <DecisionMatrix rows={matrixRows} />
+
+    <footer class="foot">
+      <Authorship
+        author="ercs-solved maintainers"
+        updated="2026-06-22"
+        editHref="https://github.com/lukso-network/ercs-solved/edit/main/src/lib/matrix.ts"
+      />
+    </footer>
+  </section>
+</Base>
+
+<style>
+  .matrix-page {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-8) var(--s-5);
+    display: grid;
+    gap: var(--s-7);
+  }
+  .head {
+    display: grid;
+    gap: var(--s-3);
+    max-width: 64ch;
+  }
+  .head h1 {
+    font-size: clamp(36px, 5vw, 64px);
+  }
+  .head .dim { color: var(--ink-bone-dim); }
+  .foot { padding-top: var(--s-4); }
+
+  @media (max-width: 640px) {
+    .matrix-page { padding: var(--s-6) var(--s-4); }
+  }
+</style>

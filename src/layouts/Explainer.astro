@@ -1,0 +1,144 @@
+---
+import Article from './Article.astro';
+import StandardChip from '~/components/brand/StandardChip.astro';
+import SpecBlock from '~/components/primitives/SpecBlock.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+
+interface Props { entry: any; }
+const { entry } = Astro.props;
+const { data, slug } = entry;
+const chipKind = data.kind === 'LSP' ? 'lsp' : 'erc';
+---
+<Article
+  title={data.title}
+  description={data.description}
+  pageTitle={`${data.kind}·${data.id} — ${data.title} · ERCs, Solved`}
+  eyebrow={`standard · ${data.purpose.toLowerCase()}`}
+  author={data.author}
+  updated={data.updated}
+  editPath={`src/content/standards/${slug}.mdx`}
+>
+  <div slot="header-extras" class="head-extras">
+    <div class="chip-row">
+      <StandardChip kind={chipKind} id={data.id} />
+      <span class="dim">·</span>
+      <span class="purpose">{data.purpose}</span>
+    </div>
+    <p class="one-line">{data.oneLine}</p>
+  </div>
+
+  <SpecBlock chip={`${data.kind}·${data.id}`} chipKind={chipKind} caption="interface" lang="solidity">{data.abi}</SpecBlock>
+
+  <section class="prose">
+    <slot />
+  </section>
+
+  {data.solves?.length > 0 && (
+    <section class="solves">
+      <h2>What it solves.</h2>
+      <ul>
+        {data.solves.map((s: any) => (
+          <li>
+            {s.href ? <Crossref href={s.href}>{s.pain}</Crossref> : <span>{s.pain}</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {data.doesNotSolve?.length > 0 && (
+    <section class="not-solves">
+      <h2>What it does <em>not</em> solve.</h2>
+      <p class="dim">Anti-overselling is a feature.</p>
+      <ul>
+        {data.doesNotSolve.map((s: string) => (<li>{s}</li>))}
+      </ul>
+    </section>
+  )}
+
+  {data.companions?.length > 0 && (
+    <section class="companions">
+      <h2>Companions.</h2>
+      <p class="dim">Standards this composes with.</p>
+      <ul class="chips">
+        {data.companions.map((c: string) => (
+          <li><Crossref href={`/standards/${c.toLowerCase().replace('·','-').replace(/[^a-z0-9-]/g,'-')}/`} chip={c}>{c}</Crossref></li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {data.docs?.length > 0 && (
+    <section class="docs">
+      <h2>Read the source.</h2>
+      <ul>
+        {data.docs.map((d: any) => (
+          <li><Crossref href={d.href}>{d.label}</Crossref></li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Article>
+
+<style>
+  .head-extras { display: grid; gap: var(--s-3); }
+  .chip-row { display: flex; gap: var(--s-2); align-items: center; }
+  .dim { color: var(--ink-line); }
+  .purpose {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+  }
+  .one-line {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(20px, 2.5vw, 32px);
+    color: var(--ink-bone-dim);
+    line-height: 1.2;
+    max-width: 36ch;
+  }
+
+  .prose {
+    max-width: var(--reading);
+    display: grid;
+    gap: var(--s-5);
+  }
+  .prose :global(h2) { font-size: var(--t-serif-1); margin-top: var(--s-4); }
+  .prose :global(p) { color: var(--ink-bone-dim); }
+  .prose :global(strong) { color: var(--ink-bone); }
+  .prose :global(code) {
+    background: var(--ink-paper);
+    border: 1px solid var(--ink-line);
+    padding: 0 4px;
+    color: var(--signal-pink);
+    font-size: 0.95em;
+  }
+  .prose :global(ul) {
+    display: grid;
+    gap: var(--s-2);
+    padding-left: var(--s-4);
+    list-style: '— ';
+    color: var(--ink-bone-dim);
+  }
+  .prose :global(a) {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .prose :global(a:hover) { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  .solves, .not-solves, .companions, .docs {
+    display: grid;
+    gap: var(--s-3);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .not-solves h2 em { color: var(--erc-sand); font-style: italic; }
+  .solves ul, .not-solves ul, .docs ul, .companions ul {
+    display: grid; gap: var(--s-2);
+  }
+  .chips { grid-auto-flow: column; grid-auto-columns: max-content; gap: var(--s-3); }
+  @media (max-width: 720px) { .chips { grid-auto-flow: row; } }
+</style>

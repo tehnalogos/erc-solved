@@ -1,0 +1,73 @@
+---
+title: "Migrate ERC20 token logic to LSP7"
+from: "ERC·20"
+to: "LSP·7"
+description: "A step-by-step migration from an ERC20 token contract to LSP7. Map balances, transfers, approvals, metadata, and receiver behavior."
+estimate: "~2 days for a typical contract"
+verdict: "Don't migrate just because LSP7 exists. Migrate when the token needs receiver awareness, structured metadata, transfer context, or account-level permission scoping. Keep ERC20 when DEX/bridge compatibility is the product."
+updated: 2026-06-22
+gotchas:
+  - "Existing ERC20-only marketplaces, bridges, and aggregators won't pick up an LSP7 deployment without explicit work."
+  - "LSP7 operators are amount-scoped — they don't magically solve approval risk. The real shift comes from pairing with LSP6 on the controller side."
+  - "force=false transfers revert if the recipient doesn't implement LSP1. Decide deliberately per use case."
+  - "ERC725Y metadata writes cost storage gas. Don't dump your whole JSON on-chain; use VerifiableURI for off-chain blobs."
+verify:
+  - "Holders mapping migrated 1:1 (or new contract has accurate snapshot mint)"
+  - "All historical transfer events replayable from a known block"
+  - "LSP4 metadata reads return expected name/symbol/JSON"
+  - "Universal Profile recipients receive LSP1 hooks on transfer"
+  - "Operator authorize/revoke fires the expected events"
+  - "force=false revert behavior covered in tests"
+docs:
+  - label: "docs.lukso.tech / migrate ERC20 to LSP7"
+    href: "https://docs.lukso.tech/learn/migrate/migrate-erc20-to-lsp7/"
+  - label: "docs.lukso.tech / LSP7 Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+related: ["compare/erc20-lsp7", "problems/erc20-transfer-hooks"]
+---
+
+### Step 1 — map the ERC20 surface
+
+List every external function your contract exposes: `transfer`, `transferFrom`, `approve`,
+`allowance`, `mint`, `burn`, admin roles. Separate **protocol compatibility requirements**
+(must work with existing DeFi pools, bridges) from **product UX requirements** (rich
+metadata, receiver hooks, scoped delegation). If protocol compatibility wins, stop here —
+LSP7 is not the right move.
+
+### Step 2 — choose which LSP7 features you actually need
+
+Don't migrate features you won't use. Real questions:
+
+- Does the recipient need to react onchain? → use LSP1 + `force=false` selectively
+- Does the transfer need context (memo, intent, source)? → use the `data` parameter
+- Should the asset carry richer metadata? → store under LSP4 keys via ERC725Y
+- Should the *account* gate operator authority? → pair with LSP6 on the controller side
+
+### Step 3 — decide the migration path
+
+Three real options:
+
+- **Fresh deployment** — new LSP7 contract, distribute via snapshot mint. Cleanest. Breaks
+  every existing integration.
+- **Wrap** — keep the ERC20, deploy a wrapper LSP7 backed 1:1. Reversible. Adds a deposit
+  step.
+- **Side-by-side** — both contracts live, choose at integration time. Confusing for users;
+  rarely the right answer.
+
+### Step 4 — port the contract
+
+Replace `transfer(to, amount)` with `transfer(from, to, amount, force, data)`. Replace
+`approve / transferFrom` with `authorizeOperator / transfer`. Move name/symbol metadata to
+ERC725Y under LSP4 keys. Add LSP4Metadata for the rich JSON.
+
+### Step 5 — handle the holders
+
+Snapshot the ERC20 balances at a known block. Deploy LSP7. Mint to the snapshot list (or
+publish a merkle claim if the holder set is large). Pause the ERC20 once the migration
+window closes.
+
+### Step 6 — wire the receivers
+
+Identify which downstream contracts (vaults, gauges, staking) need to react to incoming
+LSP7. Add LSP1 handlers there. Use `force=false` once those handlers ship; use `force=true`
+for any contract that legitimately just holds.

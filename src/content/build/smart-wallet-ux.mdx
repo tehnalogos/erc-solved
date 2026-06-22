@@ -1,0 +1,37 @@
+---
+title: "Smart wallet UX."
+vertical: "Smart wallet UX"
+description: "Session keys, scoped delegation, recovery, signature verification. The account-side primitives that turn a smart account into a usable product."
+stack: ["LSP·0", "LSP·6"]
+updated: 2026-06-22
+reading:
+  - { chip: "problem", label: "Wallets don't know how to ask for less", href: "/problems/wallet-permissions/" }
+  - { chip: "problem", label: "Recovery shouldn't be one phrase to lose", href: "/problems/social-recovery/" }
+  - { chip: "problem", label: "An EOA is one key for everything", href: "/problems/eoa-key-risk/" }
+  - { chip: "LSP·0", label: "ERC725 Account", href: "/standards/lsp0-erc725-account/" }
+  - { chip: "LSP·6", label: "Key Manager", href: "/standards/lsp6-key-manager/" }
+  - { chip: "compare", label: "EOA vs Universal Profile", href: "/standards/compare/eoa-universal-profile/" }
+docs:
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+---
+
+A smart wallet UX is a permission graph, not a connect button. LSP6 is the vocabulary for
+that graph — controllers, permissions, allowed calls, allowed data keys — and LSP0 is the
+account those controllers act on.
+
+## When this vertical fits
+
+You're shipping anything where "the wallet has full account control" is the wrong default:
+session keys for an app, scoped controllers for a marketplace integration, recovery
+controllers a user never touches day-to-day, multi-device flows where each device gets its
+own permission set.
+
+## The minimum stack
+
+- **LSP0** as the account contract
+- **LSP6** for permissions per controller
+- **LSP14** for safer ownership rotation when controllers can't just be re-permissioned
+- **LSP20** if you want controllers to call the account directly (not through the Key Manager wrapper)

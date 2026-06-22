@@ -1,0 +1,52 @@
+---
+title: "ERC1155 vs LSP7 + LSP8"
+left: { chip: "ERC·1155", label: "multi-asset contract" }
+right: { chip: "LSP·7+8", label: "split by asset shape" }
+description: "ERC1155 packs many token types into one contract; LSP7 + LSP8 split the same surface by asset semantics. Pick the boundary deliberately — it shows up in indexing, wallet UX, and marketplace logic."
+updated: 2026-06-22
+verdict:
+  useLeft: "Game / edition contracts where one deployer manages many token types and gas savings from a single contract dominate. Mature ERC1155 tooling matters."
+  useRight: "Product semantics matter. If wallets, indexers, or marketplaces need to know 'fungible vs identifiable' without per-collection decoding, ship two contracts."
+matrix:
+  - row: "contracts per product"
+    left: "one"
+    right: "one per asset shape (often two)"
+  - row: "fungibility signal"
+    left: "convention in token-id bits"
+    right: "in the standard (LSP7 vs LSP8)"
+  - row: "transfer hook"
+    left: "IERC1155Receiver (single + batch)"
+    right: "LSP1 universalReceiver (one shape for both)"
+  - row: "metadata"
+    left: "uri(id) → string"
+    right: "ERC725Y + LSP4 keys, per-token via LSP8"
+  - row: "batch transfer"
+    left: "safeBatchTransferFrom"
+    right: "transferBatch on each standard"
+  - row: "indexing cost"
+    left: "high — per-collection conventions"
+    right: "low — shape is in the standard"
+docs:
+  - label: "docs.lukso.tech / LSP7 Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+related: ["problems/erc1155-complexity", "problems/erc20-transfer-hooks"]
+---
+
+## The semantic boundary moves
+
+ERC1155 makes the boundary between fungible and identifiable a *contract-internal*
+convention. The high bits of a token id might encode "this id is fungible" or "this id is
+unique" — and that convention is per-collection. Wallets and indexers learn it the hard way.
+
+LSP7 + LSP8 put the same boundary in the *standard*. If something is fungible, it lives on
+an LSP7 contract. If something is identifiable, it lives on an LSP8 contract. Marketplace UI
+branches on the interface ID, not on a token-id bit pattern.
+
+## Cost: more contracts to deploy
+
+The honest tradeoff: where ERC1155 ships one contract for a multi-asset product, LSP7 + LSP8
+usually ships two. The deployment is a one-time gas cost; the integration savings are
+ongoing. For a game with stable item categories, the split usually pays off. For a stamp
+collection of 10,000 highly varied items, ERC1155 may still be the right call.

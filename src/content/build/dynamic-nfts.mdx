@@ -1,0 +1,41 @@
+---
+title: "Dynamic NFTs."
+vertical: "Dynamic NFTs"
+description: "Stateful, evolving, generative NFTs. Per-token data without a metadata server, dynamic updates without marketplace refresh buttons."
+stack: ["LSP·8", "LSP·4", "ERC·725Y"]
+updated: 2026-06-22
+reading:
+  - { chip: "problem", label: "The tokenURI trap", href: "/problems/erc721-dynamic-metadata/" }
+  - { chip: "problem", label: "uint256 tokenIds were always a compromise", href: "/problems/erc721-tokenid-limits/" }
+  - { chip: "LSP·8", label: "Identifiable Asset — the spec", href: "/standards/lsp8-identifiable-digital-asset/" }
+  - { chip: "LSP·4", label: "Digital Asset Metadata", href: "/standards/lsp4-digital-asset-metadata/" }
+  - { chip: "compare", label: "ERC721 vs LSP8", href: "/standards/compare/erc721-lsp8/" }
+  - { chip: "migrate", label: "Migrate ERC721 → LSP8", href: "/build/migrate/erc721-to-lsp8/" }
+docs:
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+  - label: "docs.lukso.tech / LSP4 Digital Asset Metadata"
+    href: "https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/"
+---
+
+If the NFT changes — traits evolve, levels accrue, music reveals, art shifts on a calendar —
+then metadata is data, not a URL. LSP8 makes that distinction structural.
+
+## When this vertical fits
+
+The asset has per-token state that mutates. The state should be readable by *any* app, not
+just yours. The token ID itself might mean something (a content hash, a serial). You don't
+want users hitting "refresh metadata" because the marketplace cache went stale.
+
+## When ERC721 is still the right call
+
+Marketplace compatibility is the product. If the collection has to list on every major NFT
+venue out of the gate, ERC721 is the path — even with the tokenURI tax.
+
+## The minimum stack
+
+- **LSP8** for ownership + per-token data
+- **LSP4** for collection metadata
+- **ERC725Y** for typed key-value storage (per-collection and per-token)
+- **VerifiableURI** when the off-chain media needs integrity guarantees
+- **LSP1** on the receiver side for profiles that want to react when the NFT lands

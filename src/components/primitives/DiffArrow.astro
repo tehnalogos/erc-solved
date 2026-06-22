@@ -1,0 +1,147 @@
+---
+interface Side {
+  chip: string;
+  code: string;
+  tags: string[];
+}
+interface Props {
+  from: Side;
+  to: Side;
+  size?: 'md' | 'lg';
+  framed?: boolean;
+}
+const { from, to, size = 'md', framed = false } = Astro.props;
+---
+<figure class:list={['diff', `diff-${size}`, { framed }]} role="group" aria-label={`${from.chip} compared to ${to.chip}`}>
+  <div class="block block-from">
+    <span class="gutter" aria-hidden="true">−</span>
+    <div class="body">
+      <div class="head">
+        <span class="chip">{from.chip}</span>
+        <code class="code">{from.code}</code>
+      </div>
+      <div class="tags">
+        {from.tags.map((t, i) => (
+          <>
+            {i > 0 && <span class="sep" aria-hidden="true">·</span>}
+            <span class="tag">{t}</span>
+          </>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="connector" aria-hidden="true">
+    <span class="rule"></span>
+    <span class="label">becomes</span>
+    <span class="rule"></span>
+  </div>
+
+  <div class="block block-to">
+    <span class="gutter" aria-hidden="true">+</span>
+    <div class="body">
+      <div class="head">
+        <span class="chip">{to.chip}</span>
+        <code class="code">{to.code}</code>
+      </div>
+      <div class="tags">
+        {to.tags.map((t, i) => (
+          <>
+            {i > 0 && <span class="sep" aria-hidden="true">·</span>}
+            <span class="tag">{t}</span>
+          </>
+        ))}
+      </div>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .diff {
+    margin: 0;
+    font-family: var(--font-mono);
+    display: grid;
+    gap: var(--s-4);
+    max-width: 100%;
+  }
+  .diff-md { font-size: var(--t-mono-md); }
+  .diff-lg { font-size: var(--t-mono-lg); }
+  .diff.framed {
+    border: 1px solid var(--ink-line);
+    padding: var(--s-5) var(--s-5);
+    background: var(--ink-paper);
+  }
+
+  .block {
+    display: grid;
+    grid-template-columns: 2ch 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+  }
+  .gutter {
+    font-weight: 500;
+    line-height: 1.5;
+    user-select: none;
+  }
+  .block-from .gutter { color: var(--erc-sand); }
+  .block-to   .gutter { color: var(--signal-pink); }
+
+  .body { display: grid; gap: var(--s-2); min-width: 0; }
+
+  .head {
+    display: grid;
+    grid-template-columns: 7ch 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+  }
+  .chip {
+    font-size: var(--t-mono-sm);
+    letter-spacing: 0;
+  }
+  .block-from .chip { color: var(--erc-sand); }
+  .block-to   .chip { color: var(--signal-pink); }
+
+  .code {
+    font-family: var(--font-mono);
+    font-size: inherit;
+    color: var(--ink-bone);
+    word-break: break-word;
+  }
+
+  .tags {
+    grid-column: 2;
+    margin-left: 7ch;
+    padding-left: var(--s-3);
+    color: var(--ink-fog);
+    font-size: var(--t-mono-sm);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-2);
+  }
+  .tag { letter-spacing: 0; }
+  .sep { color: var(--ink-line); }
+
+  .connector {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--s-3);
+    color: var(--ink-fog);
+    font-size: var(--t-mono-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0 var(--s-2);
+  }
+  .rule {
+    height: 1px;
+    background: var(--ink-line);
+  }
+  .label {
+    line-height: 1;
+  }
+
+  @media (max-width: 640px) {
+    .head { grid-template-columns: 1fr; gap: var(--s-1); }
+    .tags { grid-column: 1 / -1; margin-left: 0; padding-left: 0; }
+  }
+</style>

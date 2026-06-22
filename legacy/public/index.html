@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERCs, Solved: LUKSO LSP Standards for Ethereum Developers</title>
+    <meta name="description" content="A field manual for Ethereum developers comparing ERC pain points with LUKSO LSP standards for tokens, NFTs, metadata, permissions, receiver awareness, and onboarding.">
+    <link rel="canonical" href="https://ercsolved.dev/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERCs, Solved: LUKSO LSP Standards for Ethereum Developers">
+    <meta property="og:description" content="A field manual for Ethereum developers comparing ERC pain points with LUKSO LSP standards for tokens, NFTs, metadata, permissions, receiver awareness, and onboarding.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ercsolved.dev/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"ERCs, Solved","url":"https://ercsolved.dev"},{"@context":"https://schema.org","@type":"WebSite","name":"ERCs, Solved","url":"https://ercsolved.dev","description":"A field manual for Ethereum developers comparing ERC pain points with LUKSO LSP standards for tokens, NFTs, metadata, permissions, receiver awareness, and onboarding.","potentialAction":{"@type":"SearchAction","target":"https://ercsolved.dev/erc-problems/?q={search_term_string}","query-input":"required name=search_term_string"}}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">LSP guides for Ethereum developers</p>
+          <h1>EVM Problems, LSP Solutions</h1>
+          <p class="hero-subhead">ERC standards made Ethereum composable, but EVM builders still hit the same walls: ERC20 has no transfer hooks, approve is unsafe, tokenURI is static, safeTransferFrom is partial, ERC1155 packs too much, EOAs lose everything with one key, and 4337 wants its own bundler stack. ERCs, Solved names each problem in the words EVM developers search for, then shows how LUKSO LSP standards solve it.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="/erc-problems/">Find your EVM problem</a>
+            <a class="button button-secondary" href="/erc20-transfer-hooks/">ERC20 transfer hooks</a>
+          </div>
+        </div>
+        <aside class="ship-console" aria-label="Mission signal">
+          <span class="console-label">Ship computer</span>
+          <strong>ERCs are interfaces. LSPs are systems.</strong>
+          <p>ERCs are minimum interfaces. LSPs are the surrounding system: receiver hooks, account permissions, profile metadata, relay execution, and contract extensions designed to compose.</p>
+          <div class="console-grid" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section-band">
+        <div class="section-heading">
+          <p class="eyebrow">Diagnosis deck</p>
+          <h2>Start with the failure mode</h2>
+          <p>Each guide begins with an ERC problem developers already recognize, then maps it to a LUKSO standard pattern.</p>
+        </div>
+        <div class="mission-grid">
+          
+        <a class="mission-card" href="/erc20-transfer-hooks/">
+          <span>EVM problem</span>
+          <strong>How to add ERC20 transfer hooks</strong>
+          <small>ERC20 has no receiver hook. Compare ERC777, ERC1363, transferAndCall wrappers, and the LSP7 plus LSP1 receiver model for reacting to token transfers onchain.</small>
+        </a>
+        <a class="mission-card" href="/erc20-approval-risks/">
+          <span>EVM problem</span>
+          <strong>ERC20 approval risks</strong>
+          <small>Unlimited allowances, stale approvals, and split-intent UX make ERC20 approve a known security problem. Compare Permit2, EIP-2612, revoke flows, and LSP7 operator authorization with LSP6 account permissions.</small>
+        </a>
+        <a class="mission-card" href="/erc721-dynamic-metadata/">
+          <span>EVM problem</span>
+          <strong>ERC721 dynamic metadata</strong>
+          <small>tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC4906, fully onchain SVG, and LSP8 plus ERC725Y key/value metadata.</small>
+        </a>
+        <a class="mission-card" href="/gasless-transactions-smart-accounts/">
+          <span>EVM problem</span>
+          <strong>Gasless transactions for smart accounts</strong>
+          <small>EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys.</small>
+        </a>
+        <a class="mission-card" href="/smart-contract-wallet-permissions/">
+          <span>EVM problem</span>
+          <strong>Smart contract wallet permissions</strong>
+          <small>Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps.</small>
+        </a>
+        <a class="mission-card" href="/eip-4337-alternatives/">
+          <span>EVM problem</span>
+          <strong>EIP-4337 alternatives</strong>
+          <small>Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles.</small>
+        </a>
+        </div>
+      </section>
+
+      <section class="section-band split-band">
+        <div>
+          <p class="eyebrow">Field manual stance</p>
+          <h2>Respect the interface. Fix the surrounding system.</h2>
+          <p>ERC20, ERC721, and ERC1155 are successful because they are small common interfaces. The recurring product gaps appear around them: metadata, account permissions, receiver policy, transfer context, gas, and app-readable identity.</p>
+        </div>
+        <div class="telemetry-list">
+          <span>ERC20 approvals -> LSP7 operators plus account permissions</span>
+          <span>ERC721 tokenURI -> LSP4 metadata plus ERC725Y data</span>
+          <span>EOA key risk -> Universal Profile controllers</span>
+          <span>Gas-first onboarding -> LSP25 relay calls</span>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

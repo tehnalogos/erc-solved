@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERC Problems - LSP Solutions for Ethereum Developers | ERCs, Solved</title>
+    <meta name="description" content="A practical index of ERC20, ERC721, ERC1155, wallet, metadata, receiver, and onboarding problems mapped to LUKSO LSP patterns.">
+    <link rel="canonical" href="https://ercsolved.dev/erc-problems/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERC Problems - LSP Solutions for Ethereum Developers | ERCs, Solved">
+    <meta property="og:description" content="A practical index of ERC20, ERC721, ERC1155, wallet, metadata, receiver, and onboarding problems mapped to LUKSO LSP patterns.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/erc-problems/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Find your ERC problem","item":"https://ercsolved.dev/erc-problems/"}]},{"@context":"https://schema.org","@type":"CollectionPage","headline":"Find your ERC problem","description":"A practical index of ERC20, ERC721, ERC1155, wallet, metadata, receiver, and onboarding problems mapped to LUKSO LSP patterns.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["Ethereum standards","LUKSO standards"],"mainEntityOfPage":"https://ercsolved.dev/erc-problems/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Problem index</p>
+      <h1>Find your ERC problem</h1>
+      <p>A practical index of ERC20, ERC721, ERC1155, wallet, metadata, receiver, and onboarding problems mapped to LUKSO LSP patterns.</p>
+      
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>Start with the problem you are debugging. Each diagnosis links to an LSP pattern that keeps the ERC mental model but adds missing context around metadata, permissions, receiver awareness, and account UX.</p></section>
+      
+        <section class="problem-group">
+          <div>
+            <p class="eyebrow">Problem cluster</p>
+            <h2>Token transfer problems</h2>
+            <p>Approvals, recipient validation, transfer context, and hooks are where ERC20-era assumptions start to leak into product UX.</p>
+          </div>
+          <div class="problem-list">
+            
+                  <a class="problem-row" href="/erc20-approval-risks/">
+                    <span class="query">ERC20 approval risks</span>
+                    <span>Approvals split intent across approve and transferFrom, which creates stale allowance, phishing, and UX review problems.</span>
+                    <strong>LSP7 uses operators, transfer data, and receiver notifications. Universal Profiles can add LSP6 account permissions around the action.</strong>
+                  </a>
+                  <a class="problem-row" href="/erc20-transfer-hooks/">
+                    <span class="query">ERC20 transfer hooks (no receiver hook on ERC20)</span>
+                    <span>ERC20 transfers do not ask the recipient contract whether it can handle or react to the asset.</span>
+                    <strong>LSP7 transfers integrate with LSP1 Universal Receiver and include a force parameter plus a data payload.</strong>
+                  </a>
+                  <a class="problem-row" href="/erc1155-complexity/">
+                    <span class="query">ERC1155 complexity (multi-asset contracts)</span>
+                    <span>One ERC1155 contract can mix fungible, semi-fungible, and unique items, so apps pay a decoding and indexing tax.</span>
+                    <strong>LSP7 covers fungible/semi-fungible, LSP8 covers identifiable assets. The semantic split lives in the standard.</strong>
+                  </a>
+          </div>
+        </section>
+        <section class="problem-group">
+          <div>
+            <p class="eyebrow">Problem cluster</p>
+            <h2>NFT metadata problems</h2>
+            <p>NFT projects quickly outgrow a single tokenURI when metadata needs to be dynamic, per-token, verifiable, or app-readable.</p>
+          </div>
+          <div class="problem-list">
+            
+                  <a class="problem-row" href="/erc721-dynamic-metadata/">
+                    <span class="query">ERC721 dynamic metadata</span>
+                    <span>ERC721 tokenURI is simple and widely supported, but dynamic traits often depend on servers, refresh buttons, and marketplace-specific behavior.</span>
+                    <strong>LSP8 combines bytes32 token IDs with ERC725Y storage and LSP4 metadata patterns for richer collection and token-level metadata.</strong>
+                  </a>
+                  <a class="problem-row" href="/erc721-safe-transfer-problems/">
+                    <span class="query">ERC721 safe transfer problems</span>
+                    <span>safeTransferFrom only checks IERC721Receiver, so mixed-asset contracts and downstream calls still strand NFTs and ERC20s.</span>
+                    <strong>LSP1 Universal Receiver is one hook for all asset types. LSP7 and LSP8 use it through the transfer force flag.</strong>
+                  </a>
+                  <a class="problem-row" href="/erc721-vs-lsp8/">
+                    <span class="query">ERC721 tokenId uint256 limitation</span>
+                    <span>uint256 IDs are efficient, but richer identifiers often need extra mapping layers.</span>
+                    <strong>LSP8 token IDs are bytes32, which can represent hashes, serials, encoded references, or numeric IDs.</strong>
+                  </a>
+          </div>
+        </section>
+        <section class="problem-group">
+          <div>
+            <p class="eyebrow">Problem cluster</p>
+            <h2>Wallet and account problems</h2>
+            <p>EOAs are useful primitives, but consumer-grade apps need profile metadata, scoped access, recovery, signatures, and safer delegation.</p>
+          </div>
+          <div class="problem-list">
+            
+                  <a class="problem-row" href="/smart-contract-wallet-permissions/">
+                    <span class="query">smart contract wallet permissions</span>
+                    <span>A single private key cannot express app-specific authority, device roles, recovery access, or limited contract calls.</span>
+                    <strong>Universal Profiles use LSP6 Key Manager permissions and allowed calls to scope controller keys.</strong>
+                  </a>
+                  <a class="problem-row" href="/social-recovery-smart-wallets/">
+                    <span class="query">social recovery smart wallets</span>
+                    <span>Seed phrases are a single point of failure. Recovery should be a permission graph, not a backup phrase.</span>
+                    <strong>A Universal Profile can register guardian or threshold controllers through LSP6 without giving up self-custody.</strong>
+                  </a>
+                  <a class="problem-row" href="/eip-4337-alternatives/">
+                    <span class="query">EIP-4337 alternatives</span>
+                    <span>ERC4337 layers a separate UserOperation pool, bundler, and EntryPoint on top of EOAs. Most teams do not want to run that infrastructure.</span>
+                    <strong>Universal Profiles use LSP0 + LSP6 + LSP25 + LSP20 to deliver smart-account UX without bundlers.</strong>
+                  </a>
+          </div>
+        </section>
+        <section class="problem-group">
+          <div>
+            <p class="eyebrow">Problem cluster</p>
+            <h2>Onboarding and receiver problems</h2>
+            <p>The hardest adoption problems are often outside the token interface: gas, notifications, spam assets, and contract reactions.</p>
+          </div>
+          <div class="problem-list">
+            
+                  <a class="problem-row" href="/gasless-transactions-smart-accounts/">
+                    <span class="query">gasless transactions smart accounts</span>
+                    <span>New users often need native tokens before they can do anything, which breaks onboarding.</span>
+                    <strong>LSP25 relay calls let Universal Profile actions be signed by a controller and submitted by a relayer.</strong>
+                  </a>
+                  <a class="problem-row" href="/contract-extension-after-deployment/">
+                    <span class="query">contract extension after deployment</span>
+                    <span>Adding behavior to a deployed contract usually means proxies, diamonds, or off-chain modules. Each carries upgrade authority or storage risk.</span>
+                    <strong>LSP17 standardizes a fallback router so contracts can register new function selectors without an upgrade authority.</strong>
+                  </a>
+                  <a class="problem-row" href="/wallet-vs-universal-profile/">
+                    <span class="query">wallet vs universal profile</span>
+                    <span>&quot;Smart wallet&quot; can mean an EOA UI, a Safe, a 4337 account, or something else. Apps integrating &quot;all wallets&quot; carry the complexity.</span>
+                    <strong>A Universal Profile is one account shape: LSP0 contract, LSP3 metadata, LSP6 permissions, LSP1 hooks.</strong>
+                  </a>
+          </div>
+        </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

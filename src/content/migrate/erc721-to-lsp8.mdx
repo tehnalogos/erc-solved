@@ -1,0 +1,63 @@
+---
+title: "Migrate ERC721 NFT collections to LSP8"
+from: "ERC·721"
+to: "LSP·8"
+description: "A step-by-step migration from an ERC721 collection to LSP8. Map token IDs, ownership, tokenURI metadata, and safe transfers."
+estimate: "~3 days for a 10k collection with dynamic metadata"
+verdict: "Migrate when the collection needs bytes32 IDs, per-token data, or LUKSO marketplace integration. Keep ERC721 when the marketplace surface is mainnet NFT venues that don't yet speak LSP8."
+updated: 2026-06-22
+gotchas:
+  - "Mainnet marketplaces (OpenSea, Blur) don't speak LSP8 today. Migration usually means moving to the LUKSO marketplace ecosystem."
+  - "Casting uint256 → bytes32 is fine, but think about whether the new IDs should encode something semantic."
+  - "Per-token ERC725Y data is storage. Dynamic updates cost gas."
+  - "Holders mapping migration via snapshot mint changes the original mint history. Keep audit trail."
+verify:
+  - "ownerOf for every token matches pre-migration snapshot"
+  - "tokenURI equivalents resolved via getDataForTokenId"
+  - "LSP4 collection metadata returns expected JSON"
+  - "Universal Profile recipients receive LSP1 hooks on transfer"
+  - "Existing on-chain references (staking, vaults) updated to LSP8 ABI"
+docs:
+  - label: "docs.lukso.tech / migrate ERC721 to LSP8"
+    href: "https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/"
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+related: ["compare/erc721-lsp8", "problems/erc721-dynamic-metadata"]
+---
+
+### Step 1 — decide the ID encoding
+
+ERC721 uses `uint256`. LSP8 uses `bytes32`. The trivial case is `bytes32(uint256(tokenId))`.
+The interesting cases are content-hash IDs (`keccak256(mintInputs)`), structured serials
+(`abi.encodePacked(season, edition, index)`), or external references
+(`abi.encodePacked(otherContract, otherTokenId)`). Pick the encoding **once** — it's hard to
+change later.
+
+### Step 2 — map the metadata model
+
+For each piece of metadata, decide where it lives:
+
+- Collection-level (name, symbol, description) → LSP4 keys under ERC725Y on the contract
+- Per-token static (mint inputs, attributes at mint) → LSP8 per-token data keys
+- Per-token dynamic (levels, traits that change) → LSP8 per-token data keys, written by
+  permissioned controllers
+- Off-chain media → URI (with VerifiableURI when integrity matters)
+
+### Step 3 — pick the migration path
+
+- **Fresh mint** — LSP8 contract, snapshot the ERC721 holders, mint LSP8 tokens with the
+  same ID encoding. Cleanest. Original collection becomes a historical artifact.
+- **Wrap** — LSP8 wrapper backed by ERC721 escrow. Reversible. Adds deposit/withdraw flows.
+- **Side-by-side** — both live. Usually not the answer for NFTs.
+
+### Step 4 — handle the receivers
+
+Every downstream that previously implemented `IERC721Receiver` needs to also implement LSP1
+`universalReceiver` if you want the LSP8 transfers to use `force=false`. Decide per
+integration.
+
+### Step 5 — write the per-token data
+
+For dynamic collections: the migration is when you load the current state of every dynamic
+trait into the new LSP8 contract. Don't ship the migration without a permissioned writer
+designed to keep that state correct going forward.

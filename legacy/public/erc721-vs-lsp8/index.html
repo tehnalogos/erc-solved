@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ERC721 vs LSP8: Dynamic Metadata, bytes32 Token IDs, and Receiver Hooks | ERCs, Solved</title>
+    <meta name="description" content="Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.">
+    <link rel="canonical" href="https://ercsolved.dev/erc721-vs-lsp8/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="ERC721 vs LSP8: Dynamic Metadata, bytes32 Token IDs, and Receiver Hooks | ERCs, Solved">
+    <meta property="og:description" content="Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/erc721-vs-lsp8/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"ERC721 vs LSP8","item":"https://ercsolved.dev/erc721-vs-lsp8/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"ERC721 vs LSP8","description":"Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["ERC721","LSP8","NFT metadata","bytes32 token IDs"],"mainEntityOfPage":"https://ercsolved.dev/erc721-vs-lsp8/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Comparison</p>
+      <h1>ERC721 vs LSP8</h1>
+      <p>Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.</p>
+      <div class="tag-row"><span>ERC721</span><span>LSP8</span><span>NFT metadata</span><span>bytes32 token IDs</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>ERC721 made NFTs interoperable through a simple ownerOf and transfer model. LSP8 keeps identifiable assets, but uses bytes32 token IDs, ERC725Y metadata, LSP4 metadata conventions, and LSP1 receiver notifications so NFTs can carry more context and interact with Universal Profiles.</p></section>
+      
+        <section class="content-section">
+          <h2>What ERC721 gets right</h2>
+          <p>ERC721 created a shared interface for unique assets. Wallets, marketplaces, games, and explorers know how to show ownership and transfers because the interface is predictable.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>Where developers hit limits</h2>
+          
+          <ul><li>tokenURI often points to a server or immutable JSON that does not fit dynamic assets.</li><li>uint256 token IDs are simple but can require extra mappings for richer identifiers.</li><li>safeTransferFrom only checks one receiver interface and does not create a general notification layer.</li><li>Collection metadata, per-token metadata, and app-specific context often live in different places.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LSP8 changes the model</h2>
+          <p>LSP8 is LUKSO&#39;s Identifiable Digital Asset standard. It uses bytes32 token IDs, ERC725Y data storage, LSP4 metadata, LSP1 notifications, and transfer parameters that make receiving behavior explicit.</p><p>For purely ERC721-native marketplaces, ERC721 may remain the better compatibility choice. LSP8 is stronger when the asset is meant to live inside a profile-centered app ecosystem.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>ERC721 transfer</figcaption>
+              <pre><code class="language-solidity">function transferFrom(address from, address to, uint256 tokenId) external;</code></pre>
+            </figure>
+            <figure>
+              <figcaption>LSP8 transfer</figcaption>
+              <pre><code class="language-solidity">function transfer(
+  address from,
+  address to,
+  bytes32 tokenId,
+  bool force,
+  bytes calldata data
+) external;</code></pre>
+            </figure>
+    </section>
+      
+    <section class="content-section table-section">
+      <h2>Decision table</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Use ERC721 when</th><th>Use LSP8 when</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>You need maximum compatibility with ERC721-only marketplaces.</td><td>You need richer token IDs, metadata, and Universal Profile integration.</td></tr><tr><td>tokenURI is enough for your collection.</td><td>Per-token metadata should use standard data keys and VerifiableURI patterns.</td></tr><tr><td>Receiver behavior can be app-specific.</td><td>Receiver notifications and explicit transfer behavior are part of the product.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP8-Identifiable-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP4-Digital-Asset-Metadata</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp1-universal-receiver</a>
+              <a href="https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/" rel="noopener noreferrer">docs.lukso.tech/migrate/migrate-erc721-to-lsp8</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc721-tokenuri-vs-lsp4-metadata/">
+                <strong>ERC721 tokenURI problem -&gt; LSP4 metadata</strong>
+                <span>Learn why dynamic NFT metadata is hard with tokenURI alone and how LSP8, LSP4, and ERC725Y provide a richer metadata model.</span>
+              </a>
+              <a href="/guides/migrate-erc721-to-lsp8/">
+                <strong>Migrate ERC721 NFT collections to LSP8</strong>
+                <span>A practical migration guide for mapping ERC721 ownership, token IDs, tokenURI metadata, and safe transfers to LSP8.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

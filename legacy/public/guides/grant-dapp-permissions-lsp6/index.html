@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guide: Grant Dapp Permissions with LSP6 Key Manager | ERCs, Solved</title>
+    <meta name="description" content="Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.">
+    <link rel="canonical" href="https://ercsolved.dev/guides/grant-dapp-permissions-lsp6/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="Guide: Grant Dapp Permissions with LSP6 Key Manager | ERCs, Solved">
+    <meta property="og:description" content="Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/guides/grant-dapp-permissions-lsp6/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Grant dapp permissions with LSP6","item":"https://ercsolved.dev/guides/grant-dapp-permissions-lsp6/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Grant dapp permissions with LSP6","description":"Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["LSP6","smart wallet permissions","session keys","Universal Profile"],"mainEntityOfPage":"https://ercsolved.dev/guides/grant-dapp-permissions-lsp6/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Code-first guide</p>
+      <h1>Grant dapp permissions with LSP6</h1>
+      <p>Use LSP6 Key Manager concepts to grant scoped app, controller, and session permissions for Universal Profiles.</p>
+      <div class="tag-row"><span>LSP6</span><span>smart wallet permissions</span><span>session keys</span><span>Universal Profile</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>A dapp should not need full account control. LSP6 lets a Universal Profile assign permissions to controllers and restrict allowed calls or data keys, so apps can request the smallest authority their workflow needs.</p></section>
+      
+        <section class="content-section">
+          <h2>The account permission problem</h2>
+          <p>Many wallet flows reduce access to yes or no. Real apps need narrower grants: this controller can call this contract, transfer this asset, update this data key, or act for this session.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>The LSP6 pattern</h2>
+          
+          <ul><li>Treat controllers as keys or contracts that operate a Universal Profile.</li><li>Assign permissions such as CALL, SETDATA, TRANSFERVALUE, or SUPER permissions when appropriate.</li><li>Use allowed calls and allowed ERC725Y data keys for scoped access.</li><li>Revoke controllers when sessions, devices, or app integrations end.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>Security notes</h2>
+          
+          <ul><li>Avoid granting broad permissions for a narrow task.</li><li>Show users which controller receives access and what it can call.</li><li>Keep high-value recovery or admin controllers separate from app controllers.</li></ul>
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>Permission design sketch</figcaption>
+              <pre><code class="language-text">Controller: app session key
+Permission: CALL
+Allowed call: target token contract + transfer selector
+Expires: app-defined session policy</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/access-control/lsp6-key-manager/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp6-key-manager</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp0-erc725account/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp0-erc725account</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp20-call-verification/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp20-call-verification</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/eoa-vs-universal-profile/">
+                <strong>EOA wallet limits -&gt; Universal Profile smart accounts</strong>
+                <span>Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.</span>
+              </a>
+              <a href="/guides/gasless-transactions-universal-profile/">
+                <strong>Gasless transactions with Universal Profiles</strong>
+                <span>Design sponsored and gasless onboarding flows with LUKSO Universal Profiles, LSP25 relay calls, nonces, and relayers.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

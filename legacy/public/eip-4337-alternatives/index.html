@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EIP-4337 Alternatives: Smart Account Models Without Bundlers | ERCs, Solved</title>
+    <meta name="description" content="Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles.">
+    <link rel="canonical" href="https://ercsolved.dev/eip-4337-alternatives/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="EIP-4337 Alternatives: Smart Account Models Without Bundlers | ERCs, Solved">
+    <meta property="og:description" content="Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/eip-4337-alternatives/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"EIP-4337 alternatives","item":"https://ercsolved.dev/eip-4337-alternatives/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"EIP-4337 alternatives","description":"Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["eip-4337 alternatives","account abstraction","smart accounts without bundlers"],"mainEntityOfPage":"https://ercsolved.dev/eip-4337-alternatives/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">EVM problem</p>
+      <h1>EIP-4337 alternatives</h1>
+      <p>Account abstraction without ERC4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles.</p>
+      <div class="tag-row"><span>eip-4337 alternatives</span><span>account abstraction</span><span>smart accounts without bundlers</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>ERC4337 layers a separate UserOperation pool, EntryPoint, bundlers, and paymasters on top of EOAs. Native account models put the account contract on the regular call path. Safe + a relayer is one alternative; EIP-7702 is another; LUKSO Universal Profiles are a third, built from LSP0, LSP6, LSP25, and LSP20.</p></section>
+      
+        <section class="content-section">
+          <h2>The problem on EVM</h2>
+          <p>ERC4337 ships account abstraction over a transaction system designed for EOAs. The price is a parallel infrastructure: UserOperations, EntryPoint contracts, bundlers, paymasters, signature aggregators. Most product teams do not want to run or rent any of that.</p><p>The other catch: 4337 accounts are smart accounts, but the value model still runs through the EntryPoint. Debugging, tracing, and gas accounting all sit on a separate plane from regular tx flow.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>What EVM builders try today</h2>
+          
+          <ul><li>Safe + relayer — Safe is a smart account contract; a relayer submits the multisig exec call. No UserOperation, no bundler.</li><li>EIP-7702 — EOAs temporarily delegate to a contract for a single tx, getting smart-account semantics without becoming a contract.</li><li>Custodial backends — sign user actions server-side; simplest UX, weakest custody story.</li><li>App-specific forwarders — narrow, hard to share across products.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>How LUKSO standards solve it</h2>
+          <p>A Universal Profile is a contract account composed from LSP0 (ERC725 account), LSP6 (Key Manager permissions), LSP25 (executeRelayCall for sponsored execution), and LSP20 (call verification so the account can validate calls inline).</p><p>There is no bundler and no EntryPoint. A controller signs; a relayer submits; the profile validates via LSP6 and executes. Honest tradeoff: this is LUKSO-native and not portable to mainnet today — but the same design pattern (single account contract, permission layer, relay primitive) generalizes.</p>
+          
+        </section>
+      
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/standards/accounts/lsp0-erc725account/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp0-erc725account</a>
+              <a href="https://docs.lukso.tech/standards/access-control/lsp6-key-manager/" rel="noopener noreferrer">docs.lukso.tech/access-control/lsp6-key-manager</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp25-execute-relay-call</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp20-call-verification/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp20-call-verification</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/gasless-transactions-smart-accounts/">
+                <strong>Gasless transactions for smart accounts</strong>
+                <span>EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys.</span>
+              </a>
+              <a href="/wallet-vs-universal-profile/">
+                <strong>Wallet vs Universal Profile</strong>
+                <span>EOAs, Safes, ERC4337 accounts, and Universal Profiles compared. Which smart account model fits which product UX, and what the integration cost looks like.</span>
+              </a>
+              <a href="/eoa-vs-universal-profile/">
+                <strong>EOA wallet limits -&gt; Universal Profile smart accounts</strong>
+                <span>Compare externally owned accounts with LUKSO Universal Profiles for profile metadata, permissions, recovery, signatures, and gasless onboarding.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

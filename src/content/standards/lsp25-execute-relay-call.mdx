@@ -1,0 +1,42 @@
+---
+kind: LSP
+id: "25"
+title: "Execute Relay Call"
+oneLine: "Gasless execution on the account itself — controller signs, relayer submits."
+description: "LSP25 defines executeRelayCall on a Universal Profile (or via its Key Manager). A controller signs a payload with a nonce, a relayer submits it and pays gas. No bundler. No EntryPoint."
+purpose: Execution
+updated: 2026-06-22
+abi: |
+  function executeRelayCall(
+    bytes calldata signature,
+    uint256 nonce,
+    uint256 validityTimestamps,
+    bytes calldata payload
+  ) external payable returns (bytes memory);
+
+  // Nonce uses high 128 bits as channel, low 128 bits as sequence — parallel relay streams.
+  function getNonce(address from, uint128 channel) external view returns (uint256);
+solves:
+  - pain: "gasless onboarding"
+    href: "/problems/gasless-onboarding/"
+  - pain: "EIP-4337 bundler tax"
+    href: "/problems/eip4337-bundler-tax/"
+companions: ["LSP·0", "LSP·6", "LSP·20"]
+doesNotSolve:
+  - "LSP25 doesn't decide who pays. That's the relayer's policy."
+  - "Replay protection is per-channel — pick channels deliberately for parallel flows."
+  - "It doesn't make the underlying call permissionless. LSP6 still gates what the signing controller may do."
+docs:
+  - label: "docs.lukso.tech / LSP25 executeRelayCall"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "docs.lukso.tech / Transaction Relay API"
+    href: "https://docs.lukso.tech/tools/dapps/transaction-relay-api/"
+---
+
+LSP25 puts relay execution on the account contract. The signing controller is constrained by
+LSP6 permissions, the same permissions that apply to direct calls. The relayer is just
+infrastructure — it can't escalate authority by virtue of paying gas.
+
+The nonce channels are the under-appreciated detail. Channel 0 is the default linear stream;
+higher channels let you sign and submit independent payloads in parallel (one channel per
+device, one per app session, etc.) without serializing through a single nonce counter.

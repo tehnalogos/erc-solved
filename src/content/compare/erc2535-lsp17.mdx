@@ -1,0 +1,52 @@
+---
+title: "ERC2535 Diamonds vs LSP17"
+left: { chip: "ERC·2535", label: "diamond proxy" }
+right: { chip: "LSP·17", label: "Contract Extension" }
+description: "Both let a contract grow new functions after deployment. Diamonds use a delegatecall router with shared storage; LSP17 uses a fallback router with per-selector extension contracts and ERC725Y registration."
+updated: 2026-06-22
+verdict:
+  useLeft: "When upgradeable storage is a hard requirement and the team has the discipline to manage diamond storage layouts. The mature tooling and ecosystem are real."
+  useRight: "When the goal is 'add new selectors without an upgrade authority over base bytecode.' Especially for account contracts (Universal Profiles), where you want extensible behavior without proxy upgradeability."
+matrix:
+  - row: "extension mechanism"
+    left: "delegatecall to facet by selector"
+    right: "CALL (or DELEGATECALL) to extension by selector"
+  - row: "storage"
+    left: "shared with facets (layout discipline required)"
+    right: "extension keeps its own (CALL flavor)"
+  - row: "registration"
+    left: "diamondCut by owner"
+    right: "ERC725Y setData (permissioned by LSP6)"
+  - row: "upgrade authority over base bytecode"
+    left: "diamond owner can replace facets"
+    right: "none — base is immutable, extensions are additive"
+  - row: "ecosystem"
+    left: "EIP-2535 reference + diamond-1 implementations"
+    right: "LSP17-aware contracts (LSP0 Universal Profile, etc.)"
+docs:
+  - label: "docs.lukso.tech / LSP17 Contract Extension"
+    href: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
+related: ["problems/contract-extension"]
+---
+
+## Same problem, different metaphors
+
+Diamonds make the *base contract* a router. Every call goes through `delegatecall` to a
+facet that shares the diamond's storage. Adding behavior is `diamondCut`. Upgrading is
+`diamondCut`. The upgrade authority is permanent and routine.
+
+LSP17 makes *unknown function calls* the router. Known functions execute as base bytecode.
+Unknown function selectors hit the fallback, which looks up an extension contract registered
+in ERC725Y. Adding behavior is `setData` (gated by LSP6 in a Universal Profile). The base
+bytecode is never replaced.
+
+## When the difference matters
+
+For a token protocol that needs to fix bugs in the base contract, diamonds give you the
+upgrade lever — and your users live with the upgrade authority. LSP17 doesn't give you that
+lever, which is the point: if the base is wrong, the base is wrong forever, and the
+extension surface compensates by being additive.
+
+For account contracts, LSP17 is the better fit. A Universal Profile that adds a new
+signature verifier or a new asset receiver does it by registering an LSP17 extension. No
+upgrade key over the account itself. No diamond storage layout to manage.

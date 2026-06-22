@@ -1,0 +1,52 @@
+---
+interface Props {
+  author?: string;
+  authorHref?: string;
+  updated?: Date | string;
+  editHref?: string;
+}
+const {
+  author = 'maintainers',
+  authorHref,
+  updated,
+  editHref,
+} = Astro.props;
+
+function fmt(d?: Date | string) {
+  if (!d) return null;
+  const date = typeof d === 'string' ? new Date(d) : d;
+  return date.toISOString().slice(0, 10);
+}
+const updatedStr = fmt(updated);
+---
+<aside class="authorship">
+  <span>
+    written by{' '}
+    {authorHref ? <a href={authorHref}>{author}</a> : <span class="name">{author}</span>}
+  </span>
+  {updatedStr && <span class="sep">·</span>}
+  {updatedStr && <span>last updated <time datetime={updatedStr}>{updatedStr}</time></span>}
+  {editHref && <span class="sep">·</span>}
+  {editHref && <a class="edit" href={editHref} rel="noopener noreferrer" target="_blank">edit on github ↗</a>}
+</aside>
+
+<style>
+  .authorship {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding-block: var(--s-5);
+    border-top: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-fog);
+  }
+  .authorship a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .authorship a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+  .sep { color: var(--ink-line); }
+  time { font-variant-numeric: tabular-nums; }
+</style>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guide: Migrate ERC721 NFT Collections to LSP8 | ERCs, Solved</title>
+    <meta name="description" content="A practical migration guide for mapping ERC721 ownership, token IDs, tokenURI metadata, and safe transfers to LSP8.">
+    <link rel="canonical" href="https://ercsolved.dev/guides/migrate-erc721-to-lsp8/">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:title" content="Guide: Migrate ERC721 NFT Collections to LSP8 | ERCs, Solved">
+    <meta property="og:description" content="A practical migration guide for mapping ERC721 ownership, token IDs, tokenURI metadata, and safe transfers to LSP8.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ercsolved.dev/guides/migrate-erc721-to-lsp8/">
+    <meta property="og:site_name" content="ERCs, Solved">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#070712">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ERCs, Solved","item":"https://ercsolved.dev"},{"@type":"ListItem","position":2,"name":"Migrate ERC721 NFT collections to LSP8","item":"https://ercsolved.dev/guides/migrate-erc721-to-lsp8/"}]},{"@context":"https://schema.org","@type":"TechArticle","headline":"Migrate ERC721 NFT collections to LSP8","description":"A practical migration guide for mapping ERC721 ownership, token IDs, tokenURI metadata, and safe transfers to LSP8.","author":{"@type":"Organization","name":"ERCs, Solved"},"publisher":{"@type":"Organization","name":"ERCs, Solved"},"about":["ERC721 migration","LSP8","NFT migration"],"mainEntityOfPage":"https://ercsolved.dev/guides/migrate-erc721-to-lsp8/","dateModified":"2026-06-22","isAccessibleForFree":true}]</script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="scanline" aria-hidden="true"></div>
+    <header class="site-header">
+      
+    <a class="brand" href="/" aria-label="ERCs, Solved home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>ERCs, Solved</strong>
+        <small>ERC problems. LSP patterns. Better UX.</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="/erc-problems/">Problems</a><a href="/wallet-vs-universal-profile/">Smart accounts</a><a href="/guides/migrate-erc20-to-lsp7/">Guides</a><a href="https://docs.lukso.tech/" rel="noopener noreferrer">LUKSO docs</a>
+    </nav>
+  
+    </header>
+    
+    <main class="page-shell">
+      
+    <section class="page-intro">
+      <p class="eyebrow">Code-first guide</p>
+      <h1>Migrate ERC721 NFT collections to LSP8</h1>
+      <p>A practical migration guide for mapping ERC721 ownership, token IDs, tokenURI metadata, and safe transfers to LSP8.</p>
+      <div class="tag-row"><span>ERC721 migration</span><span>LSP8</span><span>NFT migration</span></div>
+    </section>
+  
+      <section class="tldr"><strong>TL;DR</strong><p>Migrate to LSP8 when your NFT needs richer token IDs, standard metadata keys, receiver notifications, or Universal Profile integration. Keep ERC721 when marketplace compatibility is the primary requirement.</p></section>
+      
+        <section class="content-section">
+          <h2>Step 1: map token IDs</h2>
+          <p>ERC721 IDs are uint256. LSP8 IDs are bytes32. Numeric IDs can be encoded into bytes32, while new collections can use hashes, serials, or other deterministic identifiers.</p>
+          
+        </section>
+        <section class="content-section">
+          <h2>Step 2: map metadata</h2>
+          
+          <ul><li>Move collection-level metadata into LSP4-compatible ERC725Y data.</li><li>Use LSP8 token ID metadata functions when individual assets need their own context.</li><li>Keep URI-based assets where off-chain media remains the right storage layer.</li></ul>
+        </section>
+        <section class="content-section">
+          <h2>Step 3: design receiver behavior</h2>
+          <p>LSP8 transfers include a force flag and data payload. That lets apps decide whether recipient contracts must support LSP1 and what context should travel with the transfer.</p>
+          
+        </section>
+      
+    <section class="code-compare" aria-label="Code comparison">
+      
+            <figure>
+              <figcaption>Token ID mapping</figcaption>
+              <pre><code class="language-solidity">uint256 erc721TokenId = 42;
+bytes32 lsp8TokenId = bytes32(erc721TokenId);</code></pre>
+            </figure>
+    </section>
+      
+      
+    <section class="content-section link-bank">
+      <h2>Learn more</h2>
+      <div>
+        
+              <a href="https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/" rel="noopener noreferrer">docs.lukso.tech/migrate/migrate-erc721-to-lsp8</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP8-Identifiable-Digital-Asset</a>
+              <a href="https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/" rel="noopener noreferrer">docs.lukso.tech/tokens/LSP4-Digital-Asset-Metadata</a>
+              <a href="https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/" rel="noopener noreferrer">docs.lukso.tech/accounts/lsp1-universal-receiver</a>
+      </div>
+    </section>
+      
+    <section class="content-section related">
+      <h2>Next routes</h2>
+      <div>
+        
+              <a href="/erc721-vs-lsp8/">
+                <strong>ERC721 vs LSP8</strong>
+                <span>Compare ERC721 with LUKSO LSP8 for NFT metadata, token IDs, transfer safety, receiver hooks, and migration decisions.</span>
+              </a>
+              <a href="/erc721-tokenuri-vs-lsp4-metadata/">
+                <strong>ERC721 tokenURI problem -&gt; LSP4 metadata</strong>
+                <span>Learn why dynamic NFT metadata is hard with tokenURI alone and how LSP8, LSP4, and ERC725Y provide a richer metadata model.</span>
+              </a>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>ERCs, Solved</strong>
+        <p>ERCs gave Ethereum composability. LSPs add the surrounding system for metadata, permissions, receiver awareness, and account-native UX.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/erc-problems/">Problem index</a>
+        <a href="https://docs.lukso.tech/" rel="noopener noreferrer">Official LUKSO docs</a>
+      </div>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

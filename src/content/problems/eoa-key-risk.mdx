@@ -1,0 +1,63 @@
+---
+title: "An EOA is one key for everything."
+tagline: "Identity, custody, signing, recovery — all bound to a single private key."
+query: "eoa wallet limits"
+description: "EOAs are simple, portable, and foundational, but they bind identity, funds, and authority to one private key. Universal Profiles separate the account from controllers and add metadata, permissions, hooks, and relay execution."
+erc: "EOA"
+lsps: ["LSP0", "LSP3", "LSP6"]
+aliases: ["seed phrase risk", "single key risk", "eoa account model", "private key recovery"]
+updated: 2026-06-22
+diff:
+  from:
+    chip: "EOA"
+    code: "address = keccak(pubkey)[12:]"
+    tags: ["one key", "no recovery", "no scope"]
+  to:
+    chip: "LSP·0"
+    code: "contract Account is ERC725 + LSP6 + LSP1"
+    tags: ["many controllers", "scoped", "recoverable"]
+verdict: "A Universal Profile is an account contract. Controllers (LSP6) sign for it; profile metadata (LSP3) describes it; LSP1 hooks let it react. The address survives controller rotation."
+docs:
+  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "docs.lukso.tech / LSP3 Profile Metadata"
+    href: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
+related: ["problems/wallet-permissions", "problems/social-recovery"]
+---
+
+## Why this breaks
+
+An EOA is `address = keccak(pubkey)[12:]`. The private key signs, owns, and identifies the
+account. There is no social fallback, no time-locked recovery, no rotating authority, no
+profile metadata, no app-readable identity — those are product problems wallet vendors have
+to solve outside the account.
+
+Dapps cannot ask for limited authority in a standard account-level way. Profile information
+usually lives in app databases or separate protocols. Gas, recovery, and device management
+become product problems outside the account.
+
+## What people try
+
+### Hardware wallets
+Better key custody. Same fundamental model — one key still signs everything.
+
+### Custodial backends
+Privy, Magic, Web3Auth. Trade self-custody for a reset-password experience.
+
+### Wallet SDKs that mimic accounts
+RainbowKit, wagmi connectors. Smooth UX over the same EOA primitive.
+
+### ENS for identity, app DBs for profile
+Identity layer separate from custody. App-by-app profile state.
+
+## How LSP solves it
+
+A Universal Profile is an account **contract**. It stores profile metadata through ERC725Y
+and LSP3, delegates control through LSP6 Key Manager controllers, reacts to interactions
+through LSP1, and supports relay execution through LSP25.
+
+The account is a user-owned object apps can read and interact with, rather than just an
+address controlled by one key. Add a controller, remove a controller, rotate a controller —
+the address is the same. The profile is the same. The history is the same.

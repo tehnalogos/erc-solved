@@ -1,0 +1,87 @@
+---
+interface Row {
+  ercChip: string;
+  ercLabel: string;
+  lspChip: string;
+  lspLabel: string;
+  verdict: string;
+  href?: string;
+}
+interface Props {
+  rows: Row[];
+  compact?: boolean;
+}
+const { rows, compact = false } = Astro.props;
+---
+<div class:list={['matrix', { compact }]}>
+  <header class="head" aria-hidden="true">
+    <span>erc</span>
+    <span class="muted">what it is</span>
+    <span>lsp</span>
+    <span class="verdict-h muted">the verdict</span>
+  </header>
+  <ol class="rows">
+    {rows.map(r => {
+      const Tag = r.href ? 'a' : 'div';
+      return (
+        <li>
+          <Tag class:list={['row', { link: !!r.href }]} href={r.href}>
+            <span class="erc-chip">{r.ercChip}</span>
+            <span class="erc-label">{r.ercLabel}</span>
+            <span class="lsp-chip">{r.lspChip}</span>
+            <span class="verdict">{r.verdict}</span>
+          </Tag>
+        </li>
+      );
+    })}
+  </ol>
+</div>
+
+<style>
+  .matrix {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    border-top: 1px solid var(--ink-line);
+  }
+  .head, .row {
+    display: grid;
+    grid-template-columns: 7ch minmax(0, 1.1fr) max-content minmax(0, 1.8fr);
+    gap: var(--s-4);
+    align-items: baseline;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .head {
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+    color: var(--ink-fog);
+    letter-spacing: 0.08em;
+  }
+  .muted { color: var(--ink-fog); }
+
+  .erc-chip { color: var(--erc-sand); white-space: nowrap; }
+  .erc-label { color: var(--ink-bone-dim); min-width: 0; }
+  .lsp-chip { color: var(--signal-pink); white-space: nowrap; }
+  .verdict { color: var(--ink-bone); min-width: 0; }
+
+  a.row {
+    color: inherit;
+    transition: background 150ms ease;
+  }
+  a.row:hover, a.row:focus-visible {
+    background: var(--ink-paper);
+    outline: none;
+  }
+  a.row:hover .verdict { color: var(--signal-pink); }
+
+  @media (max-width: 720px) {
+    .head { display: none; }
+    .row {
+      grid-template-columns: 1fr;
+      gap: var(--s-1);
+      padding: var(--s-4) 0;
+    }
+    .erc-label::before { content: '— '; color: var(--ink-line); }
+    .verdict { margin-top: var(--s-2); }
+  }
+</style>
