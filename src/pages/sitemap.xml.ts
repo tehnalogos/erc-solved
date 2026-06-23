@@ -8,7 +8,6 @@ const staticUrls = [
   '/standards/matrix/',
   '/build/',
   '/about/',
-  '/changelog/',
 ];
 
 export const GET: APIRoute = async ({ site }) => {
