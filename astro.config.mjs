@@ -3,7 +3,7 @@ import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
 
 export default defineConfig({
-  site: 'https://ercsolved.dev',
+  site: 'https://www.ercsolved.dev',
   trailingSlash: 'always',
   build: { format: 'directory' },
   integrations: [mdx(), preact()],

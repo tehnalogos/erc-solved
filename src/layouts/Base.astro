@@ -29,7 +29,7 @@ const fullTitle = title.endsWith('ERCs, Solved') || title.endsWith('ERCs, Solved
   ? title
   : `${title} · ERCs, Solved`;
 
-const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://ercsolved.dev';
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.ercsolved.dev';
 const absoluteOgImage = ogImage ? new URL(ogImage, Astro.site).toString() : undefined;
 const siteJsonLd = [
   {

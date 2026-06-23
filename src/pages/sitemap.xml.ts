@@ -11,7 +11,7 @@ const staticUrls = [
 ];
 
 export const GET: APIRoute = async ({ site }) => {
-  const origin = (site?.origin || 'https://ercsolved.dev').replace(/\/$/, '');
+  const origin = (site?.origin || 'https://www.ercsolved.dev').replace(/\/$/, '');
   const today = new Date().toISOString().slice(0, 10);
 
   const collections = ['problems', 'standards', 'compare', 'migrate', 'build'] as const;

@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { formatSearchQuery } from '~/lib/seo';
 
-const site = 'https://ercsolved.dev';
+const site = 'https://www.ercsolved.dev';
 
 function line(path: string, label: string, description: string) {
   return `- [${label}](${site}${path}): ${description}`;
