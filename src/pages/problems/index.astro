@@ -2,6 +2,7 @@
 import Base from '~/layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import StandardChip from '~/components/brand/StandardChip.astro';
+import { formatSearchQuery } from '~/lib/seo';
 
 const problems = await getCollection('problems');
 problems.sort((a, b) => a.data.query.localeCompare(b.data.query));
@@ -31,9 +32,9 @@ const description =
       <span class="eyebrow">problem index</span>
       <h1>Problems.</h1>
       <p class="dim">
-        Every recurring Ethereum ERC pain point, in the words EVM developers actually search for. Each
-        row links to a verdict-first problem page with the LSP pattern, the code, and the next
-        route. Filter by the ERC you use today.
+        Every recurring Ethereum ERC pain point, mapped to the LUKSO pattern that fixes the
+        implementation tradeoff. Filter by the ERC you use today, then jump into the verdict,
+        code, and next route.
       </p>
     </header>
 
@@ -51,22 +52,28 @@ const description =
       {problems.map(p => (
         <li class="row-wrap" data-erc={p.data.erc}>
           <a class="row" href={`/problems/${p.slug}/`}>
-            <span class="erc-chip">
-              <StandardChip kind="erc" id={p.data.erc} />
+            <span class="problem">
+              <span class="problem-head">
+                <span class="erc-chip">
+                  <StandardChip kind="erc" id={p.data.erc} />
+                </span>
+                <span class="query">{formatSearchQuery(p.data.query)}</span>
+              </span>
+              <span class="tagline">{p.data.tagline}</span>
             </span>
-            <span class="query">{p.data.query}</span>
-            <span class="sep" aria-hidden="true">→</span>
-            <span class="answer">
-              {p.data.lsps.map((lsp, i) => (
-                <>
-                  {i > 0 && <span class="plus" aria-hidden="true"> + </span>}
-                  <span class="lsp">{lsp}</span>
-                </>
-              ))}
+            <span class="route">
+              <span class="route-label">LUKSO route</span>
+              <span class="answer">
+                {p.data.lsps.map((lsp, i) => (
+                  <>
+                    {i > 0 && <span class="plus" aria-hidden="true"> + </span>}
+                    <span class="lsp">{lsp}</span>
+                  </>
+                ))}
+              </span>
             </span>
             <span class="caret" aria-hidden="true">→</span>
           </a>
-          <p class="tagline">{p.data.tagline}</p>
         </li>
       ))}
     </ol>
@@ -103,16 +110,19 @@ const description =
     padding: var(--s-8) var(--s-5);
     display: grid;
     gap: var(--s-7);
+    min-width: 0;
   }
   .hub-head {
     display: grid;
     gap: var(--s-3);
     max-width: 64ch;
+    min-width: 0;
   }
   .hub-head h1 {
     font-size: clamp(40px, 6vw, 80px);
   }
   .hub-head .dim { color: var(--ink-bone-dim); }
+  .hub-head .dim { overflow-wrap: anywhere; }
 
   .filters {
     display: flex;
@@ -121,6 +131,8 @@ const description =
     align-items: center;
     padding-bottom: var(--s-3);
     border-bottom: 1px solid var(--ink-line);
+    min-width: 0;
+    max-width: 100%;
   }
   .filter-label {
     font-family: var(--font-mono);
@@ -130,6 +142,7 @@ const description =
     margin-right: var(--s-2);
   }
   .filters .chip {
+    flex: 0 1 auto;
     padding: 4px var(--s-3);
     border: 1px solid var(--ink-line);
     color: var(--ink-fog);
@@ -149,34 +162,64 @@ const description =
   .rows {
     display: grid;
     border-top: 1px solid var(--ink-line);
+    min-width: 0;
   }
-  .row-wrap { border-bottom: 1px solid var(--ink-line); padding: var(--s-4) 0; }
+  .row-wrap { border-bottom: 1px solid var(--ink-line); padding: var(--s-4) 0; min-width: 0; }
 
   .row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1.4fr) 1.5ch minmax(0, 1fr) 1.5ch;
-    align-items: baseline;
-    gap: var(--s-4);
+    grid-template-columns: minmax(0, 1.5fr) minmax(18ch, 0.55fr) 1.5ch;
+    align-items: center;
+    gap: var(--s-5);
     font-family: var(--font-mono);
+    padding: var(--s-2) 0;
+    min-width: 0;
+  }
+  .problem {
+    display: grid;
+    gap: var(--s-3);
+    min-width: 0;
+  }
+  .problem-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
   }
   .erc-chip { display: inline-flex; }
   .query {
+    flex: 1 1 18ch;
+    min-width: 0;
     color: var(--ink-bone);
     font-size: var(--t-mono-md);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
-  .sep, .caret { color: var(--ink-line); }
-  .answer { color: var(--signal-pink); font-size: var(--t-mono-md); }
+  .route {
+    display: grid;
+    gap: var(--s-1);
+    min-width: 0;
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--ink-line);
+  }
+  .route-label {
+    color: var(--ink-fog);
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+  }
+  .caret { color: var(--ink-line); justify-self: end; }
+  .answer { color: var(--signal-pink); font-size: var(--t-mono-md); line-height: 1.4; }
   .plus { color: var(--ink-line); }
   .row:hover .query { color: var(--erc-sand); }
   .row:hover .caret { color: var(--ink-bone); }
-  .row:hover .sep { color: var(--ink-bone); }
 
   .tagline {
-    margin-top: var(--s-1);
-    padding-left: calc(2ch + var(--s-4) + 5ch + var(--s-4));
+    display: block;
     color: var(--ink-fog);
     font-family: var(--font-mono);
     font-size: var(--t-mono-sm);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
   }
 
   .hub-foot {
@@ -196,12 +239,96 @@ const description =
   .hub-foot a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
 
   @media (max-width: 720px) {
-    .hub { padding: var(--s-6) var(--s-4); }
+    .hub {
+      width: 100%;
+      max-width: 100vw;
+      padding: var(--s-6) var(--s-4);
+      overflow-x: clip;
+    }
+    .hub,
+    .hub > *,
+    .hub :where(a, div, footer, header, li, ol, p, span) {
+      min-width: 0;
+    }
+    .hub > *,
+    .hub :where(p, span) {
+      width: 100%;
+      max-width: 100%;
+    }
+    .hub-head {
+      max-width: 100%;
+    }
+    .hub-head h1 {
+      font-size: 42px;
+    }
+    .hub-head .dim {
+      display: block;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      justify-content: start;
+      align-items: start;
+      gap: var(--s-2);
+    }
+    .filter-label {
+      grid-column: 1 / -1;
+      margin-right: 0;
+    }
+    .filters .chip {
+      width: 100%;
+      justify-content: center;
+      padding-inline: var(--s-2);
+    }
     .row {
       grid-template-columns: 1fr;
-      gap: var(--s-1);
+      gap: var(--s-4);
+      width: 100%;
+      max-width: 100%;
     }
-    .sep, .caret { display: none; }
-    .tagline { padding-left: 0; }
+    .problem {
+      width: 100%;
+      max-width: 100%;
+    }
+    .problem-head {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--s-2);
+      align-items: start;
+    }
+    .erc-chip {
+      width: max-content;
+      max-width: 100%;
+    }
+    .query {
+      flex: none;
+      width: 100%;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .tagline {
+      width: 100%;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .route {
+      width: 100%;
+      max-width: 100%;
+      padding-left: 0;
+      border-left: 0;
+      padding-top: var(--s-3);
+      border-top: 1px solid var(--ink-line);
+    }
+    .answer {
+      width: 100%;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .caret { display: none; }
   }
 </style>

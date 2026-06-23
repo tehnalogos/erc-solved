@@ -54,12 +54,14 @@ const description =
         <ul class="migs">
           {migrations.map(m => (
             <li>
-              <a class="row" href={`/build/migrate/${m.slug}/`}>
-                <span class="from">{m.data.from}</span>
-                <span class="arrow" aria-hidden="true">→</span>
-                <span class="to">{m.data.to}</span>
-                <span class="t">{m.data.title}</span>
-                <span class="caret" aria-hidden="true">→</span>
+              <a class="mig-row" href={`/build/migrate/${m.slug}/`}>
+                <span class="mig-route" aria-label={`${m.data.from} to ${m.data.to}`}>
+                  <span class="from">{m.data.from}</span>
+                  <span class="arrow" aria-hidden="true">→</span>
+                  <span class="to">{m.data.to}</span>
+                </span>
+                <span class="mig-title">{m.data.title}</span>
+                <span class="mig-caret" aria-hidden="true">→</span>
               </a>
             </li>
           ))}
@@ -124,27 +126,40 @@ const description =
   .migrations .dim { color: var(--ink-fog); font-size: var(--t-mono-sm); }
   .migs { display: grid; border-top: 1px solid var(--ink-line); }
   .migs li { border-bottom: 1px solid var(--ink-line); }
-  .row {
+  .mig-row {
     display: grid;
-    grid-template-columns: 8ch 1.5ch 8ch minmax(0, 1fr) 1.5ch;
-    gap: var(--s-3);
-    align-items: baseline;
-    padding: var(--s-4) 0;
+    grid-template-columns: minmax(22ch, auto) minmax(0, 1fr) 2ch;
+    gap: var(--s-5);
+    align-items: center;
+    padding: var(--s-4);
     font-family: var(--font-mono);
     transition: background 150ms ease;
   }
-  .row:hover { background: var(--ink-paper); outline: none; }
+  .mig-row:hover, .mig-row:focus-visible { background: var(--ink-paper); outline: none; }
+  .mig-route {
+    display: grid;
+    grid-template-columns: minmax(7ch, max-content) 2ch minmax(7ch, max-content);
+    gap: var(--s-3);
+    align-items: baseline;
+    min-width: 0;
+  }
   .from { color: var(--erc-sand); }
   .arrow { color: var(--ink-line); }
   .to { color: var(--signal-pink); }
-  .t { color: var(--ink-bone); font-size: var(--t-mono-md); }
-  .row .caret { color: var(--ink-line); }
-  .row:hover .caret { color: var(--ink-bone); }
+  .mig-title {
+    min-width: 0;
+    color: var(--ink-bone);
+    font-size: var(--t-mono-md);
+    line-height: 1.45;
+  }
+  .mig-caret { color: var(--ink-line); justify-self: end; }
+  .mig-row:hover .mig-caret, .mig-row:focus-visible .mig-caret { color: var(--ink-bone); }
 
   @media (max-width: 720px) {
     .hub { padding: var(--s-6) var(--s-4); }
     .verticals { grid-template-columns: 1fr; }
-    .row { grid-template-columns: 1fr; gap: var(--s-1); }
-    .row .arrow, .row .caret { display: none; }
+    .mig-row { grid-template-columns: 1fr; gap: var(--s-2); padding: var(--s-4) 0; }
+    .mig-route { grid-template-columns: 1fr; gap: var(--s-1); }
+    .mig-route .arrow, .mig-caret { display: none; }
   }
 </style>

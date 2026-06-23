@@ -90,8 +90,36 @@ const isActive = (href: string) =>
   .search-trigger .key { color: var(--signal-pink); }
 
   @media (max-width: 720px) {
-    .inner { flex-direction: column; align-items: flex-start; gap: var(--s-3); padding: var(--s-3) var(--s-4); }
-    nav { width: 100%; gap: var(--s-4); flex-wrap: wrap; }
-    .search-trigger { margin-left: auto; }
+    .inner {
+      width: 100%;
+      min-width: 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--s-3);
+      padding: var(--s-3) var(--s-4);
+    }
+    nav {
+      width: 100%;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(3, max-content) minmax(0, 1fr);
+      gap: var(--s-4);
+    }
+    .search-trigger {
+      justify-self: end;
+      min-width: 0;
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 430px) {
+    nav {
+      grid-template-columns: repeat(3, max-content);
+    }
+    .search-trigger {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+      justify-content: center;
+    }
   }
 </style>

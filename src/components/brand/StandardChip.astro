@@ -5,7 +5,13 @@ interface Props {
   emphasis?: 'normal' | 'strong';
 }
 const { kind, id, emphasis = 'normal' } = Astro.props;
-const label = kind === 'erc' ? `ERC-${id}` : `LSP·${id}`;
+const label = kind === 'lsp'
+  ? `LSP·${id}`
+  : id === 'EOA'
+    ? 'EOA'
+    : id === 'other'
+      ? 'EVM'
+      : `ERC-${id}`;
 ---
 <span class={`chip chip-${kind} chip-${emphasis}`}>{label}</span>
 
