@@ -7,7 +7,17 @@ const description =
   'Why ERCs, Solved exists, who writes it, and how to contribute. An independent, spec-grade reference for the LUKSO LSP standards.';
 ---
 
-<Base title="About" description={description}>
+<Base
+  title="About"
+  description={description}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'About ERCs, Solved',
+    description,
+    url: 'https://ercsolved.dev/about/',
+  }}
+>
   <article class="article">
     <header class="page-head">
       <span class="eyebrow">colophon</span>
@@ -23,11 +33,12 @@ const description =
 
       <h2>The stance, in one paragraph.</h2>
       <p>
-        <strong>ERCs are interfaces. LSPs are the system.</strong> ERC-20, 721, and 1155 won by
-        underspecifying — they handed everyone a balance sheet and a transfer function and went
-        home. Every team since has paid the integration tax: approval phishing, dead NFTs in
-        vaults, tokenURI servers that go offline, EOAs nobody can recover, 4337 stacks bolted on
-        to fake what an account should be. LSPs aren't a competing token spec — they're the
+        <strong>ERCs are interfaces. LSPs are the system.</strong> ERC-20, ERC-721, and ERC-1155
+        won by underspecifying — they handed everyone a balance sheet and a transfer function
+        and went home. Every team since has paid the integration tax: approval phishing, dead
+        NFTs in vaults, tokenURI servers that go offline, EOAs nobody can recover, ERC-4337
+        stacks bolted on to fake what an account should be. LSPs aren't a competing token spec —
+        they're the
         surrounding system: receiver awareness, profile metadata, key-scoped permissions, relay
         execution, contract extension. This site exists to make that decision legible.
       </p>

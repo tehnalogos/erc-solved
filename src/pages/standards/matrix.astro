@@ -5,17 +5,24 @@ import Authorship from '~/components/primitives/Authorship.astro';
 import { matrixRows } from '~/lib/matrix.ts';
 ---
 <Base
-  title="The ERC ↔ LSP matrix"
-  description="Every Ethereum standard developers reach for, mapped to the LUKSO LSP equivalent in one row. The canonical decision page."
+  title="The Ethereum ERC ↔ LSP matrix"
+  description="Every Ethereum Request for Comments (ERC) standard developers reach for, mapped to the LUKSO LSP equivalent in one row. The canonical decision page."
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'The Ethereum ERC ↔ LSP matrix',
+    description: 'Every Ethereum Request for Comments (ERC) standard developers reach for, mapped to the LUKSO LSP equivalent in one row.',
+    url: 'https://ercsolved.dev/standards/matrix/',
+  }}
 >
-  <section class="matrix-page" data-pagefind-body data-pagefind-meta="title:The ERC ↔ LSP matrix">
+  <section class="matrix-page" data-pagefind-body data-pagefind-meta="title:The Ethereum ERC ↔ LSP matrix">
     <header class="head">
       <span class="eyebrow">decision page · share this one</span>
-      <h1>The ERC ↔ LSP matrix.</h1>
+      <h1>The Ethereum ERC ↔ LSP matrix.</h1>
       <p class="dim">
         One row per ERC. The LSP column shows what the standard would look like if it were
-        designed instead of layered. The verdict is one line. Click through for the comparison
-        page when you want the spec diff.
+        designed instead of layered on Ethereum. The verdict is one line. Click through for the
+        comparison page when you want the spec diff.
       </p>
     </header>
 

@@ -3,12 +3,12 @@ kind: LSP
 id: "3"
 title: "Profile Metadata"
 oneLine: "The standard keys for what a Universal Profile is — name, image, links, tags."
-description: "LSP3 defines ERC725Y keys for profile-level metadata: name, description, avatar, links, tags. Apps reading any LUKSO profile see the same shape."
+description: "LSP3 defines ERC-725Y keys for profile-level metadata: name, description, avatar, links, tags. Apps reading any LUKSO profile see the same shape."
 purpose: Metadata
 updated: 2026-06-22
 abi: |
-  // LSP3 is a set of well-known ERC725Y data keys.
-  // Read with the standard ERC725Y getter:
+  // LSP3 is a set of well-known ERC-725Y data keys.
+  // Read with the standard ERC-725Y getter:
   function getData(bytes32 dataKey) external view returns (bytes memory);
 
   // Canonical keys (named):
@@ -20,7 +20,7 @@ solves:
   - pain: "no standard place for account-level identity (vs app DBs)"
   - pain: "EOA wallet limits"
     href: "/problems/eoa-key-risk/"
-companions: ["LSP·0", "LSP·5", "LSP·12", "ERC·725"]
+companions: ["LSP·0", "LSP·5", "LSP·12", "ERC-725"]
 doesNotSolve:
   - "LSP3 isn't an identity protocol. It's a key schema."
   - "It doesn't validate the avatar URL or the link contents — that's the app's job."
@@ -33,7 +33,7 @@ docs:
 
 LSP3 is small. It says: if every Universal Profile uses these data keys for the same things,
 every app can read every profile without per-app conventions. The profile itself is a
-contract (LSP0), the *information about the profile* lives in ERC725Y data keys, and LSP3
+contract (LSP0), the *information about the profile* lives in ERC-725Y data keys, and LSP3
 names the canonical ones.
 
 Pair with LSP5 (received assets) and LSP12 (issued assets) for the full identity-side picture

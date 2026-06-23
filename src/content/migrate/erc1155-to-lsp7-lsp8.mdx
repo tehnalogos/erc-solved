@@ -1,18 +1,18 @@
 ---
-title: "Migrate ERC1155 multi-asset contracts to LSP7 + LSP8"
-from: "ERC·1155"
+title: "Migrate ERC-1155 multi-asset contracts to LSP7 + LSP8"
+from: "ERC-1155"
 to: "LSP·7+8"
-description: "A migration plan when the ERC1155 token-id semantics are starting to leak. Split the contract by asset shape: LSP7 for fungible, LSP8 for identifiable."
+description: "A migration plan when the ERC-1155 token-id semantics are starting to leak. Split the contract by asset shape: LSP7 for fungible, LSP8 for identifiable."
 estimate: "~1 week for a game / edition contract"
-verdict: "Migrate when wallets, indexers, or marketplaces need to know 'fungible vs identifiable' without per-collection decoding. Keep ERC1155 when gas savings from a single contract dominate and per-id branching is acceptable."
+verdict: "Migrate when downstream code needs to dispatch on asset shape (fungible vs identifiable) by interface — without per-collection decoding rules. Keep ERC-1155 when atomic cross-id batch transfers are a primitive your protocol relies on, or when per-id semantics are an integral part of your contract's state machine."
 updated: 2026-06-22
 gotchas:
   - "Two contracts instead of one — deployment cost doubles, indexing surface doubles."
   - "Batch transfers are now per-standard, not cross-standard."
-  - "Holders of mixed ERC1155 ids need to migrate to two new contracts in coordinated mints."
-  - "Marketplaces that supported your ERC1155 won't automatically pick up the new LSP7 + LSP8 contracts."
+  - "Holders of mixed ERC-1155 ids need to migrate to two new contracts in coordinated mints."
+  - "Marketplaces that supported your ERC-1155 won't automatically pick up the new LSP7 + LSP8 contracts."
 verify:
-  - "Every ERC1155 token id mapped to LSP7 amount or LSP8 token id"
+  - "Every ERC-1155 token id mapped to LSP7 amount or LSP8 token id"
   - "Holder balances reproduced across both LSP contracts"
   - "Batch transfer behavior tested per standard"
   - "LSP1 receivers handle both LSP7 and LSP8 typeIds"
@@ -26,7 +26,7 @@ related: ["compare/erc1155-lsp7-lsp8", "problems/erc1155-complexity"]
 
 ### Step 1 — classify every token id
 
-For each token id (or id range) in the existing ERC1155 contract, decide: is it
+For each token id (or id range) in the existing ERC-1155 contract, decide: is it
 **fungible** (interchangeable units, summable) or **identifiable** (each unit is unique)?
 Fungible → LSP7. Identifiable → LSP8. Semi-fungible (e.g. an edition of 100 prints) can
 work as LSP7 with `decimals=0`.
@@ -38,7 +38,7 @@ lives independently on each contract.
 
 ### Step 3 — port the holders
 
-Snapshot ERC1155 balances. For LSP7 ids, mint amounts. For LSP8 ids, mint bytes32-encoded
+Snapshot ERC-1155 balances. For LSP7 ids, mint amounts. For LSP8 ids, mint bytes32-encoded
 token ids. Two coordinated mints — usually scripted, sometimes merkle-claimed.
 
 ### Step 4 — port the integrations
@@ -49,5 +49,5 @@ LSP8 incoming?" — but one hook function, not two.
 
 ### Step 5 — sunset
 
-Once the new contracts are live and integrations have migrated, pause the ERC1155. Keep it
+Once the new contracts are live and integrations have migrated, pause the ERC-1155. Keep it
 around for historical reference — don't redeploy over it.

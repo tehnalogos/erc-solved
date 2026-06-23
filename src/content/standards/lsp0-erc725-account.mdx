@@ -1,19 +1,19 @@
 ---
 kind: LSP
 id: "0"
-title: "ERC725 Account"
+title: "ERC-725 Account"
 oneLine: "The account contract. Owns assets, holds metadata, executes calls, accepts hooks."
-description: "LSP0 defines the Universal Profile account contract. It composes ERC725X (generic call execution), ERC725Y (metadata key-value), LSP1 (universal receiver), LSP14 (ownable two-step), and LSP17 (extension router)."
+description: "LSP0 defines the Universal Profile account contract. It composes ERC725X (generic call execution), ERC-725Y (metadata key-value), LSP1 (universal receiver), LSP14 (ownable two-step), and LSP17 (extension router)."
 purpose: Account
 updated: 2026-06-22
 abi: |
-  // LSP0 composes ERC725X + ERC725Y + LSP1 + LSP14 + LSP17
+  // LSP0 composes ERC725X + ERC-725Y + LSP1 + LSP14 + LSP17
 
   // ERC725X — execute arbitrary calls from the account
   function execute(uint256 op, address target, uint256 value, bytes data)
     external payable returns (bytes memory);
 
-  // ERC725Y — typed key-value storage
+  // ERC-725Y — typed key-value storage
   function getData(bytes32 dataKey) external view returns (bytes memory);
   function setData(bytes32 dataKey, bytes memory dataValue) external;
 
@@ -31,14 +31,14 @@ doesNotSolve:
   - "Bytecode is immutable. Behavior extension goes through LSP17, not in-place upgrades."
   - "The account doesn't pick controllers for you. That policy is the LSP6 layer."
 docs:
-  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+  - label: "docs.lukso.tech / LSP0 ERC-725 Account"
     href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
-  - label: "docs.lukso.tech / ERC725"
+  - label: "docs.lukso.tech / ERC-725"
     href: "https://docs.lukso.tech/standards/erc725/"
 ---
 
 LSP0 is the substrate every other account-side LSP builds on. The contract carries an
-ERC725X execute path (so the account can call out as itself), an ERC725Y data store (so the
+ERC725X execute path (so the account can call out as itself), an ERC-725Y data store (so the
 account carries its own metadata), and an LSP1 hook (so the account can react when value or
 assets arrive). Owner rotation goes through LSP14's two-step pattern, function-selector
 extension goes through LSP17, and permissioned execution typically goes through LSP6.

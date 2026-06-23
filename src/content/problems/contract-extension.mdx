@@ -2,7 +2,7 @@
 title: "Deployed contracts can't grow without a key holder."
 tagline: "UUPS makes the upgrade authority permanent. Diamonds make storage your problem."
 query: "contract extension after deployment"
-description: "Upgradeable proxies, ERC2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority."
+description: "Upgradeable proxies, ERC-2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority."
 erc: "other"
 lsps: ["LSP17"]
 aliases: ["upgradeable contracts", "lsp17 extensions", "erc2535 alternative", "add function after deploy"]
@@ -16,13 +16,13 @@ diff:
     chip: "LSP·17"
     code: "fallback → extension[selector]"
     tags: ["base immutable", "selector-routed"]
-verdict: "LSP17 defines a fallback router: unknown selector → registered extension contract. The base contract stays immutable. New behavior is added by registering extensions in ERC725Y. No upgrade authority. No diamond storage layout problem."
+verdict: "LSP17 defines a fallback router: unknown selector → registered extension contract. The base contract stays immutable. New behavior is added by registering extensions in ERC-725Y. No upgrade authority. No diamond storage layout problem."
 docs:
   - label: "docs.lukso.tech / LSP17 Contract Extension"
     href: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
-  - label: "docs.lukso.tech / ERC725"
+  - label: "docs.lukso.tech / ERC-725"
     href: "https://docs.lukso.tech/standards/erc725/"
-related: ["problems/wallet-permissions", "problems/eip4337-bundler-tax"]
+related: ["problems/wallet-permissions", "problems/erc4337-bundler-tax"]
 ---
 
 ## Why this breaks
@@ -31,7 +31,7 @@ A deployed contract cannot grow new external functions. Adding behavior usually 
 transparent or UUPS proxy, which makes upgrade authority a permanent trust assumption, or a
 diamond, which trades trust for storage and tooling complexity.
 
-For account contracts, the per-account module patterns (Safe modules, ERC4337 validators)
+For account contracts, the per-account module patterns (Safe modules, ERC-4337 validators)
 help — but they are wallet-specific extension mechanisms, not a general contract extension
 primitive.
 
@@ -40,7 +40,7 @@ primitive.
 ### OpenZeppelin transparent / UUPS proxies
 Proven. The upgrade key never goes away. Every user is permanently exposed to whoever holds it.
 
-### ERC2535 Diamonds
+### ERC-2535 Diamonds
 Modular. Expensive to author. Storage requires discipline. Tooling is improving but specialized.
 
 ### Safe modules and guards
@@ -52,7 +52,7 @@ Bespoke per-app. No shared tooling.
 ## How LSP solves it
 
 LSP17 defines a fallback router: when a contract receives a call for an unknown function
-selector, it looks up an extension contract registered for that selector (stored in ERC725Y
+selector, it looks up an extension contract registered for that selector (stored in ERC-725Y
 data keys) and forwards the call. The base contract stays immutable. New behavior is added
 by registering extensions.
 

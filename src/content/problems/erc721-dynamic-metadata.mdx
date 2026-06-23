@@ -2,27 +2,27 @@
 title: "The tokenURI trap."
 tagline: "tokenURI returns one string. Dynamic NFTs depend on whatever server is hosting the JSON."
 query: "erc721 dynamic metadata"
-description: "tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC4906, fully onchain SVG, and LSP8 plus ERC725Y key/value metadata."
+description: "tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC-4906, fully onchain SVG, and LSP8 plus ERC-725Y key/value metadata."
 erc: "721"
 lsps: ["LSP8", "LSP4"]
 aliases: ["dynamic nft metadata", "tokenuri refresh", "nft metadata server", "erc4906", "onchain svg nft"]
 updated: 2026-06-22
 diff:
   from:
-    chip: "ERC·721"
+    chip: "ERC-721"
     code: "tokenURI(tokenId) returns (string)"
     tags: ["one URI", "server-cached", "no integrity"]
   to:
     chip: "LSP·8"
     code: "getDataForTokenId(tokenId, key)"
     tags: ["typed keys", "VerifiableURI", "per-token"]
-verdict: "LSP8 stores per-token metadata through ERC725Y data keys, not one tokenURI string. Apps read getDataForTokenId(tokenId, key) and get a typed value back. Dynamic updates are setData calls, gated by whatever account permissions you want."
+verdict: "LSP8 stores per-token metadata through ERC-725Y data keys, not one tokenURI string. Apps read getDataForTokenId(tokenId, key) and get a typed value back. Dynamic updates are setData calls, gated by whatever account permissions you want."
 docs:
   - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
     href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
   - label: "docs.lukso.tech / LSP4 Digital Asset Metadata"
     href: "https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/"
-  - label: "docs.lukso.tech / ERC725"
+  - label: "docs.lukso.tech / ERC-725"
     href: "https://docs.lukso.tech/standards/erc725/"
 related: ["problems/erc721-safe-transfer", "problems/erc721-tokenid-limits"]
 ---
@@ -34,7 +34,7 @@ or by whom. If metadata is dynamic, the truth lives in whatever server hosts the
 marketplaces, wallets, and explorers each cache it on their own schedule.
 
 "Refresh metadata" buttons exist because there is no standard signal for what changed.
-ERC4906 added a `MetadataUpdate` event, but consumers still have to ask the server what the
+ERC-4906 added a `MetadataUpdate` event, but consumers still have to ask the server what the
 new state actually is.
 
 ## What people try
@@ -45,7 +45,7 @@ Convenient. The JSON is still off-chain and trust-anchored to whoever can repin 
 ### Server-rendered metadata APIs
 Works at scale. Couples the NFT to your infrastructure. Falls over when the server does.
 
-### ERC4906 MetadataUpdate events
+### ERC-4906 MetadataUpdate events
 Signals "something changed." Doesn't say what changed, doesn't carry the new state.
 
 ### Fully on-chain SVG generators
@@ -54,7 +54,7 @@ collections.
 
 ## How LSP solves it
 
-LSP8 assets store per-token metadata through ERC725Y data keys, not through one `tokenURI`
+LSP8 assets store per-token metadata through ERC-725Y data keys, not through one `tokenURI`
 string. LSP4 defines metadata conventions (name, symbol, JSON schema). `VerifiableURI` lets
 a key point to an off-chain payload **with a hash**, so the chain enforces what the off-chain
 blob must be.

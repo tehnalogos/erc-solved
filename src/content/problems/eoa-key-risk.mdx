@@ -14,11 +14,11 @@ diff:
     tags: ["one key", "no recovery", "no scope"]
   to:
     chip: "LSP·0"
-    code: "contract Account is ERC725 + LSP6 + LSP1"
+    code: "contract Account is ERC-725 + LSP6 + LSP1"
     tags: ["many controllers", "scoped", "recoverable"]
 verdict: "A Universal Profile is an account contract. Controllers (LSP6) sign for it; profile metadata (LSP3) describes it; LSP1 hooks let it react. The address survives controller rotation."
 docs:
-  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+  - label: "docs.lukso.tech / LSP0 ERC-725 Account"
     href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
   - label: "docs.lukso.tech / LSP6 Key Manager"
     href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
@@ -54,7 +54,7 @@ Identity layer separate from custody. App-by-app profile state.
 
 ## How LSP solves it
 
-A Universal Profile is an account **contract**. It stores profile metadata through ERC725Y
+A Universal Profile is an account **contract**. It stores profile metadata through ERC-725Y
 and LSP3, delegates control through LSP6 Key Manager controllers, reacts to interactions
 through LSP1, and supports relay execution through LSP25.
 

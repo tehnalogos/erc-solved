@@ -9,10 +9,11 @@ interface Props {
   to: Side;
   size?: 'md' | 'lg';
   framed?: boolean;
+  animated?: boolean;
 }
-const { from, to, size = 'md', framed = false } = Astro.props;
+const { from, to, size = 'md', framed = false, animated = false } = Astro.props;
 ---
-<figure class:list={['diff', `diff-${size}`, { framed }]} role="group" aria-label={`${from.chip} compared to ${to.chip}`}>
+<figure class:list={['diff', `diff-${size}`, { framed, animated }]} role="group" aria-label={`${from.chip} compared to ${to.chip}`}>
   <div class="block block-from">
     <span class="gutter" aria-hidden="true">−</span>
     <div class="body">

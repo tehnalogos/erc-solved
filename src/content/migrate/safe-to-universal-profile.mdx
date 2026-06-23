@@ -4,13 +4,13 @@ from: "Safe"
 to: "LSP·0"
 description: "Move custody and ownership from a Safe multisig to a Universal Profile with LSP6 controllers. The permission model maps cleanly; the recovery model needs to be designed."
 estimate: "~1 day for a small Safe; longer if the Safe owns many assets"
-verdict: "Migrate when you want the per-controller permission scope LSP6 ships, profile-native metadata, or LSP25 relay execution — and your product is shipping on LUKSO. Stay on Safe when multi-chain reach across mature mainnet ecosystems is the requirement."
+verdict: "Migrate when you want per-controller permission scoping in a standard vocabulary (LSP6 bitfield + AllowedCalls + AllowedERC725YDataKeys), profile-native metadata storage, or LSP25 relay execution on the account itself. Stay on Safe when the m-of-n multisig threshold is the primitive your product encodes — that pattern doesn't map 1:1 to LSP6 and needs a recovery contract layer to express."
 updated: 2026-06-22
 gotchas:
-  - "Safe has mature deployments on mainnet + many L2s; the Universal Profile ecosystem (wallet, indexers, marketplaces) lives on LUKSO. This is usually also a chain migration."
-  - "Multi-sig threshold semantics don't map 1:1 to LSP6 — model it as a recovery controller contract that enforces the threshold."
-  - "Asset transfer is many separate transactions unless the Safe owns the assets through a sweep contract."
-  - "Anything connected to the Safe's address (subscriptions, vesting, DAO membership) needs to be updated."
+  - "Multi-sig threshold semantics don't map 1:1 to LSP6 — model it as a recovery controller contract that enforces the threshold and is itself registered as an LSP6 controller with EDITPERMISSIONS."
+  - "Asset transfer is many separate transactions unless the Safe owns the assets through a sweep contract that batches outbound moves."
+  - "Anything connected to the Safe's address (vesting schedules, allowance grants, on-chain memberships) needs to be re-pointed to the new profile address — addresses don't migrate, the references do."
+  - "Safe modules have their own permission shape; LSP6 controllers + LSP17 extensions are the LSP-side equivalents. Map each module to its closest LSP primitive deliberately."
 verify:
   - "All assets transferred to the Universal Profile"
   - "Old Safe paused (no longer holds material assets)"
@@ -18,7 +18,7 @@ verify:
   - "Recovery policy in place — at least one cold controller with EDITPERMISSIONS"
   - "Off-chain integrations updated to the new address"
 docs:
-  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+  - label: "docs.lukso.tech / LSP0 ERC-725 Account"
     href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
   - label: "docs.lukso.tech / LSP6 Key Manager"
     href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
@@ -47,7 +47,7 @@ Add controllers per the design from step 1.
 For each asset class:
 
 - **Native LYX** — `Safe.execTransaction → profile.execute(0, profile, value, "")`
-- **ERC20 / LSP7** — `Safe → token.transfer(profile, balance)`
+- **ERC-20 / LSP7** — `Safe → token.transfer(profile, balance)`
 - **NFTs** — `Safe → token.safeTransferFrom(safe, profile, id)` (or LSP8 equivalent)
 
 If the Safe holds many assets, write a sweep contract that batches the transfers.

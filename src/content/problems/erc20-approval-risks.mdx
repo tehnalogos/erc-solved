@@ -2,14 +2,14 @@
 title: "The approval problem."
 tagline: "approve and transferFrom split intent. Wallets can't explain what they're authorizing."
 query: "erc20 approval risks"
-description: "Unlimited allowances, stale approvals, and split-intent UX make ERC20 approve a known security problem. Compare Permit2, EIP-2612, revoke flows, and LSP7 operator authorization with LSP6 account permissions."
+description: "Unlimited allowances, stale approvals, and split-intent UX make ERC-20 approve a known security problem. Compare Permit2, EIP-2612, revoke flows, and LSP7 operator authorization with LSP6 account permissions."
 erc: "20"
 lsps: ["LSP7", "LSP6"]
 aliases: ["unlimited approval", "approve max uint", "stale allowance", "allowance phishing", "approve and transferfrom"]
 updated: 2026-06-22
 diff:
   from:
-    chip: "ERC·20"
+    chip: "ERC-20"
     code: "approve(spender, amount)"
     tags: ["unbounded", "phishable", "split-intent"]
   to:
@@ -27,7 +27,7 @@ related: ["problems/wallet-permissions", "problems/erc20-transfer-hooks"]
 
 ## Why this breaks
 
-ERC20 `approve` sets an allowance. The spender later calls `transferFrom` whenever it likes,
+ERC-20 `approve` sets an allowance. The spender later calls `transferFrom` whenever it likes,
 for any amount up to the allowance. The user signs intent once and never sees the executions,
 so wallets cannot meaningfully explain what they're authorizing.
 
@@ -51,7 +51,7 @@ but only when both sides integrate it.
 
 ### Approve-and-call wrappers
 Adds a custom router contract. Fragments UX across token + router, doesn't fix the underlying
-ERC20 model.
+ERC-20 model.
 
 ## How LSP solves it
 
@@ -59,7 +59,7 @@ LSP7's `authorizeOperator` is still amount-scoped — that part is honest. It is
 protection against every approval risk. The shift is **where the policy lives**.
 
 On a Universal Profile, the controller calling `authorizeOperator` is itself bound by LSP6
-Key Manager permissions: allowed calls, allowed standards, allowed ERC725Y data keys, value
+Key Manager permissions: allowed calls, allowed standards, allowed ERC-725Y data keys, value
 limits, and revocable per controller. So instead of asking the token contract to police every
 future `transferFrom`, the **account** decides what each app controller may invoke and when.
 

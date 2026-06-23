@@ -4,11 +4,11 @@ import DiffArrow from '~/components/primitives/DiffArrow.astro';
 import Authorship from '~/components/primitives/Authorship.astro';
 
 const description =
-  'A spec-grade field guide for EVM developers. ERC pain points mapped to the LUKSO LSP standards that were designed instead of layered.';
+  'A spec-grade field guide for Ethereum and EVM builders. Ethereum Request for Comments (ERC) pain points mapped to the LUKSO LSP standards that were designed instead of layered.';
 
 const verticals = [
   { label: 'Token economics',         stack: 'LSP·7 + LSP·4',                href: '/build/token-economics/' },
-  { label: 'Dynamic NFTs',            stack: 'LSP·8 + LSP·4 + ERC·725Y',     href: '/build/dynamic-nfts/' },
+  { label: 'Dynamic NFTs',            stack: 'LSP·8 + LSP·4 + ERC-725Y',     href: '/build/dynamic-nfts/' },
   { label: 'Smart wallet UX',         stack: 'LSP·0 + LSP·6',                href: '/build/smart-wallet-ux/' },
   { label: 'Gasless onboarding',      stack: 'LSP·25 + LSP·6',               href: '/build/gasless-onboarding/' },
   { label: 'Profile-native apps',     stack: 'LSP·0 + LSP·3 + LSP·26',       href: '/build/profile-native-apps/' },
@@ -17,8 +17,8 @@ const verticals = [
 
 const topQueries = [
   { q: 'erc20 approval risks',          a: 'LSP·7 + LSP·6',           href: '/problems/erc20-approval-risks/' },
-  { q: 'erc721 dynamic metadata',       a: 'LSP·8 + LSP·4 + ERC·725Y', href: '/problems/erc721-dynamic-metadata/' },
-  { q: 'eip-4337 alternatives',         a: 'LSP·0 + LSP·6 + LSP·25',   href: '/problems/eip4337-bundler-tax/' },
+  { q: 'erc721 dynamic metadata',       a: 'LSP·8 + LSP·4 + ERC-725Y', href: '/problems/erc721-dynamic-metadata/' },
+  { q: 'erc-4337 alternatives',         a: 'LSP·0 + LSP·6 + LSP·25',   href: '/problems/erc4337-bundler-tax/' },
   { q: 'erc20 transfer hooks',          a: 'LSP·7 + LSP·1',            href: '/problems/erc20-transfer-hooks/' },
   { q: 'social recovery smart wallets', a: 'LSP·6 controllers',        href: '/problems/social-recovery/' },
   { q: 'safetransferfrom problems',     a: 'LSP·1 universal receiver', href: '/problems/erc721-safe-transfer/' },
@@ -26,21 +26,53 @@ const topQueries = [
 ---
 
 <Base
-  title="ERCs, Solved."
+  title="Ethereum ERC Problems and LUKSO LSP Solutions"
   description={description}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Ethereum ERC Problems and LUKSO LSP Solutions',
+    description,
+    url: 'https://ercsolved.dev/',
+    about: [
+      'Ethereum Request for Comments',
+      'ERC standards',
+      'LUKSO LSP standards',
+      'EVM builder guidance',
+    ],
+  }}
 >
-  <section class="hero" data-pagefind-body data-pagefind-meta="title:ERCs, Solved.">
+  <section class="hero has-halo" data-pagefind-body data-pagefind-meta="title:Ethereum ERC Problems and LUKSO LSP Solutions">
     <div class="hero-inner">
-      <span class="eyebrow">EVM developer field manual</span>
-      <h1>ERCs are interfaces. <span class="dim">LSPs are the system.</span></h1>
-      <p class="lede">
-        ERC-20, 721, and 1155 won by underspecifying. Every team since has paid the integration
+      <div class="boot" aria-label="status">
+        <span class="typed">
+          <span class="sigil">//</span>
+          <span class="long">field manual · 12 problems · 15 standards · ready</span>
+          <span class="short">field manual · ready</span>
+        </span>
+        <span class="caret" aria-hidden="true">▍</span>
+      </div>
+
+      <h1 class="h1-stagger">
+        <span class="word" style="--i:0">ERCs</span>
+        <span class="word" style="--i:1">are</span>
+        <span class="word" style="--i:2">interfaces.</span>
+        <span class="break"></span>
+        <span class="word dim" style="--i:3">LSPs</span>
+        <span class="word dim" style="--i:4">are</span>
+        <span class="word dim" style="--i:5">the</span>
+        <span class="word dim" style="--i:6">system.</span>
+      </h1>
+
+      <p class="lede" data-reveal>
+        ERC-20, ERC-721, and ERC-1155 won by underspecifying. Every team since has paid the
+        integration
         tax — approval phishing, NFTs stranded in vaults, tokenURI servers offline, EOAs you
-        can't recover, 4337 stacks bolted on to fake what an account should be. This is the
+        can't recover, ERC-4337 stacks bolted on to fake what an account should be. This is the
         reference for the standards that were designed instead of layered.
       </p>
-      <div class="cta-row">
-        <a class="cta" href="/problems/">
+      <div class="cta-row" data-reveal>
+        <a class="cta magnetic" href="/problems/">
           <span class="bracket">[</span>
           <span class="label">start with your problem</span>
           <span class="arrow">→</span>
@@ -50,6 +82,56 @@ const topQueries = [
       </div>
     </div>
   </section>
+
+  <script>
+    // Hero halo — pink radial gradient that follows the cursor.
+    const hero = document.querySelector<HTMLElement>('.hero.has-halo');
+    if (hero) {
+      let raf = 0;
+      let nextX = 50, nextY = 30;
+      const apply = () => {
+        hero.style.setProperty('--cx', `${nextX}%`);
+        hero.style.setProperty('--cy', `${nextY}%`);
+        raf = 0;
+      };
+      hero.addEventListener('pointermove', (e) => {
+        const r = hero.getBoundingClientRect();
+        nextX = ((e.clientX - r.left) / r.width) * 100;
+        nextY = ((e.clientY - r.top) / r.height) * 100;
+        hero.dataset.halo = 'on';
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+      hero.addEventListener('pointerleave', () => { hero.dataset.halo = ''; });
+    }
+
+    // Magnetic CTA — gentle pull toward the cursor when close.
+    document.querySelectorAll<HTMLElement>('.magnetic').forEach((el) => {
+      const PULL = 0.22;       // % of distance from center
+      const RANGE = 90;        // px radius where magnetism kicks in
+      let raf = 0;
+      const apply = (dx: number, dy: number) => {
+        el.style.setProperty('--mx', `${dx}px`);
+        el.style.setProperty('--my', `${dy}px`);
+        raf = 0;
+      };
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        if (dist > RANGE) return;
+        el.dataset.magnetize = 'on';
+        if (!raf) raf = requestAnimationFrame(() => apply(dx * PULL, dy * PULL));
+      });
+      el.addEventListener('pointerleave', () => {
+        el.dataset.magnetize = '';
+        el.style.setProperty('--mx', '0px');
+        el.style.setProperty('--my', '0px');
+      });
+    });
+  </script>
 
   <section class="example">
     <div class="example-inner">
@@ -61,20 +143,23 @@ const topQueries = [
           <span class="amber">−</span> line is what ERC gives you. The <span class="pink">+</span> line is what LSP designed instead.
         </p>
       </div>
-      <DiffArrow
-        size="lg"
-        framed
-        from={{
-          chip: 'ERC·20',
-          code: 'approve(spender, amount)',
-          tags: ['unbounded', 'phishable', 'split-intent'],
-        }}
-        to={{
-          chip: 'LSP·7',
-          code: 'authorizeOperator(op, amount, data)',
-          tags: ['scoped', 'revocable', 'LSP6 account permissions'],
-        }}
-      />
+      <div data-reveal>
+        <DiffArrow
+          size="lg"
+          framed
+          animated
+          from={{
+            chip: 'ERC-20',
+            code: 'approve(spender, amount)',
+            tags: ['unbounded', 'phishable', 'split-intent'],
+          }}
+          to={{
+            chip: 'LSP·7',
+            code: 'authorizeOperator(op, amount, data)',
+            tags: ['scoped', 'revocable', 'LSP6 account permissions'],
+          }}
+        />
+      </div>
       <p class="example-foot dim">
         Read the full page →
         <a href="/problems/erc20-approval-risks/">erc20 approval risks</a>
@@ -82,7 +167,7 @@ const topQueries = [
     </div>
   </section>
 
-  <section class="band verticals">
+  <section class="band verticals" data-reveal>
     <div class="band-inner">
       <div class="band-head">
         <span class="eyebrow">what are you building?</span>
@@ -102,7 +187,7 @@ const topQueries = [
     </div>
   </section>
 
-  <section class="band queries">
+  <section class="band queries" data-reveal>
     <div class="band-inner">
       <div class="band-head">
         <span class="eyebrow">top search queries this month</span>
@@ -136,20 +221,30 @@ const topQueries = [
 <style>
   .hero {
     padding: var(--s-8) var(--s-5) var(--s-6);
+    overflow: hidden;
   }
   .hero-inner {
     max-width: var(--container);
     margin: 0 auto;
     display: grid;
     gap: var(--s-5);
+    position: relative;
+    min-width: 0;
   }
+  /* Prevent any wide child (e.g. the boot strip with nowrap) from
+     blowing up the grid past viewport width — would clip everything. */
+  .hero-inner > * { min-width: 0; max-width: 100%; }
+  .boot { max-width: 100%; overflow: hidden; }
 
   h1 {
     max-width: 22ch;
     font-size: clamp(36px, 5.5vw, 68px);
     font-variation-settings: 'opsz' 60;
-    line-height: 1.02;
+    line-height: 1.04;
   }
+  h1 .word { margin-right: 0.22em; }
+  h1 .word.dim { color: var(--ink-bone-dim); }
+  h1 .break { display: block; height: 0; }
   h1 .dim { color: var(--ink-bone-dim); }
 
   .lede {

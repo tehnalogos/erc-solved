@@ -11,6 +11,7 @@ interface Props {
   updated?: Date | string;
   editPath?: string;
   ogType?: 'website' | 'article';
+  ogImage?: string | false;
 }
 const {
   title,
@@ -21,13 +22,14 @@ const {
   updated,
   editPath,
   ogType = 'article',
+  ogImage,
 } = Astro.props;
 
 const editHref = editPath
   ? `https://github.com/lukso-network/ercs-solved/edit/main/${editPath}`
   : undefined;
 ---
-<Base title={pageTitle} description={description} ogType={ogType}>
+<Base title={pageTitle} description={description} ogType={ogType} ogImage={ogImage}>
   <article class="article" data-pagefind-body data-pagefind-meta={`title:${title}`}>
     {(eyebrow || title) && (
       <header class="page-head">

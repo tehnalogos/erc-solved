@@ -2,8 +2,8 @@
 kind: LSP
 id: "8"
 title: "Identifiable Digital Asset"
-oneLine: "NFTs and identifiable items. bytes32 IDs, per-token ERC725Y data, LSP1 hooks."
-description: "LSP8 is the LUKSO NFT standard. It keeps ERC721's ownership model, then adds bytes32 token IDs, per-token ERC725Y storage, LSP4 metadata conventions, and LSP1 receiver notifications."
+oneLine: "NFTs and identifiable items. bytes32 IDs, per-token ERC-725Y data, LSP1 hooks."
+description: "LSP8 is the LUKSO NFT standard. It keeps ERC-721's ownership model, then adds bytes32 token IDs, per-token ERC-725Y storage, LSP4 metadata conventions, and LSP1 receiver notifications."
 purpose: Token
 updated: 2026-06-22
 abi: |
@@ -17,32 +17,33 @@ abi: |
     bytes calldata data
   ) external;
 
-  // Per-token metadata via ERC725Y-on-tokenId
+  // Per-token metadata via ERC-725Y-on-tokenId
   function getDataForTokenId(bytes32 tokenId, bytes32 dataKey)
     external view returns (bytes memory);
 
   function setDataForTokenId(bytes32 tokenId, bytes32 dataKey, bytes calldata dataValue)
     external;
 solves:
-  - pain: "ERC721 dynamic metadata"
+  - pain: "ERC-721 dynamic metadata"
     href: "/problems/erc721-dynamic-metadata/"
-  - pain: "ERC721 tokenId limited to uint256"
+  - pain: "ERC-721 tokenId limited to uint256"
     href: "/problems/erc721-tokenid-limits/"
-  - pain: "ERC721 safe transfer problems"
+  - pain: "ERC-721 safe transfer problems"
     href: "/problems/erc721-safe-transfer/"
 companions: ["LSP·1", "LSP·4", "LSP·6", "LSP·7"]
 doesNotSolve:
-  - "LSP8 doesn't make off-chain media verifiable on its own — use VerifiableURI in LSP4."
-  - "Existing ERC721 marketplaces don't speak LSP8. Migration is a product decision."
-  - "Bytes32 IDs are powerful but require schema discipline — pick the encoding deliberately."
+  - "LSP8 doesn't make off-chain media verifiable on its own — use VerifiableURI in LSP4 when you need integrity."
+  - "Publishes distinct function selectors from ERC-721. Code that hardcodes ERC-721's ABI won't accidentally dispatch to LSP8."
+  - "bytes32 IDs are powerful but require schema discipline — pick the encoding once; it's part of the contract's permanent interface."
+  - "Per-token ERC-725Y data is storage. Frequent mutation costs gas; decide which fields are mutable deliberately."
 docs:
   - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
     href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
-  - label: "docs.lukso.tech / migrate ERC721 to LSP8"
+  - label: "docs.lukso.tech / migrate ERC-721 to LSP8"
     href: "https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/"
 ---
 
-LSP8 makes one structural change to ERC721: token IDs are `bytes32`, not `uint256`. The
+LSP8 makes one structural change to ERC-721: token IDs are `bytes32`, not `uint256`. The
 integer case still works — cast and proceed. The new cases (content hashes, encoded serials,
 structured references) become first-class instead of side mappings.
 

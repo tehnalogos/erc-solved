@@ -14,17 +14,28 @@ const groups = order
   .filter(g => g.entries.length > 0);
 
 const description =
-  'The LUKSO standard set, grouped by purpose. Each explainer ships an ABI block, what it solves, and what it deliberately does not solve.';
+  'The LUKSO standard set for EVM builders, grouped by purpose. Each explainer ships an ABI block, what it solves, and what it deliberately does not solve.';
 ---
-<Base title="Standards" description={description}>
-  <section class="hub" data-pagefind-body data-pagefind-meta="title:Standards">
+<Base
+  title="LUKSO Standards for EVM Builders"
+  description={description}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'LUKSO Standards for EVM Builders',
+    description,
+    url: 'https://ercsolved.dev/standards/',
+    about: ['LUKSO standards', 'EVM contract standards', 'Ethereum ERC substrate'],
+  }}
+>
+  <section class="hub" data-pagefind-body data-pagefind-meta="title:LUKSO Standards for EVM Builders">
     <header class="head">
       <span class="eyebrow">standards index</span>
       <h1>Standards.</h1>
       <p class="dim">
         Every LSP and the ERC substrate it builds on. Grouped by purpose so the composition is
         visible: an account contract (LSP0) + a permission layer (LSP6) + a metadata store
-        (ERC725Y) is not "one big spec" — it's a stack.
+        (ERC-725Y) is not "one big spec" — it's a stack.
       </p>
       <p class="cta">
         Looking for the one-glance answer?

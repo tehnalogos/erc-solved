@@ -1,15 +1,15 @@
 ---
 title: "New users need gas before they can do anything."
-tagline: "EIP-2771 forwarders, 4337 paymasters, LSP25 relay calls — three families, three costs."
+tagline: "EIP-2771 forwarders, ERC-4337 paymasters, LSP25 relay calls — three families, three costs."
 query: "gasless transactions smart accounts"
-description: "EIP-2771 forwarders, EIP-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys."
+description: "EIP-2771 forwarders, ERC-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys."
 erc: "4337"
 lsps: ["LSP25", "LSP6", "LSP20"]
 aliases: ["meta transactions", "sponsored transactions", "gasless onboarding", "pay user gas", "relay call"]
 updated: 2026-06-22
 diff:
   from:
-    chip: "ERC·4337"
+    chip: "ERC-4337"
     code: "UserOp + paymaster + bundler"
     tags: ["parallel infra", "external EntryPoint"]
   to:
@@ -22,7 +22,7 @@ docs:
     href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
   - label: "docs.lukso.tech / Transaction Relay API"
     href: "https://docs.lukso.tech/tools/dapps/transaction-relay-api/"
-related: ["problems/eip4337-bundler-tax", "problems/wallet-permissions"]
+related: ["problems/erc4337-bundler-tax", "problems/wallet-permissions"]
 ---
 
 ## Why this breaks
@@ -30,7 +30,7 @@ related: ["problems/eip4337-bundler-tax", "problems/wallet-permissions"]
 A new user needs native ETH before they can do anything. EOAs sign and pay together, so any
 sponsorship has to add a layer that separates the signer from the payer.
 
-Every popular pattern adds infrastructure: a trusted forwarder you have to trust, an ERC4337
+Every popular pattern adds infrastructure: a trusted forwarder you have to trust, an ERC-4337
 EntryPoint and bundler you have to run or rent, a third-party relayer with its own SDK. The
 cost lands on the builder, not the spec.
 
@@ -40,7 +40,7 @@ cost lands on the builder, not the spec.
 Contracts extract `msg.sender` from calldata. Cheap, but every protected contract must be
 2771-aware and trust the forwarder.
 
-### ERC4337 + paymaster
+### ERC-4337 + paymaster
 `UserOperation` pool, bundler, `EntryPoint`, paymaster. Powerful. You ship or pay for the
 bundler stack.
 

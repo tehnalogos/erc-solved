@@ -8,7 +8,7 @@ purpose: Execution
 updated: 2026-06-22
 abi: |
   // The base contract's fallback() looks up an extension per selector.
-  // Extensions are registered via ERC725Y data keys:
+  // Extensions are registered via ERC-725Y data keys:
   //
   //   LSP17Extension:<selector>  → address (the extension contract)
   //
@@ -18,7 +18,7 @@ abi: |
 solves:
   - pain: "contract extension after deployment"
     href: "/problems/contract-extension/"
-companions: ["LSP·0", "ERC·725"]
+companions: ["LSP·0", "ERC-725"]
 doesNotSolve:
   - "LSP17 isn't an upgrade primitive for the base bytecode. It adds *new* functions; it doesn't change existing ones."
   - "DELEGATECALL extensions share storage — you still need storage-layout discipline if you use that flavor."
@@ -30,7 +30,7 @@ docs:
 
 LSP17 is the "grow without an upgrade key" primitive. When a call lands on an unknown
 function selector, the base contract's fallback looks up the registered extension address in
-ERC725Y data and forwards the call. The base bytecode is immutable; new behavior is a
+ERC-725Y data and forwards the call. The base bytecode is immutable; new behavior is a
 separate, individually permissioned contract.
 
 This is the design choice that lets Universal Profiles add features (signature

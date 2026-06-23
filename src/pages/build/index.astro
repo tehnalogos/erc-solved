@@ -10,15 +10,26 @@ const order = ['token-economics', 'dynamic-nfts', 'smart-wallet-ux', 'gasless-on
 verticals.sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug));
 
 const description =
-  'Pick what you\'re building. Get a curated reading list — problems, standards, migrations — and the minimum LSP stack to reach for.';
+  'Pick what you\'re building on Ethereum or LUKSO. Get a curated reading list — problems, standards, migrations — and the minimum LSP stack to reach for.';
 ---
-<Base title="Build" description={description}>
-  <section class="hub" data-pagefind-body data-pagefind-meta="title:Build">
+<Base
+  title="Build with LUKSO"
+  description={description}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Build with LUKSO',
+    description,
+    url: 'https://ercsolved.dev/build/',
+    about: ['Ethereum builders', 'EVM builders', 'LUKSO LSP standards'],
+  }}
+>
+  <section class="hub" data-pagefind-body data-pagefind-meta="title:Build with LUKSO">
     <header class="head">
       <span class="eyebrow">what are you building?</span>
       <h1>Build.</h1>
       <p class="dim">
-        Six verticals. Each one names the LSP stack and gives you a reading list. Use this
+        Six verticals for EVM builders. Each one names the LSP stack and gives you a reading list. Use this
         when "find me a standard" is too narrow and "show me the whole site" is too wide.
       </p>
     </header>

@@ -2,14 +2,14 @@
 title: "Token economics."
 vertical: "Token economics"
 description: "Fungible tokens, market mechanics, distribution. The minimum LSP stack for an asset that's part of a profile-aware app, not just a balance sheet."
-stack: ["LSP·7", "LSP·4", "ERC·725Y"]
+stack: ["LSP·7", "LSP·4", "ERC-725Y"]
 updated: 2026-06-22
 reading:
   - { chip: "problem", label: "The approval problem", href: "/problems/erc20-approval-risks/" }
   - { chip: "problem", label: "The transfer-hook problem", href: "/problems/erc20-transfer-hooks/" }
   - { chip: "LSP·7", label: "Digital Asset — the spec", href: "/standards/lsp7-digital-asset/" }
-  - { chip: "compare", label: "ERC20 vs LSP7", href: "/standards/compare/erc20-lsp7/" }
-  - { chip: "migrate", label: "Migrate ERC20 → LSP7", href: "/build/migrate/erc20-to-lsp7/" }
+  - { chip: "compare", label: "ERC-20 vs LSP7", href: "/standards/compare/erc20-lsp7/" }
+  - { chip: "migrate", label: "Migrate ERC-20 → LSP7", href: "/build/migrate/erc20-to-lsp7/" }
 docs:
   - label: "docs.lukso.tech / LSP7 Digital Asset"
     href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
@@ -17,7 +17,7 @@ docs:
     href: "https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/"
 ---
 
-Token economics on LSP isn't a rebuild of ERC20 — it's the same balance/transfer model with
+Token economics on LSP isn't a rebuild of ERC-20 — it's the same balance/transfer model with
 the things you used to bolt on (receiver hooks, transfer context, structured metadata,
 scoped operators) baked in.
 
@@ -28,16 +28,19 @@ governance token with proposal links in metadata, an in-game currency that needs
 vaults on deposit, a membership asset where every transfer should fire a hook on the
 recipient profile.
 
-## When ERC20 is still the right call
+## When ERC-20 is still the right call
 
-DEX-and-bridge surface. If the integration target is CEX listings, big DeFi pools, and
-audited bridges that all speak ERC20 only, the LSP7 hooks become friction. Stay on ERC20,
-and use LSP6 only on the controller side if you have a Universal Profile.
+When the minimum-interface property is the design goal. ERC-20 ships exactly: balances, a
+transfer, an allowance pattern, three metadata fields. No recipient call, no reentrancy
+surface on transfer, no force flag to decide on per integration. If your token's value is
+that downstream code can integrate it with zero opinions about behavior beyond "moves
+balance, fires an event," ERC-20 is the right interface — and the absence of an LSP1 hook is
+a feature, not a gap.
 
 ## The minimum stack
 
 - **LSP7** for balances, transfers, operators
-- **LSP4** for asset metadata under ERC725Y keys
-- **ERC725Y** as the substrate (already part of LSP7)
+- **LSP4** for asset metadata under ERC-725Y keys
+- **ERC-725Y** as the substrate (already part of LSP7)
 - **LSP1** on recipients you control (Universal Profile delegates handle this by default)
 - **LSP6** on the controller side when an account permission story matters

@@ -4,7 +4,7 @@ interface Entry { date: string; title: string; body: string }
 const entries: Entry[] = [
   { date: '2026-06-23', title: 'LUKSO pink replaces the cyan accent.',         body: 'Swapped #00E5FF for LUKSO brand pink #FE005B. The LSP side of every diff, every interaction state, every hover.' },
   { date: '2026-06-22', title: 'LUKSO portability framing corrected across all content.', body: 'LSPs are plain EVM contracts deployable anywhere. The tradeoff is ecosystem reach, not portability.' },
-  { date: '2026-06-22', title: 'Phase 6 — sitemap, changelog, RSS.',           body: 'Sitemap re-enabled. robots.txt points at /sitemap-index.xml. /changelog/ shipped. RSS at /changelog.xml.' },
+  { date: '2026-06-22', title: 'Phase 6 — sitemap, changelog, RSS.',           body: 'Sitemap re-enabled. robots.txt points at /sitemap.xml. /changelog/ shipped. RSS at /changelog.xml.' },
   { date: '2026-06-22', title: 'Phase 5 — ⌘K search and smart 404.',           body: 'Pagefind indexes every page at build time. Triggered by ⌘K, Ctrl+K, or /. 404 auto-opens search.' },
   { date: '2026-06-22', title: 'Phase 4 — Build verticals and migration guides.', body: '/build/ with 6 verticals. 4 migration guides under /build/migrate/.' },
   { date: '2026-06-22', title: 'Phase 3 — Standards, the matrix, and 6 comparisons.', body: '/standards/ with 15 explainers. /standards/matrix/ is the canonical decision page.' },

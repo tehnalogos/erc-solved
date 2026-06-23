@@ -1,13 +1,13 @@
 ---
-title: "ERC20 vs LSP7"
-left: { chip: "ERC·20", label: "fungible token" }
+title: "ERC-20 vs LSP7"
+left: { chip: "ERC-20", label: "fungible token" }
 right: { chip: "LSP·7", label: "Digital Asset" }
-description: "ERC20 made fungible tokens composable on EVM. LSP7 keeps the model, then adds receiver hooks, transfer context, scoped operators, and ERC725Y-backed metadata."
+description: "ERC-20 made fungible tokens composable on EVM. LSP7 keeps the model, then adds receiver hooks, transfer context, scoped operators, and ERC-725Y-backed metadata."
 updated: 2026-06-22
 verdict:
-  useLeft: "DEX-and-bridge surface. If every counterparty is ERC20-only (CEX listings, big DeFi pools, audited bridges), staying on ERC20 is the right call."
-  useRight: "Profile-, market-, or app-native asset. If the token participates in account UX (notifications, scoped delegation, dynamic metadata), LSP7 is the design that ships."
-  neither: "Pure stablecoin reserve plumbing where receiver hooks are a liability — keep it boring with ERC20."
+  useLeft: "When the minimum-interface property is the design goal. Pull payments via approve / transferFrom, fixed metadata of name / symbol / decimals, and zero recipient code execution on transfer are features. Contracts that ABI-check for ERC-20 selectors only dispatch to ERC-20."
+  useRight: "When the token needs to carry transfer context (the bytes data payload), trigger recipient logic via LSP1, expose structured ERC-725Y metadata under LSP4 keys, or be authorized through an LSP6-gated account controller instead of a raw allowance."
+  neither: "If reentrancy from recipient code is unacceptable in your protocol, ERC-20 is the safer interface — no recipient call exists to reenter."
 matrix:
   - row: "balance model"
     left: "balanceOf(address) → uint256"
@@ -26,31 +26,34 @@ matrix:
     right: "authorizeOperator + LSP6 controller scope"
   - row: "metadata"
     left: "name / symbol / decimals only"
-    right: "ERC725Y under LSP4 keys"
+    right: "ERC-725Y under LSP4 keys"
   - row: "metadata shape"
     left: "off-chain by convention"
     right: "typed JSON via LSP4, VerifiableURI optional"
-  - row: "ecosystem reach"
-    left: "every chain, every wallet, deep DeFi integrations"
-    right: "LUKSO ecosystem; standard is plain EVM, deployable anywhere"
+  - row: "interface compatibility"
+    left: "ERC-20 selectors — code that ABI-checks for ERC-20 dispatches"
+    right: "different selectors — won't accidentally satisfy ERC-20 ABI checks"
+  - row: "reentrancy surface on transfer"
+    left: "none — no recipient call"
+    right: "LSP1 hook fires on recipient; standard reentrancy guards required"
 docs:
   - label: "docs.lukso.tech / LSP7 Digital Asset"
     href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
-  - label: "docs.lukso.tech / migrate ERC20 to LSP7"
+  - label: "docs.lukso.tech / migrate ERC-20 to LSP7"
     href: "https://docs.lukso.tech/learn/migrate/migrate-erc20-to-lsp7/"
 related: ["problems/erc20-transfer-hooks", "problems/erc20-approval-risks", "migrate/erc20-to-lsp7"]
 ---
 
 ## How they differ structurally
 
-ERC20 is a balance sheet plus a transfer event. The minimum interface that made composability
+ERC-20 is a balance sheet plus a transfer event. The minimum interface that made composability
 possible. The integration tax — receiver hooks, transfer context, approval risk — falls on
 everyone who builds on top.
 
 LSP7 keeps the balance sheet and adds the surrounding system. Every transfer has a `force`
 flag and a `bytes data` payload. Every transfer fires `universalReceiver` on sender and
 recipient through LSP1. Every authorization event includes an `operatorNotificationData`
-payload so receivers can react when operators are set or revoked. Metadata lives in ERC725Y
+payload so receivers can react when operators are set or revoked. Metadata lives in ERC-725Y
 under LSP4-defined keys, not in three top-level functions.
 
 ## When to migrate
@@ -59,7 +62,7 @@ Migrate when the token needs receiver awareness (vaults that credit on deposit),
 metadata (governance tokens with proposal links), or account-level permission scoping (apps
 that should have narrow authority, not blanket allowance).
 
-Don't migrate when ERC20 compatibility is the product. A wrapped reserve asset doesn't gain
+Don't migrate when ERC-20 compatibility is the product. A wrapped reserve asset doesn't gain
 from LSP7's hooks.
 
 ## Operator scope is honest

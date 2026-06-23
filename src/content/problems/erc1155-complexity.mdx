@@ -1,22 +1,22 @@
 ---
-title: "ERC1155 hides semantics in token IDs."
+title: "ERC-1155 hides semantics in token IDs."
 tagline: "One contract for fungible + identifiable items. Apps pay the decoding tax."
 query: "erc1155 complexity"
-description: "ERC1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7 / LSP8 split."
+description: "ERC-1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7 / LSP8 split."
 erc: "1155"
 lsps: ["LSP7", "LSP8"]
 aliases: ["erc1155 vs lsp7", "multi-asset contracts", "erc1155 token type", "type-bit token id"]
 updated: 2026-06-22
 diff:
   from:
-    chip: "ERC·1155"
+    chip: "ERC-1155"
     code: "balanceOf(account, id)"
     tags: ["one contract", "many semantics", "app-decoded"]
   to:
     chip: "LSP·7+8"
     code: "split by asset shape"
     tags: ["LSP7 fungible", "LSP8 identifiable"]
-verdict: "LSP7 covers fungible and semi-fungible. LSP8 covers identifiable. The semantic split lives in the standard, so wallets, marketplaces, and indexers don't decode it per collection."
+verdict: "LSP7 covers fungible and semi-fungible. LSP8 covers identifiable. The semantic split lives in the interface itself, so downstream code dispatches on asset shape without learning per-collection bit-conventions. Receivers handle both through one LSP1 hook with a typeId discriminator."
 docs:
   - label: "docs.lukso.tech / LSP7 Digital Asset"
     href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
@@ -27,7 +27,7 @@ related: ["problems/erc721-tokenid-limits", "problems/erc20-transfer-hooks"]
 
 ## Why this breaks
 
-One ERC1155 contract can hold currency-like tokens, edition NFTs, and unique items at once.
+One ERC-1155 contract can hold currency-like tokens, edition NFTs, and unique items at once.
 Wallets and indexers have to decode the intent of each id from per-collection rules.
 Marketplaces add custom logic per contract because there is no standard way to know which ids
 are fungible vs unique.
@@ -40,16 +40,18 @@ integrators.
 
 ### High-bit token ID conventions
 Encode "this id range is fungible, this is unique" into the top bits. Works inside one
-collection. Doesn't generalize to marketplaces or wallets.
+contract. Any external code that wants the same semantics has to learn the convention.
 
 ### One-contract-per-game patterns
-Restore the boundary ERC1155 erased. Negates the original optimization.
+Restore the boundary ERC-1155 erased. Negates the gas savings that motivated ERC-1155 in the
+first place.
 
 ### Off-chain id registries
-Move the typing problem to your backend. Same problem in a different layer.
+Move the typing problem to an off-chain index. The on-chain state still has no opinion.
 
-### Custom subgraphs per collection
-Every collection ships its own indexer logic. Tooling cost compounds.
+### Custom decoder logic per contract
+Every consumer has to implement the per-id type rules. The cost compounds for each new
+integration.
 
 ## How LSP solves it
 

@@ -1,12 +1,12 @@
 ---
-title: "ERC2535 Diamonds vs LSP17"
-left: { chip: "ERC·2535", label: "diamond proxy" }
+title: "ERC-2535 Diamonds vs LSP17"
+left: { chip: "ERC-2535", label: "diamond proxy" }
 right: { chip: "LSP·17", label: "Contract Extension" }
-description: "Both let a contract grow new functions after deployment. Diamonds use a delegatecall router with shared storage; LSP17 uses a fallback router with per-selector extension contracts and ERC725Y registration."
+description: "Both let a contract grow new functions after deployment. Diamonds use a delegatecall router with shared storage; LSP17 uses a fallback router with per-selector extension contracts and ERC-725Y registration."
 updated: 2026-06-22
 verdict:
-  useLeft: "When upgradeable storage is a hard requirement and the team has the discipline to manage diamond storage layouts. The mature tooling and ecosystem are real."
-  useRight: "When the goal is 'add new selectors without an upgrade authority over base bytecode.' Especially for account contracts (Universal Profiles), where you want extensible behavior without proxy upgradeability."
+  useLeft: "When facets must share storage with the base contract and you accept the permanent diamondCut authority as the cost. Diamond storage is the right primitive when extensions need to read and mutate the same state slots as the base."
+  useRight: "When the goal is adding new function selectors without upgrade authority over the base bytecode. Extensions via CALL keep their own storage; via DELEGATECALL they share — both routes are permissioned per-selector at registration, not as a single upgrade key."
 matrix:
   - row: "extension mechanism"
     left: "delegatecall to facet by selector"
@@ -16,13 +16,13 @@ matrix:
     right: "extension keeps its own (CALL flavor)"
   - row: "registration"
     left: "diamondCut by owner"
-    right: "ERC725Y setData (permissioned by LSP6)"
+    right: "ERC-725Y setData (permissioned by LSP6)"
   - row: "upgrade authority over base bytecode"
     left: "diamond owner can replace facets"
     right: "none — base is immutable, extensions are additive"
-  - row: "ecosystem"
-    left: "EIP-2535 reference + diamond-1 implementations"
-    right: "LSP17-aware contracts (LSP0 Universal Profile, etc.)"
+  - row: "permissioning"
+    left: "single diamondCut function — gated by an owner / role"
+    right: "per-selector setData on ERC-725Y — granular grants per extension"
 docs:
   - label: "docs.lukso.tech / LSP17 Contract Extension"
     href: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
@@ -37,7 +37,7 @@ facet that shares the diamond's storage. Adding behavior is `diamondCut`. Upgrad
 
 LSP17 makes *unknown function calls* the router. Known functions execute as base bytecode.
 Unknown function selectors hit the fallback, which looks up an extension contract registered
-in ERC725Y. Adding behavior is `setData` (gated by LSP6 in a Universal Profile). The base
+in ERC-725Y. Adding behavior is `setData` (gated by LSP6 in a Universal Profile). The base
 bytecode is never replaced.
 
 ## When the difference matters

@@ -1,12 +1,12 @@
 ---
-title: "ERC1155 vs LSP7 + LSP8"
-left: { chip: "ERC·1155", label: "multi-asset contract" }
+title: "ERC-1155 vs LSP7 + LSP8"
+left: { chip: "ERC-1155", label: "multi-asset contract" }
 right: { chip: "LSP·7+8", label: "split by asset shape" }
-description: "ERC1155 packs many token types into one contract; LSP7 + LSP8 split the same surface by asset semantics. Pick the boundary deliberately — it shows up in indexing, wallet UX, and marketplace logic."
+description: "ERC-1155 packs many token types into one contract; LSP7 + LSP8 split the same surface by asset semantics. The boundary shows up in code — batch primitives, receiver dispatch, and per-id branching."
 updated: 2026-06-22
 verdict:
-  useLeft: "Game / edition contracts where one deployer manages many token types and gas savings from a single contract dominate. Mature ERC1155 tooling matters."
-  useRight: "Product semantics matter. If wallets, indexers, or marketplaces need to know 'fungible vs identifiable' without per-collection decoding, ship two contracts."
+  useLeft: "When batch transfer is a primitive your code relies on (cross-id atomic moves), or when one deployment must hold a large mix of token types and the per-id semantics live in your contract logic."
+  useRight: "When downstream code dispatches on asset shape (fungible vs identifiable) without per-collection knowledge. LSP7 and LSP8 expose distinct interfaces — receivers branch on typeId through one LSP1 hook instead of implementing four receiver shapes."
 matrix:
   - row: "contracts per product"
     left: "one"
@@ -19,7 +19,7 @@ matrix:
     right: "LSP1 universalReceiver (one shape for both)"
   - row: "metadata"
     left: "uri(id) → string"
-    right: "ERC725Y + LSP4 keys, per-token via LSP8"
+    right: "ERC-725Y + LSP4 keys, per-token via LSP8"
   - row: "batch transfer"
     left: "safeBatchTransferFrom"
     right: "transferBatch on each standard"
@@ -36,7 +36,7 @@ related: ["problems/erc1155-complexity", "problems/erc20-transfer-hooks"]
 
 ## The semantic boundary moves
 
-ERC1155 makes the boundary between fungible and identifiable a *contract-internal*
+ERC-1155 makes the boundary between fungible and identifiable a *contract-internal*
 convention. The high bits of a token id might encode "this id is fungible" or "this id is
 unique" — and that convention is per-collection. Wallets and indexers learn it the hard way.
 
@@ -46,7 +46,7 @@ branches on the interface ID, not on a token-id bit pattern.
 
 ## Cost: more contracts to deploy
 
-The honest tradeoff: where ERC1155 ships one contract for a multi-asset product, LSP7 + LSP8
+The honest tradeoff: where ERC-1155 ships one contract for a multi-asset product, LSP7 + LSP8
 usually ships two. The deployment is a one-time gas cost; the integration savings are
 ongoing. For a game with stable item categories, the split usually pays off. For a stamp
-collection of 10,000 highly varied items, ERC1155 may still be the right call.
+collection of 10,000 highly varied items, ERC-1155 may still be the right call.

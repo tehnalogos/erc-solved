@@ -12,15 +12,26 @@ const ercs = Array.from(new Set(problems.map(p => p.data.erc))).sort(
 );
 
 const description =
-  'Every ERC pain point developers hit, mapped to the LUKSO LSP pattern that handles it. Filter by ERC, scan, click.';
+  'Every Ethereum Request for Comments (ERC) pain point developers hit, mapped to the LUKSO LSP pattern that handles it. Filter by ERC, scan, click.';
 ---
-<Base title="Problems" description={description}>
-  <section class="hub" data-pagefind-body data-pagefind-meta="title:Problems">
+<Base
+  title="Ethereum ERC Problem Index"
+  description={description}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Ethereum ERC Problem Index',
+    description,
+    url: 'https://ercsolved.dev/problems/',
+    about: ['Ethereum Request for Comments', 'ERC problem patterns', 'LUKSO LSP standards'],
+  }}
+>
+  <section class="hub" data-pagefind-body data-pagefind-meta="title:Ethereum ERC Problem Index">
     <header class="hub-head">
       <span class="eyebrow">problem index</span>
       <h1>Problems.</h1>
       <p class="dim">
-        Every recurring ERC pain point, in the words EVM developers actually search for. Each
+        Every recurring Ethereum ERC pain point, in the words EVM developers actually search for. Each
         row links to a verdict-first problem page with the LSP pattern, the code, and the next
         route. Filter by the ERC you use today.
       </p>

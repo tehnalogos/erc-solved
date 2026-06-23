@@ -59,20 +59,34 @@ const { rows, compact = false } = Astro.props;
   }
   .muted { color: var(--ink-fog); }
 
-  .erc-chip { color: var(--erc-sand); white-space: nowrap; }
+  .erc-chip { color: var(--erc-sand); white-space: nowrap; transition: transform 200ms ease, color 200ms ease; }
   .erc-label { color: var(--ink-bone-dim); min-width: 0; }
-  .lsp-chip { color: var(--signal-pink); white-space: nowrap; }
+  .lsp-chip { color: var(--signal-pink); white-space: nowrap; transition: transform 200ms ease, text-shadow 200ms ease; }
   .verdict { color: var(--ink-bone); min-width: 0; }
 
   a.row {
     color: inherit;
     transition: background 150ms ease;
+    position: relative;
+  }
+  a.row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0;
+    height: 1px;
+    background: var(--signal-pink);
+    transition: width 320ms cubic-bezier(0.65, 0, 0.35, 1);
   }
   a.row:hover, a.row:focus-visible {
     background: var(--ink-paper);
     outline: none;
   }
+  a.row:hover::before, a.row:focus-visible::before { width: 100%; opacity: 0.18; }
   a.row:hover .verdict { color: var(--signal-pink); }
+  a.row:hover .erc-chip { transform: translateX(-2px); }
+  a.row:hover .lsp-chip { transform: translateX(2px); text-shadow: 0 0 12px color-mix(in srgb, var(--signal-pink) 50%, transparent); }
 
   @media (max-width: 720px) {
     .head { display: none; }

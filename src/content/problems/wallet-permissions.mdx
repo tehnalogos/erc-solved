@@ -2,7 +2,7 @@
 title: "Wallets don't know how to ask for less."
 tagline: "Connect a dapp and it gets the whole account. Session scoping isn't standard."
 query: "smart contract wallet permissions"
-description: "Session keys, ERC4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps."
+description: "Session keys, ERC-4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps."
 erc: "4337"
 lsps: ["LSP6", "LSP20"]
 aliases: ["session keys", "scoped wallet access", "dapp permissions", "smart account permissions"]
@@ -38,7 +38,7 @@ Interoperability is poor. Revocation tends to be all-or-nothing.
 ### Argent session keys
 Temporary signing keys with scoped allowed contracts. Vendor-specific.
 
-### ERC4337 validation modules
+### ERC-4337 validation modules
 Pluggable validators define what each key may do. Standardizes the mechanism, not the policy
 vocabulary.
 
@@ -52,7 +52,7 @@ Flexible. Enforcement depends on the relayer believing the capability.
 
 LSP6 Key Manager assigns each controller a permission bitfield (`CALL`, `SETDATA`,
 `TRANSFERVALUE`, `ADDCONTROLLER`, `SIGN`, …) plus optional allowed calls (target contract +
-standard interface + function selector) and allowed ERC725Y data keys.
+standard interface + function selector) and allowed ERC-725Y data keys.
 
 ```
 Controller: app session key 0xabc...

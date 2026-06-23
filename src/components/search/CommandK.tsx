@@ -28,7 +28,7 @@ interface ResultItem {
 const TOP_QUERIES: { q: string; href: string }[] = [
   { q: 'erc20 approval risks', href: '/problems/erc20-approval-risks/' },
   { q: 'erc721 dynamic metadata', href: '/problems/erc721-dynamic-metadata/' },
-  { q: 'eip-4337 alternatives', href: '/problems/eip4337-bundler-tax/' },
+  { q: 'erc-4337 alternatives', href: '/problems/erc4337-bundler-tax/' },
   { q: 'erc20 transfer hooks', href: '/problems/erc20-transfer-hooks/' },
   { q: 'social recovery smart wallets', href: '/problems/social-recovery/' },
   { q: 'safetransferfrom problems', href: '/problems/erc721-safe-transfer/' },

@@ -1,13 +1,13 @@
 ---
-title: "ERC721 vs LSP8"
-left: { chip: "ERC·721", label: "identifiable NFT" }
+title: "ERC-721 vs LSP8"
+left: { chip: "ERC-721", label: "identifiable NFT" }
 right: { chip: "LSP·8", label: "Identifiable Digital Asset" }
-description: "ERC721 standardized NFT ownership. LSP8 keeps the ownership model, then upgrades token IDs to bytes32, replaces tokenURI with typed per-token data, and routes every transfer through LSP1."
+description: "ERC-721 standardized NFT ownership. LSP8 keeps the ownership model, then upgrades token IDs to bytes32, replaces tokenURI with typed per-token data, and routes every transfer through LSP1."
 updated: 2026-06-22
 verdict:
-  useLeft: "Marketplace compatibility is the product. If OpenSea, Blur, and every wallet that already speaks ERC721 are the integration surface, ERC721 wins by reach."
-  useRight: "Token IDs need to mean something, or metadata is dynamic, or the asset is part of a profile-aware app. LSP8 was designed for those cases."
-  neither: "A static, immutable, fully on-chain SVG art collection — ERC721 is fine and the LSP layer adds no value."
+  useLeft: "When IDs are sequential, metadata is immutable, and the contract is built to be consumed by code that hardcodes the ERC-721 ABI. ERC-721 is the smaller surface — fewer bytes, simpler reasoning, no force flag or data payload to decide on."
+  useRight: "When the token ID itself needs to carry meaning (hash, serial, structured reference), per-token state mutates after mint, or recipient logic needs to fire on transfer through LSP1 — not as an opt-in `safeTransferFrom` variant."
+  neither: "A purely on-chain SVG generator with immutable traits — ERC-721 is sufficient and LSP8's per-token data surface adds no behavior you'd use."
 matrix:
   - row: "token ID type"
     left: "uint256"
@@ -19,7 +19,7 @@ matrix:
     left: "tokenURI(id) → string"
     right: "getDataForTokenId(id, key) → bytes"
   - row: "dynamic updates"
-    left: "MetadataUpdate event (ERC4906) — signal only"
+    left: "MetadataUpdate event (ERC-4906) — signal only"
     right: "setDataForTokenId — typed write"
   - row: "transfer hook"
     left: "onERC721Received (only on safeTransferFrom)"
@@ -30,20 +30,23 @@ matrix:
   - row: "off-chain integrity"
     left: "trust the host"
     right: "VerifiableURI option in LSP4"
-  - row: "marketplace reach"
-    left: "every NFT venue today"
-    right: "LUKSO marketplaces; standard is plain EVM, deployable anywhere"
+  - row: "per-token data writes"
+    left: "external — server / proxy / extra mappings"
+    right: "setDataForTokenId — typed, on-chain, permissioned"
+  - row: "interface ABI"
+    left: "ERC-721 selectors — consumed by code that hardcodes them"
+    right: "different selectors — distinct dispatch from ERC-721"
 docs:
   - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
     href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
-  - label: "docs.lukso.tech / migrate ERC721 to LSP8"
+  - label: "docs.lukso.tech / migrate ERC-721 to LSP8"
     href: "https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/"
 related: ["problems/erc721-dynamic-metadata", "problems/erc721-tokenid-limits", "problems/erc721-safe-transfer"]
 ---
 
 ## How they differ structurally
 
-ERC721 is `ownerOf(tokenId)` plus a transfer event, with `tokenURI(tokenId)` returning a
+ERC-721 is `ownerOf(tokenId)` plus a transfer event, with `tokenURI(tokenId)` returning a
 string. Everything else — dynamic metadata, receiver behavior, marketplace cooperation — is
 convention layered on top.
 
@@ -52,14 +55,13 @@ LSP8 keeps `ownerOf`-equivalent behavior but widens the token ID to `bytes32` an
 hash. Want per-token attributes that change at mint, on reveal, on a game event? Set the data
 key, gated by whatever permissions you've configured on the asset contract.
 
-## What changes for marketplaces
+## What changes for downstream code
 
-Existing mainnet NFT marketplaces don't speak LSP8 today — that's the real constraint. The
-standard itself is EVM-compatible and could ship anywhere, but adoption is what makes a
-marketplace useful, and the LSP-aware marketplace ecosystem lives on LUKSO. If the collection
-needs to list on the established mainnet NFT venues right now, ERC721 is the path. If the
-collection lives in an app or a profile-native marketplace on LUKSO, LSP8 gives the asset
-richer self-description without sidecar APIs.
+LSP8 publishes different function selectors. A contract that calls `IERC721(token).transferFrom(...)`
+or reads `tokenURI(id)` won't accidentally hit LSP8 — the ABIs are disjoint by design. That's a
+feature: it stops legacy code from misinterpreting an LSP8 asset as an ERC-721 and treating its
+data incorrectly. The cost is real: anything you build against LSP8 has to call its functions
+explicitly.
 
 ## bytes32 is the small detail that matters
 

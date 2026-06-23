@@ -3,7 +3,7 @@ kind: LSP
 id: "6"
 title: "Key Manager"
 oneLine: "The permission layer. Many controllers per account, each with a scoped permission bitfield."
-description: "LSP6 sits in front of a Universal Profile (LSP0) and gates every call by a per-controller permission bitfield, allowed calls, and allowed ERC725Y data keys."
+description: "LSP6 sits in front of a Universal Profile (LSP0) and gates every call by a per-controller permission bitfield, allowed calls, and allowed ERC-725Y data keys."
 purpose: Permission
 updated: 2026-06-22
 abi: |
@@ -11,7 +11,7 @@ abi: |
   function execute(bytes calldata payload)
     external payable returns (bytes memory);
 
-  // Permissions are stored as ERC725Y data on the account:
+  // Permissions are stored as ERC-725Y data on the account:
   //   AddressPermissions[]                                 → array of controller addresses
   //   AddressPermissions:Permissions:<controller>          → 32-byte bitfield
   //   AddressPermissions:AllowedCalls:<controller>         → list of (standard, target, selector)
@@ -19,7 +19,7 @@ abi: |
 solves:
   - pain: "smart contract wallet permissions"
     href: "/problems/wallet-permissions/"
-  - pain: "ERC20 approval risks"
+  - pain: "ERC-20 approval risks"
     href: "/problems/erc20-approval-risks/"
   - pain: "social recovery"
     href: "/problems/social-recovery/"

@@ -9,7 +9,7 @@ aliases: ["safetransferfrom problems", "nfts stuck in contract", "ierc721receive
 updated: 2026-06-22
 diff:
   from:
-    chip: "ERC·721"
+    chip: "ERC-721"
     code: "onERC721Received(...) returns (bytes4)"
     tags: ["one asset type", "narrow hook"]
   to:
@@ -31,11 +31,11 @@ related: ["problems/erc20-transfer-hooks", "problems/erc721-dynamic-metadata"]
 
 `safeTransferFrom` is real safety, but it is narrow. It only checks `IERC721Receiver`, only
 for that one call, only when the caller chose the "safe" variant. The non-safe `transferFrom`
-still ships, and most ERC20 transfers go straight to a balance update with no recipient
+still ships, and most ERC-20 transfers go straight to a balance update with no recipient
 interaction at all.
 
 In practice, every asset standard has its own receiver shape — `IERC721Receiver`,
-`IERC1155Receiver`, ERC777 `tokensReceived`. A multi-asset contract implements each one. And
+`IERC1155Receiver`, ERC-777 `tokensReceived`. A multi-asset contract implements each one. And
 there is still no general "I received value of some kind" hook.
 
 ## What people try

@@ -2,22 +2,22 @@
 kind: LSP
 id: "4"
 title: "Digital Asset Metadata"
-oneLine: "Standard ERC725Y keys for digital asset metadata — collection name, symbol, JSON schema."
+oneLine: "Standard ERC-725Y keys for digital asset metadata — collection name, symbol, JSON schema."
 description: "LSP4 defines the metadata keys every LSP7 and LSP8 asset uses: name, symbol, creators, metadata JSON, token-type discriminator."
 purpose: Metadata
 updated: 2026-06-22
 abi: |
-  // Well-known ERC725Y keys read via getData(bytes32):
+  // Well-known ERC-725Y keys read via getData(bytes32):
   //   LSP4TokenName        → string
   //   LSP4TokenSymbol      → string
   //   LSP4TokenType        → 0=Token, 1=NFT, 2=Collection
   //   LSP4Metadata         → VerifiableURI or JSON pointer
   //   LSP4Creators[]       → contributing creators
 solves:
-  - pain: "ERC721 dynamic metadata (tokenURI trap)"
+  - pain: "ERC-721 dynamic metadata (tokenURI trap)"
     href: "/problems/erc721-dynamic-metadata/"
-  - pain: "ERC20 metadata limited to name/symbol/decimals"
-companions: ["LSP·7", "LSP·8", "ERC·725"]
+  - pain: "ERC-20 metadata limited to name/symbol/decimals"
+companions: ["LSP·7", "LSP·8", "ERC-725"]
 doesNotSolve:
   - "LSP4 doesn't host your media. That's still IPFS / Arweave / your CDN."
   - "It doesn't make off-chain JSON trustworthy by itself — pair with VerifiableURI."
@@ -26,8 +26,8 @@ docs:
     href: "https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/"
 ---
 
-LSP4 is the asset-side equivalent of LSP3 (which does the profile side). Both define ERC725Y
-keys; both rely on the asset contract being ERC725Y-aware (every LSP7 and LSP8 is). The
+LSP4 is the asset-side equivalent of LSP3 (which does the profile side). Both define ERC-725Y
+keys; both rely on the asset contract being ERC-725Y-aware (every LSP7 and LSP8 is). The
 practical implication: read `LSP4Metadata` and get a typed result; read `tokenURI` and get a
 string you have to fetch, parse, and decide whether to trust.
 

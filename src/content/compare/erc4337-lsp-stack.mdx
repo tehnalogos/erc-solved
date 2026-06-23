@@ -1,12 +1,12 @@
 ---
-title: "ERC4337 vs the LSP account stack"
-left: { chip: "ERC·4337", label: "account abstraction over EOAs" }
+title: "ERC-4337 vs the LSP account stack"
+left: { chip: "ERC-4337", label: "account abstraction over EOAs" }
 right: { chip: "LSP·0+6+20+25", label: "native smart account" }
-description: "ERC4337 puts account abstraction on top of EOAs via a parallel mempool, EntryPoint, and bundlers. The LSP stack puts the account contract on the normal call path, with permissions and relay execution as composed standards."
+description: "ERC-4337 puts account abstraction on top of EOAs via a parallel mempool, EntryPoint, and bundlers. The LSP stack puts the account contract on the normal call path, with permissions and relay execution as composed standards."
 updated: 2026-06-22
 verdict:
-  useLeft: "Mainnet, where 4337 has the deployment, tooling, and paymaster economy. Or if the project must remain chain-agnostic and account abstraction has to live above the chain semantics."
-  useRight: "On LUKSO, when you want smart-account UX without running or renting a bundler stack. The account contract is the entry point — no parallel mempool, no UserOperations."
+  useLeft: "When you need account abstraction to layer onto a chain whose native transaction model is EOA-anchored, with pluggable per-account validators and a separate aggregation/sponsorship plane that's decoupled from the account itself."
+  useRight: "When you want the account contract to be the call entry point — no EntryPoint, no UserOperation envelope, no bundler. `msg.sender` at downstream targets is the account; LSP6 vocabulary expresses permissions; LSP25 handles sponsored execution on the account itself."
 matrix:
   - row: "transaction flow"
     left: "user → UserOp pool → bundler → EntryPoint → account"
@@ -23,18 +23,18 @@ matrix:
   - row: "explorer experience"
     left: "shows handleOps + UserOp decode"
     right: "shows the call as itself"
-  - row: "deployment cost"
-    left: "EntryPoint + bundler + paymaster infrastructure"
-    right: "one account contract + its companions"
-  - row: "ecosystem"
-    left: "mainnet + L2s (mature, retrofitted onto EOAs)"
-    right: "LUKSO (an EVM L1 designed around the LSP stack from day one)"
+  - row: "trace / debug surface"
+    left: "appears as handleOps → EntryPoint → account (extra hops)"
+    right: "appears as a direct call into the account contract"
+  - row: "permission vocabulary"
+    left: "per-account validator modules — non-standard across accounts"
+    right: "LSP6 permission bitfield + AllowedCalls + AllowedERC725YDataKeys — uniform"
 docs:
-  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+  - label: "docs.lukso.tech / LSP0 ERC-725 Account"
     href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
   - label: "docs.lukso.tech / LSP25 executeRelayCall"
     href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
-related: ["problems/eip4337-bundler-tax", "problems/gasless-onboarding", "problems/wallet-permissions"]
+related: ["problems/erc4337-bundler-tax", "problems/gasless-onboarding", "problems/wallet-permissions"]
 ---
 
 ## Two answers to the same question
@@ -42,7 +42,7 @@ related: ["problems/eip4337-bundler-tax", "problems/gasless-onboarding", "proble
 Both stacks deliver "smart account UX": fine-grained permissions, sponsored execution,
 account-level signature verification. They differ on *where* that work happens.
 
-ERC4337 ships account abstraction over a chain whose primitive is the EOA. The cost is a
+ERC-4337 ships account abstraction over a chain whose primitive is the EOA. The cost is a
 parallel infrastructure (UserOperation pool, bundlers, EntryPoint, paymasters) sitting beside
 the normal transaction flow. The benefit is portability — the same account model works
 anywhere EntryPoint is deployed.
@@ -52,15 +52,16 @@ no EntryPoint, no bundler — the controller calls the account, LSP20 inline-ver
 LSP6, the call executes. Gasless flows go through LSP25 on the account itself, not through a
 separate paymaster contract.
 
-## Which to reach for
+## Which model fits the product
 
-LSP standards are EVM smart contracts — they're deployable on mainnet or any EVM chain, the
-same way 4337 contracts are. The choice isn't about portability; it's about which ecosystem
-you ship into.
+If your product needs account abstraction that's *decoupled* from the underlying account
+contract — pluggable validator modules per account, a separate aggregation/sponsorship plane,
+the option to mix-and-match validators per UserOp — ERC-4337's parallel infrastructure is the
+mechanism. The cost is the extra hops in every trace and the non-standard permission shape
+each validator defines.
 
-If you're on mainnet, 4337 has the deployed EntryPoint, the bundler economy, the paymaster
-infrastructure, and the wallet integrations that make the model practical *now*. If you're
-on LUKSO — an EVM L1 designed around the LSP stack from day one — the wallet, indexer, and
-marketplace ecosystem already speaks Universal Profiles. Most teams shipping on LUKSO are
-not asking "which AA do I want?" — they're asking "what's a Universal Profile?" The answer
-is the LSP stack.
+If your product needs the account itself to be the call entry point — so downstream contracts
+see the account as `msg.sender`, permissions live in a standard on-chain vocabulary, and
+sponsored execution is a function on the account contract rather than a separate paymaster —
+the LSP stack is the mechanism. The cost is that account behavior is fixed by the contract;
+adding new authorization shapes means extending through LSP17, not swapping a validator.
