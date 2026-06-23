@@ -3,19 +3,37 @@ import Article from './Article.astro';
 import Verdict from '~/components/primitives/Verdict.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
 import SpecBlock from '~/components/primitives/SpecBlock.astro';
+import { breadcrumbJsonLd, buildPageTitle, techArticleJsonLd } from '~/lib/seo';
 
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
+const pageTitle = buildPageTitle(data.vertical);
+const buildPath = `/build/${slug}/`;
 ---
 <Article
-  title={data.title}
+  title={pageTitle}
   description={data.description}
-  pageTitle={`Build · ${data.vertical} · ERCs, Solved`}
+  pageTitle={pageTitle}
   eyebrow={`build vertical · ${data.vertical.toLowerCase()}`}
   author={data.author}
   updated={data.updated}
   editPath={`src/content/build/${slug}.mdx`}
+  jsonLd={[
+    techArticleJsonLd({
+      headline: pageTitle,
+      description: data.description,
+      path: buildPath,
+      updated: data.updated,
+      author: data.author,
+      about: [data.vertical, 'Ethereum', 'EVM', 'LUKSO Standards', ...data.stack],
+    }),
+    breadcrumbJsonLd([
+      { name: 'ERCs, Solved', path: '/' },
+      { name: 'Build', path: '/build/' },
+      { name: data.vertical, path: buildPath },
+    ]),
+  ]}
 >
   <Verdict tone="use-lsp" label="the LSP stack for this vertical">
     <p><strong>{data.stack.join(' + ')}</strong></p>

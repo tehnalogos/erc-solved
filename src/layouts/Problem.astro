@@ -5,6 +5,14 @@ import DiffArrow from '~/components/primitives/DiffArrow.astro';
 import Verdict from '~/components/primitives/Verdict.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
 import { getEntry } from 'astro:content';
+import {
+  breadcrumbJsonLd,
+  formatErcLabel,
+  formatLspList,
+  formatSearchQuery,
+  problemPageTitle,
+  techArticleJsonLd,
+} from '~/lib/seo';
 
 interface Props {
   entry: any;
@@ -34,17 +42,49 @@ async function resolveRelated() {
   return items.filter(Boolean) as { href: string; title: string; chip: string | null }[];
 }
 const related = await resolveRelated();
+const displayQuery = formatSearchQuery(data.query);
+const pageTitle = problemPageTitle(displayQuery, data.lsps);
+const problemPath = `/problems/${slug}/`;
+const lspList = formatLspList(data.lsps);
+const about = [
+  'Ethereum',
+  'EVM',
+  'Ethereum Request for Comments',
+  formatErcLabel(data.erc),
+  'LUKSO Standards',
+  ...data.lsps.map((lsp: string) => formatLspList([lsp])),
+];
 ---
 <Article
-  title={data.title}
+  title={displayQuery}
   description={data.description}
-  pageTitle={`${data.query} · ERCs, Solved`}
+  pageTitle={pageTitle}
   eyebrow={`problem · ${data.query}`}
   author={data.author}
   updated={data.updated}
   editPath={`src/content/problems/${slug}.mdx`}
   ogImage={false}
+  jsonLd={[
+    techArticleJsonLd({
+      headline: pageTitle,
+      description: data.description,
+      path: problemPath,
+      updated: data.updated,
+      author: data.author,
+      about,
+    }),
+    breadcrumbJsonLd([
+      { name: 'ERCs, Solved', path: '/' },
+      { name: 'Ethereum ERC Problems', path: '/problems/' },
+      { name: displayQuery, path: problemPath },
+    ]),
+  ]}
 >
+  <div slot="title" class="problem-title">
+    <h1>{displayQuery}</h1>
+    <p>{data.title}</p>
+  </div>
+
   <div slot="header-extras" class="head-extras">
     <div class="chips">
       <StandardChip kind="erc" id={data.erc} />
@@ -62,6 +102,14 @@ const related = await resolveRelated();
     from={data.diff.from}
     to={data.diff.to}
   />
+
+  <section class="answer">
+    <span class="eyebrow">answer for Ethereum/EVM builders</span>
+    <p>
+      For Ethereum and EVM builders searching "{displayQuery}", the LUKSO Standards route is
+      <strong> {lspList}</strong>. {data.verdict}
+    </p>
+  </section>
 
   <Verdict tone="use-lsp" label="verdict">
     <p>{data.verdict}</p>
@@ -99,6 +147,23 @@ const related = await resolveRelated();
 </Article>
 
 <style>
+  .problem-title {
+    display: grid;
+    gap: var(--s-2);
+  }
+  .problem-title h1 {
+    font-size: clamp(34px, 5vw, 60px);
+    font-variation-settings: 'opsz' 60;
+    max-width: 22ch;
+  }
+  .problem-title p {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(18px, 2vw, 24px);
+    color: var(--ink-bone-dim);
+    max-width: 36ch;
+    line-height: 1.25;
+  }
   .head-extras { display: grid; gap: var(--s-3); }
   .chips {
     display: flex;
@@ -115,6 +180,20 @@ const related = await resolveRelated();
     max-width: 36ch;
     line-height: 1.25;
   }
+
+  .answer {
+    display: grid;
+    gap: var(--s-3);
+    max-width: var(--reading);
+    padding: var(--s-4);
+    border: 1px solid var(--ink-line);
+    background: var(--ink-paper);
+  }
+  .answer p {
+    color: var(--ink-bone-dim);
+    line-height: 1.7;
+  }
+  .answer strong { color: var(--signal-pink); }
 
   .prose {
     max-width: var(--reading);

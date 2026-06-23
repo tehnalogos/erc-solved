@@ -2,25 +2,44 @@
 import Article from './Article.astro';
 import Verdict from '~/components/primitives/Verdict.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
+import { breadcrumbJsonLd, comparisonPageTitle, techArticleJsonLd } from '~/lib/seo';
 
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
+const pageTitle = comparisonPageTitle(data.left.chip, data.right.chip);
+const comparePath = `/standards/compare/${slug}/`;
 ---
 <Article
-  title={data.title}
+  title={pageTitle}
   description={data.description}
-  pageTitle={`${data.left.chip} vs ${data.right.chip} · ERCs, Solved`}
+  pageTitle={pageTitle}
   eyebrow="comparison · spec-grade diff"
   author={data.author}
   updated={data.updated}
   editPath={`src/content/compare/${slug}.mdx`}
+  jsonLd={[
+    techArticleJsonLd({
+      headline: pageTitle,
+      description: data.description,
+      path: comparePath,
+      updated: data.updated,
+      author: data.author,
+      about: [data.left.chip, data.right.chip, 'Ethereum', 'EVM', 'LUKSO Standards'],
+    }),
+    breadcrumbJsonLd([
+      { name: 'ERCs, Solved', path: '/' },
+      { name: 'Standards', path: '/standards/' },
+      { name: `${data.left.chip} vs ${data.right.chip}`, path: comparePath },
+    ]),
+  ]}
 >
   <div slot="title" class="vs">
     <h1>
       <span class="left">{data.left.chip}</span>
       <span class="vs-word">vs</span>
       <span class="right">{data.right.chip}</span>
+      <span class="scope">Ethereum/EVM standard comparison</span>
     </h1>
     <p class="lede">{data.description}</p>
   </div>
@@ -101,6 +120,14 @@ const { data, slug } = entry;
   .left { color: var(--erc-sand); }
   .right { color: var(--signal-pink); }
   .vs-word { color: var(--ink-fog); font-family: var(--font-mono); font-size: 0.45em; }
+  .scope {
+    flex-basis: 100%;
+    color: var(--ink-fog);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    letter-spacing: 0;
+    text-transform: lowercase;
+  }
   .lede { color: var(--ink-bone-dim); max-width: 72ch; }
 
   .verdict-grid { display: grid; gap: var(--s-3); grid-template-columns: 1fr 1fr; }

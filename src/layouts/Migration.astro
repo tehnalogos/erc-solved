@@ -2,19 +2,37 @@
 import Article from './Article.astro';
 import Verdict from '~/components/primitives/Verdict.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
+import { breadcrumbJsonLd, migrationPageTitle, techArticleJsonLd } from '~/lib/seo';
 
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
+const pageTitle = migrationPageTitle(data.from, data.to);
+const migratePath = `/build/migrate/${slug}/`;
 ---
 <Article
-  title={data.title}
+  title={pageTitle}
   description={data.description}
-  pageTitle={`Migrate ${data.from} → ${data.to} · ERCs, Solved`}
+  pageTitle={pageTitle}
   eyebrow={`migration · ${data.from} → ${data.to}`}
   author={data.author}
   updated={data.updated}
   editPath={`src/content/migrate/${slug}.mdx`}
+  jsonLd={[
+    techArticleJsonLd({
+      headline: pageTitle,
+      description: data.description,
+      path: migratePath,
+      updated: data.updated,
+      author: data.author,
+      about: [data.from, data.to, 'Ethereum', 'EVM', 'LUKSO Standards'],
+    }),
+    breadcrumbJsonLd([
+      { name: 'ERCs, Solved', path: '/' },
+      { name: 'Build', path: '/build/' },
+      { name: `${data.from} to ${data.to}`, path: migratePath },
+    ]),
+  ]}
 >
   <Verdict tone="use-lsp" label={`estimate · ${data.estimate}`}>
     <p>{data.verdict}</p>

@@ -12,6 +12,7 @@ interface Props {
   editPath?: string;
   ogType?: 'website' | 'article';
   ogImage?: string | false;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 const {
   title,
@@ -23,13 +24,14 @@ const {
   editPath,
   ogType = 'article',
   ogImage,
+  jsonLd,
 } = Astro.props;
 
 const editHref = editPath
   ? `https://github.com/tehnalogos/erc-solved/edit/main/${editPath}`
   : undefined;
 ---
-<Base title={pageTitle} description={description} ogType={ogType} ogImage={ogImage}>
+<Base title={pageTitle} description={description} ogType={ogType} ogImage={ogImage} jsonLd={jsonLd}>
   <article class="article" data-pagefind-body data-pagefind-meta={`title:${title}`}>
     {(eyebrow || title) && (
       <header class="page-head">

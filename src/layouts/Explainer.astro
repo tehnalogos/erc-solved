@@ -3,20 +3,39 @@ import Article from './Article.astro';
 import StandardChip from '~/components/brand/StandardChip.astro';
 import SpecBlock from '~/components/primitives/SpecBlock.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
+import { breadcrumbJsonLd, standardPageTitle, techArticleJsonLd, formatStandardLabel } from '~/lib/seo';
 
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
 const chipKind = data.kind === 'LSP' ? 'lsp' : 'erc';
+const pageTitle = standardPageTitle(data.kind, data.id, data.title);
+const standardPath = `/standards/${slug}/`;
+const standardLabel = formatStandardLabel(data.kind, data.id);
 ---
 <Article
-  title={data.title}
+  title={pageTitle}
   description={data.description}
-  pageTitle={`${data.kind}·${data.id} — ${data.title} · ERCs, Solved`}
+  pageTitle={pageTitle}
   eyebrow={`standard · ${data.purpose.toLowerCase()}`}
   author={data.author}
   updated={data.updated}
   editPath={`src/content/standards/${slug}.mdx`}
+  jsonLd={[
+    techArticleJsonLd({
+      headline: pageTitle,
+      description: data.description,
+      path: standardPath,
+      updated: data.updated,
+      author: data.author,
+      about: [standardLabel, 'Ethereum', 'EVM', 'LUKSO Standards', data.purpose],
+    }),
+    breadcrumbJsonLd([
+      { name: 'ERCs, Solved', path: '/' },
+      { name: 'Standards', path: '/standards/' },
+      { name: standardLabel, path: standardPath },
+    ]),
+  ]}
 >
   <div slot="header-extras" class="head-extras">
     <div class="chip-row">
