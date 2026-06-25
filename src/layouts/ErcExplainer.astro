@@ -1,0 +1,1279 @@
+---
+import Base from './Base.astro';
+import Authorship from '~/components/primitives/Authorship.astro';
+import StandardChip from '~/components/brand/StandardChip.astro';
+import SpecBlock from '~/components/primitives/SpecBlock.astro';
+import DiffArrow from '~/components/primitives/DiffArrow.astro';
+import Verdict from '~/components/primitives/Verdict.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+import TOCRail from '~/components/primitives/TOCRail.astro';
+import {
+  techArticleJsonLd,
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  personJsonLd,
+  definedTermJsonLd,
+  howToJsonLd,
+  absoluteUrl,
+  slugify,
+} from '~/lib/seo';
+
+interface Props { entry: any; }
+const { entry } = Astro.props;
+const { data, slug } = entry;
+const path = `/${slug}/`;
+const canonical = absoluteUrl(path);
+const editHref = `https://github.com/tehnalogos/erc-solved/edit/main/src/content/erc/${slug}.mdx`;
+
+const aboutTerms = [
+  data.title,
+  ...(data.aliases ?? []),
+  'Ethereum',
+  'EVM token standard',
+  'LUKSO',
+  'LSP standards',
+  ...data.standardAuthors,
+];
+
+const keywords = [
+  data.title,
+  ...(data.aliases ?? []),
+  `what is ${data.title}`,
+  `${data.title} standard`,
+  `${data.title} explained`,
+  `${data.title} vs LSP-7`,
+  ...data.standardAuthors,
+];
+
+const personLd = data.personSchema ? personJsonLd(data.personSchema) : null;
+
+const faqsWithUrls = (data.faqs ?? []).map((f: any) => ({
+  ...f,
+  url: `${canonical}#faq-${slugify(f.q)}`,
+}));
+
+const jsonLd = [
+  techArticleJsonLd({
+    headline: data.pageTitle,
+    description: data.description,
+    path,
+    updated: data.updated,
+    author: data.author,
+    about: aboutTerms,
+    creator: personLd ?? undefined,
+    mentions: data.mentions,
+    keywords,
+  }),
+  breadcrumbJsonLd([
+    { name: 'ERCs, Solved', path: '/' },
+    { name: 'ERC Explainers', path: '/erc/' },
+    { name: data.title, path },
+  ]),
+  ...(faqsWithUrls.length ? [faqPageJsonLd(faqsWithUrls)] : []),
+  definedTermJsonLd({
+    name: data.title,
+    description: data.definition ?? data.description,
+    url: canonical,
+    inDefinedTermSet: 'https://eips.ethereum.org/',
+    ...(data.termCode ? { termCode: data.termCode } : {}),
+  }),
+  ...(personLd ? [personLd] : []),
+  ...(data.howToMigration
+    ? [
+        howToJsonLd({
+          name: data.howToMigration.name,
+          description: data.howToMigration.description,
+          steps: data.howToMigration.steps,
+          toolHref: data.howToMigration.toolHref,
+        }),
+      ]
+    : []),
+];
+
+const headlineWords = data.headline.split(/\s+/);
+
+// Reading-time from raw MDX body + structured content
+const structuredWords = [
+  data.definition ?? '',
+  data.tldr ?? '',
+  data.useErc ?? '',
+  data.useLsp ?? '',
+  ...((data.limits ?? []).map((l: any) => l.summary)),
+  ...((data.faqs ?? []).map((f: any) => `${f.q} ${f.a}`)),
+  ...((data.timeline ?? []).map((t: any) => t.text)),
+  ...((data.glossary ?? []).map((g: any) => `${g.term} ${g.def}`)),
+].join(' ');
+const bodyText = `${entry.body ?? ''} ${structuredWords}`;
+const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
+const readingMinutes = Math.max(1, Math.ceil(wordCount / 240));
+
+const updatedStr = data.updated
+  ? new Date(data.updated).toISOString().slice(0, 10)
+  : null;
+
+const toc = [
+  { depth: 2, text: 'What is ERC-20?',          slug: 'what-is-erc-20' },
+  { depth: 2, text: 'At a glance',              slug: 'at-a-glance' },
+  { depth: 2, text: 'The origin story',         slug: 'origin' },
+  { depth: 2, text: `What ${data.title} actually is`, slug: 'the-spec' },
+  { depth: 2, text: "What's broken",            slug: 'whats-broken' },
+  ...((data.limits ?? []).map((l: any) => ({
+    depth: 3,
+    text: l.title.replace(/\.$/, ''),
+    slug: slugify(l.title),
+  }))),
+  { depth: 2, text: "Vogelsteller's second act", slug: 'vogelsteller-pivot' },
+  ...(data.compareRows?.length
+    ? [{ depth: 2, text: `${data.title} vs LSP-7`, slug: 'compare' }]
+    : []),
+  { depth: 2, text: 'When to use which',        slug: 'when-to-use-which' },
+  ...(data.faqs?.length
+    ? [{ depth: 2, text: 'FAQ', slug: 'faq' }]
+    : []),
+  { depth: 2, text: 'Keep reading',             slug: 'keep-reading' },
+];
+---
+
+<Base
+  title={data.pageTitle}
+  description={data.description}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <article
+    class="erc-page"
+    data-pagefind-body
+    data-pagefind-meta={`title:${data.title}`}
+  >
+    <section class="hero has-halo" id="what-is-erc-20">
+      <div class="hero-inner">
+        <span class="eyebrow">the standard · since {data.proposed}</span>
+
+        <div class="boot" aria-label="status">
+          <span class="typed">
+            <span class="sigil">//</span>
+            <span class="text"> {data.bootStrip}</span>
+          </span>
+          <span class="caret" aria-hidden="true">▍</span>
+        </div>
+
+        <h1 class="h1-stagger">
+          {headlineWords.map((w: string, i: number) => (
+            <>
+              <span class="word" style={`--i:${i}`}>{w}</span>{' '}
+            </>
+          ))}
+        </h1>
+
+        <p class="tagline">{data.tagline}</p>
+
+        <div class="chip-row">
+          <StandardChip kind="erc" id={data.id} />
+          {data.eipNumber && <span class="sep">·</span>}
+          {data.eipNumber && <span class="eip">{data.eipNumber}</span>}
+          <span class="sep">·</span>
+          <span class="authors">by {data.standardAuthors.join(' + ')}</span>
+        </div>
+
+        {updatedStr && (
+          <p class="meta-line">
+            <span>updated <time datetime={updatedStr}>{updatedStr}</time></span>
+            <span class="meta-sep">·</span>
+            <span>{readingMinutes} min read</span>
+            <span class="meta-sep">·</span>
+            <span>by <a href="/about/">{data.author}</a></span>
+          </p>
+        )}
+
+        {data.definition && (
+          <aside class="definition" aria-label="Definition">
+            <span class="def-label">definition</span>
+            <p>{data.definition}</p>
+          </aside>
+        )}
+
+        <div class="lede prose" data-reveal>
+          <slot name="lede" />
+        </div>
+
+        <div class="cta-row" data-reveal>
+          <a class="cta magnetic" href="#whats-broken">
+            <span class="bracket">[</span>
+            <span class="label">jump to what's broken</span>
+            <span class="arrow">→</span>
+            <span class="bracket">]</span>
+          </a>
+          {data.compareHref && (
+            <span class="cta-meta">
+              or read <a href={data.compareHref}>{data.title} vs LSP·7</a>
+            </span>
+          )}
+        </div>
+      </div>
+    </section>
+
+    {/* On-this-page disclosure — visible on narrow screens; sticky rail handles wide */}
+    {toc.length > 0 && (
+      <details class="toc-disclose">
+        <summary>
+          <span class="toc-key">on this page</span>
+          <span class="toc-caret" aria-hidden="true">▾</span>
+        </summary>
+        <ol>
+          {toc.map((i) => (
+            <li class={`d-${i.depth}`}><a href={`#${i.slug}`}>{i.text}</a></li>
+          ))}
+        </ol>
+      </details>
+    )}
+
+    {/* Sticky page-corner TOC — only visible at >=1280px */}
+    {toc.length > 0 && (
+      <div class="toc-fixed" aria-hidden="false">
+        <TOCRail items={toc} />
+      </div>
+    )}
+
+    {data.stats?.length > 0 && (
+      <section class="band stats-band" id="at-a-glance">
+        <div class="band-inner">
+          <span class="eyebrow">at a glance</span>
+          <h2>The standard, in one card.</h2>
+          <dl class="stats">
+            {data.stats.map((s: any) => (
+              <div class="stat">
+                <dt>{s.k}</dt>
+                <dd>
+                  {s.href
+                    ? <a href={s.href} rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined} target={s.href.startsWith('http') ? '_blank' : undefined}>{s.v}</a>
+                    : s.v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    )}
+
+    <section class="band tldr-band">
+      <div class="band-inner">
+        <Verdict tone="use-lsp" label="tl;dr">
+          <p>{data.tldr}</p>
+        </Verdict>
+      </div>
+    </section>
+
+    <section class="band" id="origin">
+      <div class="band-inner">
+        <span class="eyebrow">how the standard came to be</span>
+        <h2>The origin story.<a class="anchor" href="#origin" aria-label="Link to this section">#</a></h2>
+        <div class="prose">
+          <slot name="origin" />
+        </div>
+
+        {data.timeline?.length > 0 && (
+          <ol class="timeline" data-reveal>
+            {data.timeline.map((t: any) => (
+              <li class="tl-row">
+                <span class="tl-year">{t.year}</span>
+                <span class="tl-rule" aria-hidden="true"></span>
+                <span class="tl-text">
+                  {t.text}{' '}
+                  {t.href && (
+                    <a class="tl-cite" href={t.href} rel={t.href.startsWith('http') ? 'noopener noreferrer' : undefined} target={t.href.startsWith('http') ? '_blank' : undefined}>↗</a>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </section>
+
+    <section class="band" id="the-spec">
+      <div class="band-inner">
+        <span class="eyebrow">the spec, end to end</span>
+        <h2>What {data.title} actually is.<a class="anchor" href="#the-spec" aria-label="Link to this section">#</a></h2>
+        <SpecBlock chip={data.title} chipKind="erc" caption={`${data.eipNumber ?? data.title} interface`} lang="solidity">{data.abi}</SpecBlock>
+
+        {data.interfaceDiagram?.length > 0 && (
+          <figure class="iface" aria-label={`${data.title} interface, grouped`}>
+            <figcaption>
+              <span class="if-chip">{data.title}</span>
+              <span class="if-caption">interface, grouped</span>
+            </figcaption>
+            <div class="if-body">
+              {data.interfaceDiagram.map((g: any) => (
+                <div class="if-row">
+                  <span class="if-group">{g.group}:</span>
+                  <span class="if-items">
+                    {g.items.map((it: string, i: number) => (
+                      <>
+                        {i > 0 && <span class="if-sep"> · </span>}
+                        <code>{it}</code>
+                      </>
+                    ))}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </figure>
+        )}
+
+        <div class="prose">
+          <slot name="spec" />
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="whats-broken">
+      <div class="band-inner">
+        <span class="eyebrow">the integration tax</span>
+        <h2>What's broken about {data.title}.<a class="anchor" href="#whats-broken" aria-label="Link to this section">#</a></h2>
+        <div class="prose lede-prose">
+          <slot name="whatsBroken" />
+        </div>
+
+        <ol class="limits">
+          {data.limits.map((lim: any, i: number) => {
+            const limSlug = slugify(lim.title);
+            return (
+              <li class="limit" data-reveal id={limSlug}>
+                <div class="limit-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</div>
+                <div class="limit-body">
+                  <h3>{lim.title}<a class="anchor" href={`#${limSlug}`} aria-label="Link to this section">#</a></h3>
+                  <p>{lim.summary}</p>
+                  <DiffArrow size="md" framed from={lim.from} to={lim.to} />
+                  {lim.workarounds.length > 0 && (
+                    <p class="workarounds">
+                      <span class="wk-label">workarounds tried:</span>{' '}
+                      {lim.workarounds.map((w: string, idx: number) => (
+                        <>
+                          {idx > 0 && <span class="wk-sep"> · </span>}
+                          <span class="wk-item">{w}</span>
+                        </>
+                      ))}
+                    </p>
+                  )}
+                  {lim.href && (
+                    <p class="deeper"><Crossref href={lim.href}>read the deep-dive</Crossref></p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </section>
+
+    <section class="band" id="vogelsteller-pivot">
+      <div class="band-inner">
+        <span class="eyebrow">the author's second act</span>
+        <h2>So {data.standardAuthors[0]} built <span class="pink">LUKSO</span>.<a class="anchor" href="#vogelsteller-pivot" aria-label="Link to this section">#</a></h2>
+        <div class="prose">
+          <slot name="vogelsteller" />
+        </div>
+
+        <ul class="routes" data-reveal>
+          {data.luksoRoutes.map((r: any) => (
+            <li>
+              <a class="route" href={r.href}>
+                <span class="route-chip">{r.chip}</span>
+                <span class="route-label">{r.label}</span>
+                <span class="route-summary">{r.summary}</span>
+                <span class="route-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    {data.compareRows.length > 0 && (
+      <section class="band" id="compare">
+        <div class="band-inner">
+          <span class="eyebrow">spec to spec, at a glance</span>
+          <h2>{data.title} vs LSP·7 in one table.<a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
+          <div class="compare-wrap" data-reveal>
+            <table class="compare">
+              <thead>
+                <tr>
+                  <th class="row-label">row</th>
+                  <th class="left"><StandardChip kind="erc" id={data.id} /></th>
+                  <th class="right"><StandardChip kind="lsp" id="7" /></th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.compareRows.map((r: any) => (
+                  <tr>
+                    <td class="row-label">{r.row}</td>
+                    <td class="left"><code>{r.left}</code></td>
+                    <td class="right"><code>{r.right}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data.compareHref && (
+            <p class="compare-foot">
+              full matrix → <Crossref href={data.compareHref}>standards/compare/erc20-lsp7</Crossref>
+            </p>
+          )}
+        </div>
+      </section>
+    )}
+
+    <section class="band" id="when-to-use-which">
+      <div class="band-inner">
+        <span class="eyebrow">be honest about scope</span>
+        <h2>When to use which.<a class="anchor" href="#when-to-use-which" aria-label="Link to this section">#</a></h2>
+        <div class="verdict-pair">
+          <Verdict tone="use-erc" label={`use ${data.title} when`}>
+            <p>{data.useErc}</p>
+          </Verdict>
+          <Verdict tone="use-lsp" label="reach for LSP when">
+            <p>{data.useLsp}</p>
+          </Verdict>
+        </div>
+      </div>
+    </section>
+
+    {data.faqs.length > 0 && (
+      <section class="band" id="faq">
+        <div class="band-inner">
+          <span class="eyebrow">people also ask</span>
+          <h2>FAQ.<a class="anchor" href="#faq" aria-label="Link to this section">#</a></h2>
+          <ul class="faqs">
+            {data.faqs.map((f: any, i: number) => {
+              const faqId = `faq-${slugify(f.q)}`;
+              return (
+                <li class="faq" id={faqId}>
+                  <span class="faq-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <div class="faq-body">
+                    <h3 class="faq-q">
+                      {f.q}
+                      <a class="anchor" href={`#${faqId}`} aria-label="Link to this question">#</a>
+                    </h3>
+                    <p class="faq-a">{f.a}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    {data.glossary?.length > 0 && (
+      <section class="band glossary-band" id="glossary">
+        <div class="band-inner">
+          <details class="glossary-disclose">
+            <summary>
+              <span class="eyebrow">glossary</span>
+              <span class="gloss-key">{data.glossary.length} terms used on this page</span>
+              <span class="gloss-caret" aria-hidden="true">▾</span>
+            </summary>
+            <dl class="glossary">
+              {data.glossary.map((g: any) => (
+                <div class="gloss-row">
+                  <dt>{g.term}</dt>
+                  <dd>{g.def}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
+        </div>
+      </section>
+    )}
+
+    {data.primarySources?.length > 0 && (
+      <section class="band sources-band" id="sources">
+        <div class="band-inner">
+          <span class="eyebrow">primary sources</span>
+          <h2>Where this page draws from.<a class="anchor" href="#sources" aria-label="Link to this section">#</a></h2>
+          <ol class="sources">
+            {data.primarySources.map((s: any) => (
+              <li>
+                <Crossref href={s.href}>{s.label}</Crossref>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )}
+
+    <section class="band" id="keep-reading">
+      <div class="band-inner">
+        <span class="eyebrow">where to go next</span>
+        <h2>Keep reading.<a class="anchor" href="#keep-reading" aria-label="Link to this section">#</a></h2>
+        <ul class="next-list">
+          {data.luksoRoutes.map((r: any) => (
+            <li>
+              <a class="next-row" href={r.href}>
+                <span class="next-q">{r.label.toLowerCase()}</span>
+                <span class="next-arrow" aria-hidden="true">→</span>
+                <span class="next-a">{r.chip}</span>
+              </a>
+            </li>
+          ))}
+          {data.compareHref && (
+            <li>
+              <a class="next-row" href={data.compareHref}>
+                <span class="next-q">{data.title.toLowerCase()} vs lsp-7 (full matrix)</span>
+                <span class="next-arrow" aria-hidden="true">→</span>
+                <span class="next-a">comparison</span>
+              </a>
+            </li>
+          )}
+          <li>
+            <a class="next-row" href="/standards/matrix/">
+              <span class="next-q">all ERC ↔ LSP mappings</span>
+              <span class="next-arrow" aria-hidden="true">→</span>
+              <span class="next-a">matrix</span>
+            </a>
+          </li>
+          <li>
+            <a class="next-row" href="/problems/">
+              <span class="next-q">start from your problem</span>
+              <span class="next-arrow" aria-hidden="true">→</span>
+              <span class="next-a">problems</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="authorship-wrap">
+      <Authorship author={data.author} updated={data.updated} editHref={editHref} />
+    </div>
+  </article>
+
+  <script>
+    // Cursor-tracking halo for this page's hero
+    const hero = document.querySelector<HTMLElement>('.erc-page .hero.has-halo');
+    if (hero) {
+      let raf = 0;
+      let nextX = 50, nextY = 30;
+      const apply = () => {
+        hero.style.setProperty('--cx', `${nextX}%`);
+        hero.style.setProperty('--cy', `${nextY}%`);
+        raf = 0;
+      };
+      hero.addEventListener('pointermove', (e) => {
+        const r = hero.getBoundingClientRect();
+        nextX = ((e.clientX - r.left) / r.width) * 100;
+        nextY = ((e.clientY - r.top) / r.height) * 100;
+        hero.dataset.halo = 'on';
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+      hero.addEventListener('pointerleave', () => { hero.dataset.halo = ''; });
+    }
+
+    // Magnetic CTA
+    document.querySelectorAll<HTMLElement>('.erc-page .magnetic').forEach((el) => {
+      const PULL = 0.22;
+      const RANGE = 90;
+      let raf = 0;
+      const apply = (dx: number, dy: number) => {
+        el.style.setProperty('--mx', `${dx}px`);
+        el.style.setProperty('--my', `${dy}px`);
+        raf = 0;
+      };
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        if (dist > RANGE) return;
+        el.dataset.magnetize = 'on';
+        if (!raf) raf = requestAnimationFrame(() => apply(dx * PULL, dy * PULL));
+      });
+      el.addEventListener('pointerleave', () => {
+        el.dataset.magnetize = '';
+        el.style.setProperty('--mx', '0px');
+        el.style.setProperty('--my', '0px');
+      });
+    });
+  </script>
+</Base>
+
+<style>
+  .erc-page {
+    display: grid;
+  }
+
+  /* ── hero ─────────────────────────────────────────────────────────── */
+  .hero {
+    padding: var(--s-8) var(--s-5) var(--s-7);
+    overflow: hidden;
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .hero-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    gap: var(--s-5);
+    position: relative;
+    min-width: 0;
+  }
+  .hero-inner > * { min-width: 0; max-width: 100%; }
+  .boot { max-width: 100%; overflow: hidden; }
+
+  .hero h1 {
+    max-width: 18ch;
+    font-size: clamp(48px, 9vw, 120px);
+    font-variation-settings: 'opsz' 88;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 .word { margin-right: 0; }
+
+  .tagline {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(22px, 3vw, 36px);
+    color: var(--ink-bone-dim);
+    line-height: 1.2;
+    max-width: 32ch;
+  }
+
+  .chip-row {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+  }
+  .chip-row .sep { color: var(--ink-line); }
+  .chip-row .eip { color: var(--erc-sand); }
+  .chip-row .authors { color: var(--ink-bone-dim); }
+
+  .lede {
+    max-width: 72ch;
+  }
+  .lede :global(p) {
+    font-size: var(--t-mono-md);
+    color: var(--ink-bone-dim);
+    line-height: 1.65;
+  }
+  .lede :global(p) + :global(p) { margin-top: var(--s-3); }
+  .lede :global(strong) { color: var(--ink-bone); font-weight: 500; }
+
+  .cta-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-5);
+    flex-wrap: wrap;
+    margin-top: var(--s-3);
+  }
+  .cta {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--ink-bone);
+    color: var(--ink-bone);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .cta:hover, .cta:focus-visible {
+    background: var(--signal-pink);
+    color: var(--ink-black);
+    border-color: var(--signal-pink);
+    outline: none;
+  }
+  .cta .bracket { color: var(--ink-fog); }
+  .cta:hover .bracket { color: var(--ink-black); }
+  .cta-meta { font-size: var(--t-mono-sm); color: var(--ink-fog); }
+  .cta-meta a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .cta-meta a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  /* ── bands ────────────────────────────────────────────────────────── */
+  .band {
+    padding: var(--s-9) var(--s-5);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .tldr-band { padding: var(--s-7) var(--s-5); }
+  .band-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    gap: var(--s-5);
+  }
+  .band-inner > h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    max-width: 22ch;
+  }
+  .band-inner .pink { color: var(--signal-pink); }
+
+  /* ── prose ────────────────────────────────────────────────────────── */
+  .prose {
+    max-width: var(--reading);
+    display: grid;
+    gap: var(--s-4);
+  }
+  .prose.lede-prose :global(p) { font-size: var(--t-mono-lg); color: var(--ink-bone); }
+  .prose :global(p) {
+    color: var(--ink-bone-dim);
+    line-height: 1.7;
+  }
+  .prose :global(strong) { color: var(--ink-bone); font-weight: 500; }
+  .prose :global(em) { color: var(--ink-bone); font-style: italic; }
+  .prose :global(h3) {
+    font-family: var(--font-serif);
+    font-size: var(--t-serif-1);
+    margin-top: var(--s-3);
+  }
+  .prose :global(code) {
+    background: var(--ink-paper);
+    border: 1px solid var(--ink-line);
+    padding: 0 4px;
+    color: var(--signal-pink);
+    font-size: 0.95em;
+  }
+  .prose :global(a) {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .prose :global(a:hover) { color: var(--signal-pink); border-color: var(--signal-pink); }
+  .prose :global(ul) {
+    display: grid;
+    gap: var(--s-2);
+    padding-left: var(--s-4);
+    list-style: '— ';
+    color: var(--ink-bone-dim);
+  }
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--signal-pink);
+    padding: var(--s-2) var(--s-4);
+    color: var(--ink-bone);
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1.35;
+  }
+  .prose :global(blockquote p) { color: inherit; }
+
+  /* ── limits ───────────────────────────────────────────────────────── */
+  .limits {
+    display: grid;
+    gap: var(--s-7);
+    counter-reset: limit;
+    margin-top: var(--s-3);
+  }
+  .limit {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--s-4);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--ink-line);
+  }
+  .limit-num {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    color: var(--erc-sand);
+    letter-spacing: 0;
+    padding-top: 4px;
+  }
+  .limit-body { display: grid; gap: var(--s-4); min-width: 0; }
+  .limit-body h3 {
+    font-family: var(--font-serif);
+    font-size: clamp(22px, 2.6vw, 32px);
+    max-width: 28ch;
+    line-height: 1.15;
+  }
+  .limit-body p {
+    color: var(--ink-bone-dim);
+    line-height: 1.65;
+    max-width: var(--reading);
+  }
+  .workarounds {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-fog);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-2);
+    align-items: baseline;
+  }
+  .wk-label { color: var(--erc-sand); margin-right: var(--s-2); }
+  .wk-sep { color: var(--ink-line); }
+  .wk-item { color: var(--ink-bone-dim); }
+  .deeper { margin-top: var(--s-1); }
+
+  /* ── routes grid ──────────────────────────────────────────────────── */
+  .routes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--ink-line);
+    border-left: 1px solid var(--ink-line);
+    margin-top: var(--s-3);
+  }
+  .route {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    align-items: baseline;
+    column-gap: var(--s-3);
+    row-gap: var(--s-2);
+    padding: var(--s-5);
+    border-right: 1px solid var(--ink-line);
+    border-bottom: 1px solid var(--ink-line);
+    transition: background 150ms ease;
+    min-height: 100%;
+  }
+  .route:hover, .route:focus-visible { background: var(--ink-paper); outline: none; }
+  .route-chip {
+    grid-column: 1;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--signal-pink);
+  }
+  .route-label {
+    grid-column: 1;
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: 22px;
+    color: var(--ink-bone);
+    line-height: 1.15;
+  }
+  .route-summary {
+    grid-column: 1;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone-dim);
+    line-height: 1.55;
+  }
+  .route-arrow {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: center;
+    color: var(--ink-fog);
+    font-size: 20px;
+  }
+  .route:hover .route-arrow { color: var(--signal-pink); }
+
+  /* ── compare table ────────────────────────────────────────────────── */
+  .compare-wrap { overflow-x: auto; border: 1px solid var(--ink-line); }
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    background: var(--ink-paper);
+  }
+  .compare th, .compare td {
+    text-align: left;
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid var(--ink-line);
+    vertical-align: top;
+  }
+  .compare thead th { background: var(--ink-black); }
+  .compare tbody tr:last-child td { border-bottom: none; }
+  .compare .row-label { color: var(--ink-fog); white-space: nowrap; }
+  .compare .left { color: var(--ink-bone-dim); }
+  .compare .right { color: var(--ink-bone); }
+  .compare code {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .compare-foot {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-fog);
+    margin-top: var(--s-2);
+  }
+
+  /* ── verdict pair ─────────────────────────────────────────────────── */
+  .verdict-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-4);
+  }
+
+  /* ── faqs ─────────────────────────────────────────────────────────── */
+  .faqs { display: grid; gap: var(--s-4); }
+  .faq {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--s-4);
+    padding: var(--s-4) 0;
+    border-top: 1px solid var(--ink-line);
+  }
+  .faq:last-child { border-bottom: 1px solid var(--ink-line); }
+  .faq-num {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--signal-pink);
+    padding-top: 4px;
+  }
+  .faq-body { display: grid; gap: var(--s-2); max-width: var(--reading); min-width: 0; }
+  .faq-q {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(18px, 2.2vw, 24px);
+    color: var(--ink-bone);
+    line-height: 1.25;
+  }
+  .faq-a {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    color: var(--ink-bone-dim);
+    line-height: 1.65;
+  }
+
+  /* ── next list ────────────────────────────────────────────────────── */
+  .next-list {
+    display: grid;
+    border-top: 1px solid var(--ink-line);
+  }
+  .next-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--s-4);
+    padding: var(--s-4) var(--s-2);
+    border-bottom: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+  }
+  .next-row .next-q { color: var(--erc-sand); font-size: var(--t-mono-md); }
+  .next-row .next-arrow { color: var(--ink-line); }
+  .next-row .next-a { color: var(--signal-pink); font-size: var(--t-mono-md); }
+  .next-row:hover { background: var(--ink-paper); }
+  .next-row:hover .next-arrow { color: var(--ink-bone); }
+
+  /* ── authorship ───────────────────────────────────────────────────── */
+  .authorship-wrap {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 var(--s-5);
+    width: 100%;
+  }
+
+  /* ── meta-line (updated · reading time · author) ──────────────────── */
+  .meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    margin-top: calc(-1 * var(--s-3));
+  }
+  .meta-line .meta-sep { color: var(--ink-line); }
+  .meta-line time { font-variant-numeric: tabular-nums; color: var(--ink-bone-dim); }
+  .meta-line a {
+    color: var(--ink-bone-dim);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .meta-line a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  /* ── definition (Wikipedia-style infobox lede) ────────────────────── */
+  .definition {
+    margin: var(--s-3) 0 0 0;
+    padding: var(--s-4);
+    border: 1px solid var(--signal-pink-dim);
+    background: color-mix(in srgb, var(--signal-pink) 4%, var(--ink-paper));
+    max-width: 72ch;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .definition .def-label {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--signal-pink);
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+  }
+  .definition p {
+    margin: 0;
+    color: var(--ink-bone);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    line-height: 1.7;
+  }
+  .definition p :global(strong) { color: var(--ink-bone); font-weight: 500; }
+
+  /* ── on-this-page disclosure (narrow viewports only) ──────────────── */
+  .toc-disclose {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 var(--s-5);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .toc-disclose summary {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-3) 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-fog);
+  }
+  .toc-disclose summary::-webkit-details-marker { display: none; }
+  .toc-disclose .toc-key { color: var(--signal-pink); }
+  .toc-disclose .toc-caret { color: var(--ink-fog); transition: transform 150ms ease; }
+  .toc-disclose[open] .toc-caret { transform: rotate(180deg); }
+  .toc-disclose ol {
+    display: grid;
+    gap: var(--s-2);
+    padding: 0 0 var(--s-4) var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+  }
+  .toc-disclose li.d-3 { padding-left: var(--s-3); }
+  .toc-disclose a {
+    color: var(--ink-bone-dim);
+    border-bottom: 1px solid transparent;
+  }
+  .toc-disclose a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  /* ── sticky page-corner TOC (only wide viewports) ─────────────────── */
+  .toc-fixed { display: none; }
+  @media (min-width: 1320px) {
+    .toc-fixed {
+      display: block;
+      position: fixed;
+      top: 96px;
+      right: max(24px, calc((100vw - var(--container)) / 2 - 220px));
+      width: 200px;
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+      z-index: 5;
+    }
+    .toc-disclose { display: none; }
+  }
+
+  /* ── stats card ───────────────────────────────────────────────────── */
+  .stats-band { padding: var(--s-7) var(--s-5); }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--ink-line);
+    border-left: 1px solid var(--ink-line);
+  }
+  .stat {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) 2fr;
+    gap: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    border-right: 1px solid var(--ink-line);
+    border-bottom: 1px solid var(--ink-line);
+    align-items: baseline;
+    background: var(--ink-paper);
+  }
+  .stat dt {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+  }
+  .stat dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone);
+  }
+  .stat dd a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .stat dd a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  /* ── timeline ─────────────────────────────────────────────────────── */
+  .timeline {
+    display: grid;
+    gap: 0;
+    margin-top: var(--s-3);
+    border-top: 1px solid var(--ink-line);
+  }
+  .tl-row {
+    display: grid;
+    grid-template-columns: 100px 28px minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+  }
+  .tl-year {
+    color: var(--signal-pink);
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .tl-rule {
+    height: 1px;
+    background: var(--ink-line);
+    align-self: center;
+  }
+  .tl-text { color: var(--ink-bone-dim); line-height: 1.55; }
+  .tl-cite {
+    color: var(--ink-fog);
+    border-bottom: none;
+    margin-left: 2px;
+  }
+  .tl-cite:hover { color: var(--signal-pink); }
+
+  /* ── interface diagram ────────────────────────────────────────────── */
+  .iface {
+    margin: 0;
+    border: 1px solid var(--ink-line);
+    background: var(--ink-paper);
+    font-family: var(--font-mono);
+  }
+  .iface figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-4);
+    border-bottom: 1px solid var(--ink-line);
+    background: var(--ink-black);
+    font-size: var(--t-mono-xs);
+  }
+  .iface .if-chip {
+    padding: 1px var(--s-2);
+    border: 1px solid var(--erc-sand);
+    color: var(--erc-sand);
+  }
+  .iface .if-caption { color: var(--ink-bone-dim); }
+  .iface .if-body { display: grid; gap: var(--s-2); padding: var(--s-4); }
+  .iface .if-row {
+    display: grid;
+    grid-template-columns: 12ch minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: baseline;
+    font-size: var(--t-mono-sm);
+  }
+  .iface .if-group { color: var(--erc-sand); }
+  .iface .if-items { color: var(--ink-bone); }
+  .iface .if-items code {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .iface .if-sep { color: var(--ink-line); }
+
+  /* ── anchor link icons (h2/h3) ─────────────────────────────────────── */
+  h2, .faq-q { position: relative; }
+  .anchor {
+    display: inline-block;
+    margin-left: var(--s-2);
+    color: var(--ink-line);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.7em;
+    opacity: 0;
+    transition: opacity 150ms ease, color 150ms ease;
+    vertical-align: middle;
+  }
+  h2:hover .anchor,
+  h3:hover .anchor,
+  .anchor:focus-visible {
+    opacity: 1;
+  }
+  .anchor:hover { color: var(--signal-pink); }
+
+  /* ── glossary ─────────────────────────────────────────────────────── */
+  .glossary-band { padding: var(--s-6) var(--s-5); }
+  .glossary-disclose summary {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    cursor: pointer;
+    list-style: none;
+    padding: var(--s-2) 0;
+  }
+  .glossary-disclose summary::-webkit-details-marker { display: none; }
+  .glossary-disclose .gloss-key {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone-dim);
+  }
+  .glossary-disclose .gloss-caret {
+    margin-left: auto;
+    color: var(--ink-fog);
+    transition: transform 150ms ease;
+  }
+  .glossary-disclose[open] .gloss-caret { transform: rotate(180deg); }
+  .glossary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    margin-top: var(--s-4);
+    border-top: 1px solid var(--ink-line);
+    border-left: 1px solid var(--ink-line);
+  }
+  .gloss-row {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    border-right: 1px solid var(--ink-line);
+    border-bottom: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    background: var(--ink-paper);
+  }
+  .gloss-row dt {
+    color: var(--signal-pink);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .gloss-row dd {
+    margin: 0;
+    color: var(--ink-bone-dim);
+    line-height: 1.55;
+  }
+
+  /* ── primary sources ──────────────────────────────────────────────── */
+  .sources {
+    display: grid;
+    gap: var(--s-2);
+    list-style: decimal;
+    padding-left: var(--s-5);
+    font-family: var(--font-mono);
+    color: var(--ink-fog);
+  }
+  .sources li { padding: var(--s-1) 0; }
+
+  /* ── responsive ───────────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .routes { grid-template-columns: 1fr; }
+    .verdict-pair { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    .glossary { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .hero { padding: var(--s-7) var(--s-4) var(--s-5); }
+    .band { padding: var(--s-7) var(--s-4); }
+    .authorship-wrap { padding: 0 var(--s-4); }
+    .limit { grid-template-columns: 32px minmax(0, 1fr); gap: var(--s-3); }
+    .faq { grid-template-columns: 32px minmax(0, 1fr); gap: var(--s-3); }
+    .next-row { grid-template-columns: 1fr; gap: var(--s-1); padding: var(--s-3) 0; }
+    .next-row .next-arrow { display: none; }
+    .stat { grid-template-columns: 1fr; gap: var(--s-1); padding: var(--s-3); }
+    .tl-row { grid-template-columns: 80px minmax(0, 1fr); gap: var(--s-3); }
+    .tl-rule { display: none; }
+    .iface .if-row { grid-template-columns: 1fr; gap: var(--s-1); }
+    .toc-disclose, .glossary-band { padding: var(--s-3) var(--s-4); }
+    .gloss-row { padding: var(--s-2) var(--s-3); }
+  }
+</style>

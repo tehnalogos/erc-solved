@@ -14,10 +14,21 @@ type ArticleInput = {
   updated?: Date | string;
   author?: string;
   about?: string[];
+  creator?: Record<string, unknown>;
+  mentions?: { name: string; url?: string }[];
+  keywords?: string[];
 };
 
 export function absoluteUrl(path = '/') {
   return new URL(path, SITE_URL).toString();
+}
+
+export function slugify(input: string) {
+  return input
+    .toLowerCase()
+    .replace(/[''`]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 export function formatLsp(id: string) {
@@ -84,6 +95,103 @@ export function breadcrumbJsonLd(crumbs: Crumb[]) {
   };
 }
 
+export function faqPageJsonLd(
+  faqs: { q: string; a: string; url?: string }[],
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ q, a, url }) => ({
+      '@type': 'Question',
+      name: q,
+      ...(url ? { url } : {}),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: a,
+      },
+    })),
+  };
+}
+
+type PersonInput = {
+  name: string;
+  url?: string;
+  jobTitle?: string;
+  worksFor?: { name: string; url?: string };
+  sameAs?: string[];
+  knowsAbout?: string[];
+};
+
+export function personJsonLd(p: PersonInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: p.name,
+    ...(p.url ? { url: p.url } : {}),
+    ...(p.jobTitle ? { jobTitle: p.jobTitle } : {}),
+    ...(p.worksFor
+      ? {
+          worksFor: {
+            '@type': 'Organization',
+            name: p.worksFor.name,
+            ...(p.worksFor.url ? { url: p.worksFor.url } : {}),
+          },
+        }
+      : {}),
+    ...(p.sameAs?.length ? { sameAs: p.sameAs } : {}),
+    ...(p.knowsAbout?.length ? { knowsAbout: p.knowsAbout } : {}),
+  };
+}
+
+export function definedTermJsonLd(t: {
+  name: string;
+  description: string;
+  url: string;
+  inDefinedTermSet?: string;
+  termCode?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    name: t.name,
+    description: t.description,
+    url: t.url,
+    ...(t.inDefinedTermSet ? { inDefinedTermSet: t.inDefinedTermSet } : {}),
+    ...(t.termCode ? { termCode: t.termCode } : {}),
+  };
+}
+
+type HowToStep = { name: string; text: string };
+export function howToJsonLd(input: {
+  name: string;
+  description: string;
+  steps: HowToStep[];
+  toolHref?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: input.name,
+    description: input.description,
+    step: input.steps.map((s) => ({
+      '@type': 'HowToStep',
+      name: s.name,
+      text: s.text,
+    })),
+    ...(input.toolHref
+      ? {
+          tool: [
+            {
+              '@type': 'HowToTool',
+              name: 'LUKSO LSP smart contracts',
+              url: input.toolHref,
+            },
+          ],
+        }
+      : {}),
+  };
+}
+
 export function techArticleJsonLd({
   headline,
   description,
@@ -91,6 +199,9 @@ export function techArticleJsonLd({
   updated,
   author = AUTHOR_NAME,
   about = [],
+  creator,
+  mentions,
+  keywords,
 }: ArticleInput) {
   return {
     '@context': 'https://schema.org',
@@ -101,6 +212,7 @@ export function techArticleJsonLd({
       '@type': 'Organization',
       name: author,
     },
+    ...(creator ? { creator } : {}),
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,
@@ -110,5 +222,15 @@ export function techArticleJsonLd({
     dateModified: updated ? new Date(updated).toISOString().slice(0, 10) : undefined,
     isAccessibleForFree: true,
     about,
+    ...(mentions?.length
+      ? {
+          mentions: mentions.map((m) => ({
+            '@type': 'DefinedTerm',
+            name: m.name,
+            ...(m.url ? { url: m.url } : {}),
+          })),
+        }
+      : {}),
+    ...(keywords?.length ? { keywords: keywords.join(', ') } : {}),
   };
 }

@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import Article from './Article.astro';
 import StandardChip from '~/components/brand/StandardChip.astro';
 import SpecBlock from '~/components/primitives/SpecBlock.astro';
@@ -12,6 +13,20 @@ const chipKind = data.kind === 'LSP' ? 'lsp' : 'erc';
 const pageTitle = standardPageTitle(data.kind, data.id, data.title);
 const standardPath = `/standards/${slug}/`;
 const standardLabel = formatStandardLabel(data.kind, data.id);
+
+// Build a chip → slug map from the standards collection so companion links resolve
+// (chip values like "LSP·1" or "ERC-725" must map to actual built slugs like
+// "lsp1-universal-receiver" or "erc725", which we cannot derive from the chip alone).
+const allStandards = await getCollection('standards');
+const chipToSlug = new Map<string, string>();
+for (const s of allStandards) {
+  const id = s.data.id;
+  const key = s.data.kind === 'LSP' ? `LSP·${id}` : `ERC-${id}`;
+  chipToSlug.set(key, s.slug);
+}
+function companionHref(chip: string): string {
+  return chipToSlug.has(chip) ? `/standards/${chipToSlug.get(chip)}/` : `/standards/`;
+}
 ---
 <Article
   title={pageTitle}
@@ -81,7 +96,7 @@ const standardLabel = formatStandardLabel(data.kind, data.id);
       <p class="dim">Standards this composes with.</p>
       <ul class="chips">
         {data.companions.map((c: string) => (
-          <li><Crossref href={`/standards/${c.toLowerCase().replace('·','-').replace(/[^a-z0-9-]/g,'-')}/`} chip={c}>{c}</Crossref></li>
+          <li><Crossref href={companionHref(c)} chip={c}>{c}</Crossref></li>
         ))}
       </ul>
     </section>

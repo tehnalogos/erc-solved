@@ -27,13 +27,18 @@ async function resolveRelated() {
       const [collection, ...rest] = slug.split('/');
       const targetSlug = rest.join('/');
       try {
-        const e = await getEntry(collection as any, targetSlug);
+        const e: any = await getEntry(collection as any, targetSlug);
         if (!e) return null;
-        return {
-          href: `/${collection}/${targetSlug}/`,
-          title: e.data.title,
-          chip: e.data.diff?.to?.chip || e.data.lsps?.[0] || null,
-        };
+        const href = collection === 'erc'
+          ? `/${targetSlug}/`
+          : `/${collection}/${targetSlug}/`;
+        const title = collection === 'erc'
+          ? e.data.headline ?? e.data.title
+          : e.data.title;
+        const chip = collection === 'erc'
+          ? e.data.title
+          : e.data.diff?.to?.chip || e.data.lsps?.[0] || null;
+        return { href, title, chip };
       } catch {
         return null;
       }

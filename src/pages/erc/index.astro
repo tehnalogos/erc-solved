@@ -1,0 +1,174 @@
+---
+import Base from '~/layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import StandardChip from '~/components/brand/StandardChip.astro';
+
+const entries = await getCollection('erc');
+entries.sort((a, b) => Number(a.data.id) - Number(b.data.id));
+
+const description =
+  'Long-form explainers for each Ethereum Request for Comments (ERC) token and account standard. What the standard is, what its author left out, and the LUKSO LSP that handles the gap.';
+
+const upcoming = [
+  { id: '721', label: 'Non-fungible tokens' },
+  { id: '1155', label: 'Multi-token contracts' },
+  { id: '4337', label: 'Account abstraction via bundlers' },
+];
+const haveSlugs = new Set<string>(entries.map((e) => e.slug));
+---
+<Base
+  title="ERC Explainers"
+  description={description}
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'ERC Explainers',
+    description,
+    url: 'https://www.ercsolved.dev/erc/',
+    about: ['Ethereum Request for Comments', 'ERC-20', 'ERC-721', 'ERC-1155', 'LUKSO LSP standards'],
+  }}
+>
+  <section class="hub" data-pagefind-body data-pagefind-meta="title:ERC Explainers">
+    <header class="hub-head">
+      <span class="eyebrow">long-form, one standard per page</span>
+      <h1>ERC Explainers.</h1>
+      <p class="dim">
+        Reference pages for the Ethereum token and account standards developers actually
+        ship against. Each one explains what the standard is, where its author left gaps,
+        and the LUKSO LSP that was designed to handle the gap.
+      </p>
+    </header>
+
+    <ol class="rows">
+      {entries.map((entry) => (
+        <li class="row-wrap">
+          <a class="row" href={`/${entry.slug}/`}>
+            <span class="left">
+              <span class="chip-slot"><StandardChip kind="erc" id={entry.data.id} /></span>
+              <span class="title">{entry.data.title}</span>
+            </span>
+            <span class="middle">
+              <span class="tagline">{entry.data.tagline}</span>
+            </span>
+            <span class="caret" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+
+      {upcoming
+        .filter((u) => !haveSlugs.has(`erc-${u.id}`))
+        .map((u) => (
+          <li class="row-wrap">
+            <div class="row pending" aria-disabled="true">
+              <span class="left">
+                <span class="chip-slot"><StandardChip kind="erc" id={u.id} /></span>
+                <span class="title dim">{u.label}</span>
+              </span>
+              <span class="middle">
+                <span class="tagline dim">explainer in progress</span>
+              </span>
+              <span class="caret pending-caret" aria-hidden="true">·</span>
+            </div>
+          </li>
+        ))}
+    </ol>
+
+    <footer class="hub-foot">
+      <span>Want a particular ERC covered next?</span>
+      <a href="https://github.com/tehnalogos/erc-solved/issues/new" rel="noopener noreferrer" target="_blank">
+        [ propose one on github → ]
+      </a>
+    </footer>
+  </section>
+</Base>
+
+<style>
+  .hub {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--s-8) var(--s-5);
+    display: grid;
+    gap: var(--s-7);
+    min-width: 0;
+  }
+  .hub-head {
+    display: grid;
+    gap: var(--s-3);
+    max-width: 64ch;
+    min-width: 0;
+  }
+  .hub-head h1 { font-size: clamp(40px, 6vw, 80px); }
+  .hub-head .dim { color: var(--ink-bone-dim); }
+
+  .rows {
+    display: grid;
+    border-top: 1px solid var(--ink-line);
+    min-width: 0;
+  }
+  .row-wrap {
+    border-bottom: 1px solid var(--ink-line);
+    min-width: 0;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr) 1.5ch;
+    align-items: center;
+    gap: var(--s-5);
+    padding: var(--s-4) var(--s-2);
+    font-family: var(--font-mono);
+    min-width: 0;
+  }
+  .row:hover { background: var(--ink-paper); }
+  .row:hover .caret { color: var(--ink-bone); }
+  .row.pending {
+    cursor: default;
+  }
+  .row.pending:hover { background: none; }
+
+  .left { display: flex; gap: var(--s-3); align-items: center; min-width: 0; }
+  .chip-slot { flex: 0 0 auto; }
+  .title {
+    color: var(--ink-bone);
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .title.dim { color: var(--ink-fog); }
+  .middle { display: grid; gap: var(--s-1); min-width: 0; }
+  .tagline {
+    color: var(--ink-bone-dim);
+    font-size: var(--t-mono-sm);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .tagline.dim { color: var(--ink-fog); }
+  .caret { color: var(--ink-line); justify-self: end; }
+  .pending-caret { color: var(--ink-line); }
+
+  .hub-foot {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    align-items: baseline;
+    padding-top: var(--s-4);
+    color: var(--ink-fog);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+  }
+  .hub-foot a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .hub-foot a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  @media (max-width: 720px) {
+    .hub { padding: var(--s-6) var(--s-4); }
+    .row {
+      grid-template-columns: 1fr;
+      gap: var(--s-3);
+      padding: var(--s-4) 0;
+    }
+    .caret { display: none; }
+  }
+</style>

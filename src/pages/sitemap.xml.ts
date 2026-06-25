@@ -7,6 +7,7 @@ const staticUrls = [
   '/standards/',
   '/standards/matrix/',
   '/build/',
+  '/erc/',
   '/about/',
 ];
 
@@ -14,7 +15,7 @@ export const GET: APIRoute = async ({ site }) => {
   const origin = (site?.origin || 'https://www.ercsolved.dev').replace(/\/$/, '');
   const today = new Date().toISOString().slice(0, 10);
 
-  const collections = ['problems', 'standards', 'compare', 'migrate', 'build'] as const;
+  const collections = ['problems', 'standards', 'compare', 'migrate', 'build', 'erc'] as const;
   const collectionUrls: { url: string; updated: string }[] = [];
 
   for (const collection of collections) {
@@ -25,6 +26,7 @@ export const GET: APIRoute = async ({ site }) => {
       compare: '/standards/compare/',
       migrate: '/build/migrate/',
       build: '/build/',
+      erc: '/',
     }[collection];
 
     for (const entry of entries) {
@@ -46,7 +48,7 @@ export const GET: APIRoute = async ({ site }) => {
     <loc>${origin}${url}</loc>
     <lastmod>${updated}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>${url === '/' ? '1.0' : '0.8'}</priority>
+    <priority>${url === '/' || url === '/erc-20/' ? '1.0' : '0.8'}</priority>
   </url>`,
     )
     .join('\n');

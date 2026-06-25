@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import ErcExplainer from '~/layouts/ErcExplainer.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('erc');
+  return entries.map((entry) => ({
+    params: { erc: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+<ErcExplainer entry={entry}>
+  <Content />
+</ErcExplainer>

@@ -101,7 +101,13 @@ const comparePath = `/standards/compare/${slug}/`;
       <ul>
         {data.related.map((r: string) => {
           const [coll, ...rest] = r.split('/');
-          return <li><Crossref href={`/${coll}/${rest.join('/')}/`}>{rest.join('/')}</Crossref></li>;
+          const targetSlug = rest.join('/');
+          const href =
+            coll === 'erc' ? `/${targetSlug}/`
+            : coll === 'migrate' ? `/build/migrate/${targetSlug}/`
+            : coll === 'compare' ? `/standards/compare/${targetSlug}/`
+            : `/${coll}/${targetSlug}/`;
+          return <li><Crossref href={href}>{targetSlug}</Crossref></li>;
         })}
       </ul>
     </section>
