@@ -27,15 +27,23 @@ const filtered = items.filter(i => i.depth >= 2 && i.depth <= 3);
     font-family: var(--font-mono);
     font-size: var(--t-mono-xs);
     color: var(--ink-fog);
+    line-height: 1.5;
   }
-  ol { display: grid; gap: var(--s-2); }
+  ol { display: grid; gap: var(--s-3); }
+  li { line-height: 1.4; }
   .toc a {
     color: var(--ink-fog);
     border-bottom: 1px solid transparent;
+    display: inline-block;
+    padding: 2px 0;
   }
   .toc a:hover, .toc a:focus-visible {
     color: var(--ink-bone);
     border-color: var(--ink-line);
   }
-  .d-3 { padding-left: var(--s-3); }
+  .d-3 {
+    padding-left: var(--s-3);
+    border-left: 1px solid var(--ink-line);
+    margin-left: 2px;
+  }
 </style>

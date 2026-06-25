@@ -112,23 +112,26 @@ const updatedStr = data.updated
   : null;
 
 const toc = [
-  { depth: 2, text: 'What is ERC-20?',          slug: 'what-is-erc-20' },
+  { depth: 2, text: `What is ${data.title}?`,   slug: 'what-is-erc-20' },
   { depth: 2, text: 'At a glance',              slug: 'at-a-glance' },
-  { depth: 2, text: 'The origin story',         slug: 'origin' },
-  { depth: 2, text: `What ${data.title} actually is`, slug: 'the-spec' },
+  { depth: 2, text: 'Origin story',             slug: 'origin' },
+  { depth: 2, text: 'The spec',                 slug: 'the-spec' },
   { depth: 2, text: "What's broken",            slug: 'whats-broken' },
   ...((data.limits ?? []).map((l: any) => ({
     depth: 3,
-    text: l.title.replace(/\.$/, ''),
+    text: l.title.replace(/^The\s+/, '').replace(/\.$/, ''),
     slug: slugify(l.title),
   }))),
-  { depth: 2, text: "Vogelsteller's second act", slug: 'vogelsteller-pivot' },
+  { depth: 2, text: 'The second act',           slug: 'vogelsteller-pivot' },
   ...(data.compareRows?.length
     ? [{ depth: 2, text: `${data.title} vs LSP-7`, slug: 'compare' }]
     : []),
   { depth: 2, text: 'When to use which',        slug: 'when-to-use-which' },
   ...(data.faqs?.length
     ? [{ depth: 2, text: 'FAQ', slug: 'faq' }]
+    : []),
+  ...(data.primarySources?.length
+    ? [{ depth: 2, text: 'Sources', slug: 'sources' }]
     : []),
   { depth: 2, text: 'Keep reading',             slug: 'keep-reading' },
 ];
@@ -1044,16 +1047,34 @@ const toc = [
 
   /* ── sticky page-corner TOC (only wide viewports) ─────────────────── */
   .toc-fixed { display: none; }
-  @media (min-width: 1320px) {
+
+  /* When the sticky right rail is visible, reserve room on the right of every
+     band so content never extends underneath it. The TOC sits in the freed
+     gutter, aligned with the container's right edge. */
+  @media (min-width: 1380px) {
+    .erc-page {
+      --toc-width: 240px;
+      --toc-gap: 40px;
+      --toc-gutter: calc(var(--toc-width) + var(--toc-gap));
+    }
+    .erc-page .hero-inner,
+    .erc-page .band-inner,
+    .erc-page .authorship-wrap {
+      padding-right: var(--toc-gutter);
+    }
     .toc-fixed {
       display: block;
       position: fixed;
       top: 96px;
-      right: max(24px, calc((100vw - var(--container)) / 2 - 220px));
-      width: 200px;
+      /* Align TOC's right edge with the right edge of .band-inner (the centered
+         container). band-inner sits inside .band (24px horizontal padding) so we
+         compute the side gutter from viewport math. */
+      right: max(var(--s-5), calc((100vw - var(--container)) / 2));
+      width: var(--toc-width);
       max-height: calc(100vh - 140px);
       overflow-y: auto;
       z-index: 5;
+      padding-right: var(--s-2);
     }
     .toc-disclose { display: none; }
   }

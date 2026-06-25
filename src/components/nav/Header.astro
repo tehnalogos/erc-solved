@@ -4,6 +4,7 @@ import Wordmark from '~/components/brand/Wordmark.astro';
 const pathname = Astro.url.pathname;
 const nav = [
   { label: 'Problems', href: '/problems/' },
+  { label: 'Explainers', href: '/erc/' },
   { label: 'Standards', href: '/standards/' },
   { label: 'Build', href: '/build/' },
 ];
@@ -102,7 +103,7 @@ const isActive = (href: string) =>
       width: 100%;
       min-width: 0;
       display: grid;
-      grid-template-columns: repeat(3, max-content) minmax(0, 1fr);
+      grid-template-columns: repeat(4, max-content) minmax(0, 1fr);
       gap: var(--s-4);
     }
     .search-trigger {
@@ -112,9 +113,10 @@ const isActive = (href: string) =>
     }
   }
 
-  @media (max-width: 430px) {
+  @media (max-width: 560px) {
     nav {
-      grid-template-columns: repeat(3, max-content);
+      grid-template-columns: repeat(4, max-content);
+      gap: var(--s-3);
     }
     .search-trigger {
       grid-column: 1 / -1;
