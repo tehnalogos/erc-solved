@@ -7,7 +7,6 @@ updated: 2026-06-22
 verdict:
   useLeft: "When IDs are sequential, metadata is immutable, and the contract is built to be consumed by code that hardcodes the ERC-721 ABI. ERC-721 is the smaller surface — fewer bytes, simpler reasoning, no force flag or data payload to decide on."
   useRight: "When the token ID itself needs to carry meaning (hash, serial, structured reference), per-token state mutates after mint, or recipient logic needs to fire on transfer through LSP1 — not as an opt-in `safeTransferFrom` variant."
-  neither: "A purely on-chain SVG generator with immutable traits — ERC-721 is sufficient and LSP8's per-token data surface adds no behavior you'd use."
 matrix:
   - row: "token ID type"
     left: "uint256"

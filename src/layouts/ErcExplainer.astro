@@ -1,5 +1,8 @@
 ---
+import { marked } from 'marked';
 import Base from './Base.astro';
+
+const md = (s?: string) => (s ? marked.parse(s) : '');
 import Authorship from '~/components/primitives/Authorship.astro';
 import StandardChip from '~/components/brand/StandardChip.astro';
 import SpecBlock from '~/components/primitives/SpecBlock.astro';
@@ -32,7 +35,7 @@ const aboutTerms = [
   'EVM token standard',
   'LUKSO',
   'LSP standards',
-  ...data.standardAuthors,
+  ...(data.standardAuthors ?? []),
 ];
 
 const keywords = [
@@ -42,7 +45,7 @@ const keywords = [
   `${data.title} standard`,
   `${data.title} explained`,
   `${data.title} vs LSP7`,
-  ...data.standardAuthors,
+  ...(data.standardAuthors ?? []),
 ];
 
 const personLd = data.personSchema ? personJsonLd(data.personSchema) : null;
@@ -111,6 +114,14 @@ const updatedStr = data.updated
   ? new Date(data.updated).toISOString().slice(0, 10)
   : null;
 
+// Graceful-degradation flags for topic pages (entries that aren't a single
+// ERC standard — e.g. /gasless-transactions/). The chip-row, spec section,
+// and comparison table all skip ERC-specific pieces when not applicable.
+const hasIdChip = !isNaN(Number(data.id));
+const hasEip = !!data.eipNumber;
+const hasAuthors = (data.standardAuthors ?? []).length > 0;
+const hasAbi = !!data.abi;
+
 // Pivot framing — the "what LUKSO built instead" section. Defaults are
 // honest for any ERC; entries can override (e.g. /erc-20/, where Vogelsteller
 // IS the author of the ERC, gets a more personal "the author's second act"
@@ -126,7 +137,7 @@ const pivotParts = pivot.headline.split(
 );
 
 const toc = [
-  { depth: 2, text: `What is ${data.title}?`,   slug: 'what-is-erc-20' },
+  { depth: 2, text: `What is ${data.title}?`,   slug: 'what-it-is' },
   { depth: 2, text: 'At a glance',              slug: 'at-a-glance' },
   { depth: 2, text: 'Origin story',             slug: 'origin' },
   { depth: 2, text: 'The spec',                 slug: 'the-spec' },
@@ -166,9 +177,9 @@ const toc = [
     data-pagefind-body
     data-pagefind-meta={`title:${data.title}`}
   >
-    <section class="hero has-halo" id="what-is-erc-20">
+    <section class="hero has-halo" id="what-it-is">
       <div class="hero-inner">
-        <span class="eyebrow">the standard · since {data.proposed}</span>
+        <span class="eyebrow">{data.proposed ? `the standard · since ${data.proposed}` : 'the topic'}</span>
 
         <div class="boot" aria-label="status">
           <span class="typed">
@@ -188,13 +199,23 @@ const toc = [
 
         <p class="tagline">{data.tagline}</p>
 
-        <div class="chip-row">
-          <StandardChip kind="erc" id={data.id} />
-          {data.eipNumber && <span class="sep">·</span>}
-          {data.eipNumber && <span class="eip">{data.eipNumber}</span>}
-          <span class="sep">·</span>
-          <span class="authors">by {data.standardAuthors.join(' + ')}</span>
-        </div>
+        {(hasIdChip || hasEip || hasAuthors) && (
+          <div class="chip-row">
+            {hasIdChip && <StandardChip kind="erc" id={data.id} />}
+            {hasEip && (
+              <>
+                {hasIdChip && <span class="sep">·</span>}
+                <span class="eip">{data.eipNumber}</span>
+              </>
+            )}
+            {hasAuthors && (
+              <>
+                {(hasIdChip || hasEip) && <span class="sep">·</span>}
+                <span class="authors">by {data.standardAuthors.join(' + ')}</span>
+              </>
+            )}
+          </div>
+        )}
 
         {updatedStr && (
           <p class="meta-line">
@@ -213,9 +234,9 @@ const toc = [
           </aside>
         )}
 
-        <div class="lede prose" data-reveal>
-          <slot name="lede" />
-        </div>
+        {data.lede && (
+          <div class="lede prose" data-reveal set:html={md(data.lede)} />
+        )}
 
         <div class="cta-row" data-reveal>
           <a class="cta magnetic" href="#whats-broken">
@@ -288,9 +309,9 @@ const toc = [
       <div class="band-inner">
         <span class="eyebrow">how the standard came to be</span>
         <h2>The origin story.<a class="anchor" href="#origin" aria-label="Link to this section">#</a></h2>
-        <div class="prose">
-          <slot name="origin" />
-        </div>
+        {data.origin && (
+          <div class="prose" set:html={md(data.origin)} />
+        )}
 
         {data.timeline?.length > 0 && (
           <ol class="timeline" data-reveal>
@@ -313,9 +334,11 @@ const toc = [
 
     <section class="band" id="the-spec">
       <div class="band-inner">
-        <span class="eyebrow">the spec, end to end</span>
-        <h2>What {data.title} actually is.<a class="anchor" href="#the-spec" aria-label="Link to this section">#</a></h2>
-        <SpecBlock chip={data.title} chipKind="erc" caption={`${data.eipNumber ?? data.title} interface`} lang="solidity">{data.abi}</SpecBlock>
+        <span class="eyebrow">{hasAbi ? 'the spec, end to end' : 'the stack, end to end'}</span>
+        <h2>{hasAbi ? `What ${data.title} actually is.` : `How ${data.title} actually works.`}<a class="anchor" href="#the-spec" aria-label="Link to this section">#</a></h2>
+        {hasAbi && (
+          <SpecBlock chip={data.title} chipKind="erc" caption={`${data.eipNumber ?? data.title} interface`} lang="solidity">{data.abi}</SpecBlock>
+        )}
 
         {data.interfaceDiagram?.length > 0 && (
           <figure class="iface" aria-label={`${data.title} interface, grouped`}>
@@ -341,9 +364,9 @@ const toc = [
           </figure>
         )}
 
-        <div class="prose">
-          <slot name="spec" />
-        </div>
+        {data.spec && (
+          <div class="prose" set:html={md(data.spec)} />
+        )}
       </div>
     </section>
 
@@ -351,9 +374,9 @@ const toc = [
       <div class="band-inner">
         <span class="eyebrow">the integration tax</span>
         <h2>What's broken about {data.title}.<a class="anchor" href="#whats-broken" aria-label="Link to this section">#</a></h2>
-        <div class="prose lede-prose">
-          <slot name="whatsBroken" />
-        </div>
+        {data.whatsBroken && (
+          <div class="prose lede-prose" set:html={md(data.whatsBroken)} />
+        )}
 
         <ol class="limits">
           {data.limits.map((lim: any, i: number) => {
@@ -390,7 +413,7 @@ const toc = [
       <section class="band author-criticism-band" id="author-criticism">
         <div class="band-inner">
           <span class="eyebrow">criticism from the source</span>
-          <h2>What an {data.title} co-author said about the standard.<a class="anchor" href="#author-criticism" aria-label="Link to this section">#</a></h2>
+          <h2>What {data.title} co-authors said about the standard.<a class="anchor" href="#author-criticism" aria-label="Link to this section">#</a></h2>
           <p class="ac-intro">{data.authorCriticism.intro}</p>
 
           <ol class="ac-list">
@@ -402,7 +425,7 @@ const toc = [
                   <blockquote class="ac-quote">
                     <p>{item.quote}</p>
                     <footer class="ac-attribution">
-                      — {data.authorCriticism.authorName}, <a href={data.authorCriticism.sourceUrl} rel="noopener noreferrer" target="_blank">{data.authorCriticism.sourceLabel}</a>
+                      — {item.authorName ?? data.authorCriticism.authorName}, <a href={item.sourceUrl ?? data.authorCriticism.sourceUrl} rel="noopener noreferrer" target="_blank">{item.sourceLabel ?? data.authorCriticism.sourceLabel}</a>
                     </footer>
                   </blockquote>
                   <div class="ac-solution">
@@ -439,9 +462,9 @@ const toc = [
             ? <span class="pink">{part}</span>
             : part
         ))}<a class="anchor" href="#vogelsteller-pivot" aria-label="Link to this section">#</a></h2>
-        <div class="prose">
-          <slot name="vogelsteller" />
-        </div>
+        {data.vogelsteller && (
+          <div class="prose" set:html={md(data.vogelsteller)} />
+        )}
 
         <ul class="routes" data-reveal>
           {data.luksoRoutes.map((r: any) => (
@@ -468,7 +491,11 @@ const toc = [
               <thead>
                 <tr>
                   <th class="row-label">row</th>
-                  <th class="left"><StandardChip kind="erc" id={data.id} /></th>
+                  <th class="left">
+                    {hasIdChip
+                      ? <StandardChip kind="erc" id={data.id} />
+                      : <span class="erc-fallback-chip">Ethereum</span>}
+                  </th>
                   <th class="right"><StandardChip kind="lsp" id="7" /></th>
                 </tr>
               </thead>
@@ -1089,6 +1116,15 @@ const toc = [
   .compare thead th { background: var(--ink-black); }
   .compare tbody tr:last-child td { border-bottom: none; }
   .compare .row-label { color: var(--ink-fog); white-space: nowrap; }
+  .erc-fallback-chip {
+    padding: 2px var(--s-2);
+    border: 1px solid var(--erc-sand);
+    color: var(--erc-sand);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    line-height: 1.4;
+    white-space: nowrap;
+  }
   .compare .left { color: var(--ink-bone-dim); }
   .compare .right { color: var(--ink-bone); }
   .compare code {

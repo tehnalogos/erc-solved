@@ -405,95 +405,45 @@ authorCriticism:
       quote: "With the ledger model, it's hard to know who should pay this rent. For example, the CryptoKitties contract represents tens of thousands of players with almost two million Kitties and over 111MB of on-chain data. Ethereum provides no way of fairly charging rent to all those Kitty owners."
       lsps: ["ERC-725Y", "LSP4", "LSP5"]
       solution: "ERC-725Y is the typed key-value storage substrate every LUKSO account and asset is built on. LSP4 defines per-asset metadata under ERC-725Y on the asset itself; per-token data lives there too via getDataForTokenId. LSP5 keeps standardised records of received assets on the owner's account. Storage sits with whichever entity actually reads and pays for it — the asset, the per-token slot, or the owner — instead of all of it accumulating in one central per-contract mapping that nobody can fairly charge for."
+
+lede: |
+  ERC-721 is the standard that made Ethereum the home of the NFT — every CryptoPunk, every Bored Ape, every art drop, every PFP collection speaks the same nine-function interface that Dieter Shirley first drafted in September 2017 and that William Entriken led to final specification on 24 January 2018. That minimalism is exactly why so much built on top of it, and exactly why every team since has paid an integration tax for metadata that goes offline, approvals that drain entire collections, and safe-transfer hooks that the spec itself describes as a deliberate "caller-control" tradeoff. This page walks the history, the ABI, the limits people keep working around, and the LSP8 standard the author of ERC-20 designed instead.
+
+origin: |
+  On **22 September 2017**, [Dieter Shirley](https://github.com/dete) — then CTO at **Dapper Labs** — opened [GitHub issue #721](https://github.com/ethereum/EIPs/issues/721) on the Ethereum repository with a draft proposal for a *non-fungible* token standard. The team at Dapper Labs was a few months from launching **CryptoKitties**, and the spec was the substrate they needed: a way for each kitty to be a uniquely-owned on-chain object with its own provenance, transferable through the same primitives that ERC-20 had standardized for fungible balances.
+
+  CryptoKitties [launched on 28 November 2017](https://en.wikipedia.org/wiki/CryptoKitties) — between Shirley's draft and the spec's finalization — and immediately demonstrated both the thesis and the limits. The thesis: people would pay real money for unique on-chain assets. The limit: ERC-721's one-transfer-per-token model meant the viral growth congested Ethereum, with the network briefly overwhelmed by kitty breeding and trading.
+
+  Over the next few months [William Entriken](https://github.com/fulldecent) took on the lead-author role, joined by Shirley, Jacob Evans, and Nastassia Sachs, and [EIP-721 was finalized on 24 January 2018](https://eips.ethereum.org/EIPS/eip-721). Entriken's framing — visible in his [later interviews](https://www.coingecko.com/learn/spotlight-3-william-entriken) and in his GitHub bio ("Lead author of ERC-721") — was that he had deliberately designed "a minimal standard which is ERC-721," after studying use cases that went well beyond the cat-collecting example: government assets, identities, physical goods, provenance.
+
+  > The minimum interface is a feature, not a limitation. It is what made the rest of the NFT economy possible — the same interface used by CryptoKitties is the one used by Punks, Bored Apes, Art Blocks, and every collection since.
+
+  The cost shows up in the parts the spec deliberately left to the application layer. The Rationale section of EIP-721 is honest about one of these tradeoffs:
+
+  > Different functions are used for `transfer` and `safeTransferFrom` to give the caller control over their risk.
+
+  That is the authors saying, in plain text, that the safety hook is opt-in by design. The rest of this page is about what each "control over their risk" delegation has cost the people building on the standard since — and how one of the co-authors (Shirley) has framed those costs in retrospect, in the dedicated **Criticism from the source** section below.
+
+spec: |
+  The mental model is small: an **ownership map** (`ownerOf`), a way to **move ownership** (`transferFrom` / `safeTransferFrom`), a way to **delegate authority** (per-token `approve` or collection-wide `setApprovalForAll`), and three **events** so the chain can be indexed. The optional metadata extension adds the `tokenURI(tokenId)` that returns a string — typically a URL pointing to off-chain JSON. EIP-721 mandates **ERC-165** (`supportsInterface`) so consumers can ask a contract whether it implements the NFT interface before calling into it. The canonical specification is at [eips.ethereum.org/EIPS/eip-721](https://eips.ethereum.org/EIPS/eip-721).
+
+whatsBroken: |
+  Five gaps, in order of how often they cost users money or render their collections unviewable. Each one has produced its own follow-on EIP, its own marketplace policy fight, its own startup. None of those follow-ons fix the substrate.
+
+vogelsteller: |
+  ERC-721's authors did exactly what a minimum-interface standard is supposed to do — they shipped a primitive small enough to be adopted everywhere, and explicit about the parts they were leaving to application code. The downside is the downside of every minimum spec: every gap turns into a known problem the rest of the industry pays for forever.
+
+  [**Fabian Vogelsteller**](https://github.com/frozeman) had already lived this once. He wrote [ERC-20](/erc-20/) in November 2015 and watched the same dynamic play out on the fungible side: a minimum interface that won the network effect, plus six years of layered EIPs trying to patch what the substrate didn't say. When he co-founded **LUKSO** with Marjorie Hernandez in 2017 — the same year Shirley drafted ERC-721 — the thesis was direct: design the *surrounding system* that a minimum interface deliberately can't specify.
+
+  For non-fungible tokens, that surrounding system is **LSP8**. The structural moves are small and deliberate:
+
+  - **`bytes32` tokenIds.** The integer case still works — cast a `uint256` and proceed. The new cases (content hashes, encoded serials, structured references) become first-class instead of side mappings. The ID becomes a typed value, not a counter pretending to be a name.
+  - **Per-token ERC-725Y data**, via `getDataForTokenId(tokenId, key)`. The metadata stops being a URL behind a server you don't control. It's a typed key-value graph on-chain, dynamic updates are `setData` calls gated by [**LSP6**](/standards/lsp6-key-manager/) account permissions, and off-chain media still works — with `VerifiableURI` when you want hash-anchored integrity.
+  - **Receiver hooks via [LSP1](/standards/lsp1-universal-receiver/) on every transfer**, not only on the opt-in `safeTransferFrom` variant. One hook, every asset type, declared policy.
+  - **Operator authorization scoped per token** and gated through [LSP6](/standards/lsp6-key-manager/) on the account side. The collection-wide `setApprovalForAll` pattern simply doesn't exist; an operator can be authorized for a specific tokenId, with the controller doing the authorization itself bound by named, revocable permissions.
+
+  [LUKSO mainnet went live in 2023](https://docs.lukso.tech/). LSP8 is an EVM contract — it doesn't require the LUKSO chain to run; it requires the LUKSO chain to *cohere*. On Ethereum, an LSP8 contract works, but every marketplace and indexer around it still expects ERC-721's ABI. On LUKSO, the substrate matches the standard: [Universal Profiles](/standards/lsp0-erc725-account/) hold the assets, [LSP6](/standards/lsp6-key-manager/) authorizes the operators, [LSP1](/standards/lsp1-universal-receiver/) routes the transfer hooks, [LSP4](/standards/lsp4-digital-asset-metadata/) holds the metadata, and a non-fungible token finally gets to live in a system designed for it instead of one bolted on.
+
+  The funnel for this site is not "switch to LUKSO." It is: when your ERC-721 design is breaking down at the seams the spec deliberately ignored — dead tokenURIs, drained collections from `setApprovalForAll` phishing, stranded NFTs in non-receiver-aware contracts, gas tax on every per-token transfer, the three shortcomings Shirley named in retrospect — there is a standards suite that designed those concerns in from the bottom. Built, notably, by the same person who wrote the original ERC-20.
 ---
 
-{/* ─── slot: lede (renders in the hero) ─────────────────────────────────── */}
-<Fragment slot="lede">
-
-ERC-721 is the standard that made Ethereum the home of the NFT — every CryptoPunk, every Bored Ape, every art drop, every PFP collection speaks the same nine-function interface that Dieter Shirley first drafted in September 2017 and that William Entriken led to final specification on 24 January 2018. That minimalism is exactly why so much built on top of it, and exactly why every team since has paid an integration tax for metadata that goes offline, approvals that drain entire collections, and safe-transfer hooks that the spec itself describes as a deliberate "caller-control" tradeoff. This page walks the history, the ABI, the limits people keep working around, and the LSP8 standard the author of ERC-20 designed instead.
-
-</Fragment>
-
-{/* ─── slot: origin ──────────────────────────────────────────────────── */}
-<Fragment slot="origin">
-
-On **22 September 2017**, [Dieter Shirley](https://github.com/dete) — then CTO at **Dapper Labs** — opened [GitHub issue #721](https://github.com/ethereum/EIPs/issues/721) on the Ethereum repository with a draft proposal for a *non-fungible* token standard. The team at Dapper Labs was a few months from launching **CryptoKitties**, and the spec was the substrate they needed: a way for each kitty to be a uniquely-owned on-chain object with its own provenance, transferable through the same primitives that ERC-20 had standardized for fungible balances.
-
-CryptoKitties [launched on 28 November 2017](https://en.wikipedia.org/wiki/CryptoKitties) — between Shirley's draft and the spec's finalization — and immediately demonstrated both the thesis and the limits. The thesis: people would pay real money for unique on-chain assets. The limit: ERC-721's one-transfer-per-token model meant the viral growth congested Ethereum, with the network briefly overwhelmed by kitty breeding and trading.
-
-Over the next few months [William Entriken](https://github.com/fulldecent) took on the lead-author role, joined by Shirley, Jacob Evans, and Nastassia Sachs, and [EIP-721 was finalized on 24 January 2018](https://eips.ethereum.org/EIPS/eip-721). Entriken's framing — visible in his [later interviews](https://www.coingecko.com/learn/spotlight-3-william-entriken) and in his GitHub bio ("Lead author of ERC-721") — was that he had deliberately designed "a minimal standard which is ERC-721," after studying use cases that went well beyond the cat-collecting example: government assets, identities, physical goods, provenance.
-
-> The minimum interface is a feature, not a limitation. It is what made the rest of the NFT economy possible — the same interface used by CryptoKitties is the one used by Punks, Bored Apes, Art Blocks, and every collection since.
-
-The cost shows up in the parts the spec deliberately left to the application layer. The Rationale section of EIP-721 is honest about one of these tradeoffs:
-
-> Different functions are used for `transfer` and `safeTransferFrom` to give the caller control over their risk.
-
-That is the authors saying, in plain text, that the safety hook is opt-in by design. The rest of this page is about what each "control over their risk" delegation has cost the people building on the standard since.
-
-### What one of the authors said in retrospect
-
-Two years after EIP-721 was finalized, **Dieter Shirley** — one of the four co-authors and CTO of Dapper Labs (the team that built CryptoKitties, the standard's launch use case) — revisited the design in [a March 2020 Medium essay titled "Resource-Oriented Programming: A Better Model for Digital Ownership"](https://medium.com/dapperlabs/resource-oriented-programming-bee4d69c8f8e). Shirley's retrospective is the most concrete on-the-record author criticism of the standard's architecture. Three direct quotes:
-
-On the ownership-model assumption:
-
-> ERC-721 defines an ownership model for NFTs that assumes that only Ethereum addresses can own an NFT. However, the idea of an asset itself owning other assets (like a CryptoKitty owning a nifty pair of sunglasses) is very interesting in some use cases, and required a new specification (ERC-998) to be created. ERC-998 is very powerful, but it's also much more complicated than ERC-721.
-
-On the retroactive-immutability problem:
-
-> Implementing it [ERC-998] properly is very difficult, and retroactively applying its features to existing ERC-721 assets is effectively impossible due to the immutable nature of Ethereum smart contracts.
-
-On the central-ledger storage model (CryptoKitties as the concrete example):
-
-> With the ledger model, it's hard to know who should pay this rent. For example, the CryptoKitties contract represents tens of thousands of players with almost two million Kitties and over 111MB of on-chain data. Ethereum provides no way of fairly charging rent to all those Kitty owners.
-
-Three different framings of the same underlying complaint: the ownership architecture assumes a flat address space, the contract is immutable so the model can't be revisited later, and the central per-contract ownership ledger is the wrong place to assign per-asset storage cost. The other three co-authors (Entriken, Evans, Sachs) don't have an equivalent retrospective criticism on the record — so for them, the strongest "what the authors said" material remains the EIP-721 Rationale section itself, quoted above.
-
-</Fragment>
-
-{/* ─── slot: spec (after the SpecBlock) ─────────────────────────────── */}
-<Fragment slot="spec">
-
-The mental model is small: an **ownership map** (`ownerOf`), a way to **move ownership** (`transferFrom` / `safeTransferFrom`), a way to **delegate authority** (per-token `approve` or collection-wide `setApprovalForAll`), and three **events** so the chain can be indexed. The optional metadata extension adds the `tokenURI(tokenId)` that returns a string — typically a URL pointing to off-chain JSON. EIP-721 mandates **ERC-165** (`supportsInterface`) so consumers can ask a contract whether it implements the NFT interface before calling into it. The canonical specification is at [eips.ethereum.org/EIPS/eip-721](https://eips.ethereum.org/EIPS/eip-721).
-
-</Fragment>
-
-{/* ─── slot: whatsBroken (intro paragraph before the limits list) ───── */}
-<Fragment slot="whatsBroken">
-
-Five gaps, in order of how often they cost users money or render their collections unviewable. Each one has produced its own follow-on EIP, its own marketplace policy fight, its own startup. None of those follow-ons fix the substrate.
-
-</Fragment>
-
-{/* ─── slot: vogelsteller (after the h2 in the second-act band) ─────── */}
-<Fragment slot="vogelsteller">
-
-ERC-721's authors did exactly what a minimum-interface standard is supposed to do — they shipped a primitive small enough to be adopted everywhere, and explicit about the parts they were leaving to application code. The downside is the downside of every minimum spec: every gap turns into a known problem the rest of the industry pays for forever.
-
-[**Fabian Vogelsteller**](https://github.com/frozeman) had already lived this once. He wrote [ERC-20](/erc-20/) in November 2015 and watched the same dynamic play out on the fungible side: a minimum interface that won the network effect, plus six years of layered EIPs trying to patch what the substrate didn't say. When he co-founded **LUKSO** with Marjorie Hernandez in 2017 — the same year Shirley drafted ERC-721 — the thesis was direct: design the *surrounding system* that a minimum interface deliberately can't specify.
-
-For non-fungible tokens, that surrounding system is **LSP8**. The structural moves are small and deliberate:
-
-- **`bytes32` tokenIds.** The integer case still works — cast a `uint256` and proceed. The new cases (content hashes, encoded serials, structured references) become first-class instead of side mappings. The ID becomes a typed value, not a counter pretending to be a name.
-- **Per-token ERC-725Y data**, via `getDataForTokenId(tokenId, key)`. The metadata stops being a URL behind a server you don't control. It's a typed key-value graph on-chain, dynamic updates are `setData` calls gated by [**LSP6**](/standards/lsp6-key-manager/) account permissions, and off-chain media still works — with `VerifiableURI` when you want hash-anchored integrity.
-- **Receiver hooks via [LSP1](/standards/lsp1-universal-receiver/) on every transfer**, not only on the opt-in `safeTransferFrom` variant. One hook, every asset type, declared policy.
-- **Operator authorization scoped per token** and gated through [LSP6](/standards/lsp6-key-manager/) on the account side. The collection-wide `setApprovalForAll` pattern simply doesn't exist; an operator can be authorized for a specific tokenId, with the controller doing the authorization itself bound by named, revocable permissions.
-
-[LUKSO mainnet went live in 2023](https://docs.lukso.tech/). LSP8 is an EVM contract — it doesn't require the LUKSO chain to run; it requires the LUKSO chain to *cohere*. On Ethereum, an LSP8 contract works, but every marketplace and indexer around it still expects ERC-721's ABI. On LUKSO, the substrate matches the standard: [Universal Profiles](/standards/lsp0-erc725-account/) hold the assets, [LSP6](/standards/lsp6-key-manager/) authorizes the operators, [LSP1](/standards/lsp1-universal-receiver/) routes the transfer hooks, [LSP4](/standards/lsp4-digital-asset-metadata/) holds the metadata, and a non-fungible token finally gets to live in a system designed for it instead of one bolted on.
-
-### What Shirley diagnosed in 2020, and the LSP that addresses it
-
-The three specific shortcomings Shirley named in [his March 2020 retrospective](https://medium.com/dapperlabs/resource-oriented-programming-bee4d69c8f8e) map directly onto the LUKSO account stack:
-
-- **"ERC-721 defines an ownership model for NFTs that assumes that only Ethereum addresses can own an NFT" — composable arrangements required the ERC-998 extension, which is "much more complicated than ERC-721."**
-  &nbsp;&nbsp;→ [**LSP0 Universal Profile**](/standards/lsp0-erc725-account/) + [**LSP8**](/standards/lsp8-identifiable-digital-asset/). On LUKSO, accounts *are* contracts. An NFT can be owned by a Universal Profile that itself owns other Universal Profiles or assets, and ownership relationships compose without a separate "composable" extension on top. The thing ERC-998 had to bolt on is the substrate's default.
-
-- **"Retroactively applying its features to existing ERC-721 assets is effectively impossible due to the immutable nature of Ethereum smart contracts."**
-  &nbsp;&nbsp;→ [**LSP17 Contract Extension**](/standards/lsp17-contract-extension/) + [**LSP6 Key Manager**](/standards/lsp6-key-manager/) + [**LSP14 Ownable 2-Step**](/standards/lsp14-ownable-2-step/). Extension is a first-class standard at the account layer; the Key Manager is replaceable; ownership transitions and renunciation have a defined lifecycle. The "we deployed it, now it's frozen" problem is treated as substrate, not as an irreversible accident.
-
-- **"With the ledger model, it's hard to know who should pay this rent ... Ethereum provides no way of fairly charging rent to all those Kitty owners." (Shirley cites the live CryptoKitties contract: ~2M Kitties, 111MB of on-chain data, all in one central per-contract mapping.)**
-  &nbsp;&nbsp;→ **ERC-725Y** (the typed key-value substrate) + [**LSP4 Digital Asset Metadata**](/standards/lsp4-digital-asset-metadata/) + [**LSP5 Received Assets**](/standards/lsp5-received-assets/). Per-token data lives under ERC-725Y on the asset itself; the owner side keeps standardised records of what it holds through LSP5. Storage cost sits with whichever entity actually reads and pays for that storage, instead of all of it accumulating in one central per-contract mapping.
-
-The funnel for this site is not "switch to LUKSO." It is: when your ERC-721 design is breaking down at the seams the spec deliberately ignored — dead tokenURIs, drained collections from `setApprovalForAll` phishing, stranded NFTs in non-receiver-aware contracts, gas tax on every per-token transfer, the three Shirley named in retrospect — there is a standards suite that designed those concerns in from the bottom. Built, notably, by the same person who wrote the original ERC-20.
-
-</Fragment>

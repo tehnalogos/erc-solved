@@ -1,0 +1,390 @@
+---
+id: "gasless"
+title: "Gasless Transactions"
+headline: "What are gasless transactions on Ethereum?"
+pageTitle: "Gasless Transactions on Ethereum: The Stack, The Failure Modes, and What LUKSO Designed Instead"
+description: "A field guide to gasless transactions on Ethereum and EVM L2s in 2026 — the layered standards (ERC-2771, ERC-4337, EIP-7702), the production infrastructure (Pimlico, ZeroDev, Biconomy, Alchemy, OpenGSN, OpenZeppelin Defender, Gelato), the structural failure modes that have kept the consumer-app market out of reach for nearly a decade, on-the-record criticism from the standards' own maintainers, and the LUKSO LSP25 + LSP15 + LSP6 + LSP0 stack designed to break through the bottleneck."
+tagline: "Sponsored execution — the consumer-app UX every wallet has been promising. And why it hasn't broken through."
+bootStrip: "topic · layered since 2017 · still unsolved · ready"
+aliases:
+  - "sponsored transactions"
+  - "meta transactions"
+  - "gasless onboarding"
+  - "account abstraction UX"
+  - "user pays no gas"
+  - "transaction sponsorship"
+  - "relayed transactions"
+updated: 2026-06-26
+
+pivot:
+  eyebrow: "the LUKSO answer"
+  headline: "Why LUKSO breaks through the bottleneck."
+  highlight: "LUKSO"
+  tocLabel: "Why LUKSO breaks through"
+
+definition: "Gasless transactions are blockchain transactions where the user signs an intent off-chain and a third party (a relayer or bundler) submits it on-chain and pays the gas. On Ethereum and EVM L2s, gasless flows are layered patterns: ERC-2771 trusted forwarders (2020), ERC-4337 paymasters and bundlers (2021, mainnet 2023), and EIP-7702 EOA delegation (Pectra, May 2025) are the three deployed standards. None of them is a protocol-native gasless primitive — each is a workaround for Ethereum's EOA-first transaction model. On LUKSO, gasless execution is the substrate: LSP25 is a function on the Universal Profile account contract itself, with LSP15 standardising the off-chain relayer API."
+
+tldr: "Gasless transactions on Ethereum are real but expensive to ship: every protected contract has to opt in to ERC-2771, every smart account has to integrate ERC-4337 paymasters and bundlers, and EIP-7702 still leaves the original ECDSA key on a delegated EOA. The mass-consumer-app market has been 'six months away' for nearly a decade because the bottleneck isn't any single standard — it's the EOA-first protocol assumption every layered standard has tried to work around. LUKSO Universal Profiles ship gasless execution as a function on the account contract itself (LSP25), with a standardised relayer API (LSP15), no bundler, no paymaster contract, and no residual EOA key for an attacker to override recovery with."
+
+stats:
+  - k: "Topic"
+    v: "Gasless transactions on Ethereum and EVM L2s"
+  - k: "First standardised proposal"
+    v: "ERC-1613 (Tabookey GSN v1, Nov 2018)"
+    href: "https://eips.ethereum.org/EIPS/eip-1613"
+  - k: "Current Ethereum stack"
+    v: "ERC-2771 + ERC-4337 + EIP-7702"
+  - k: "Protocol-native gasless?"
+    v: "Ethereum: partial (EIP-7702, May 2025) · LUKSO: yes (LSP25, since 2023)"
+  - k: "Required (4337) infrastructure"
+    v: "EntryPoint + bundler + paymaster + validator module"
+  - k: "Production AA stack vendors"
+    v: "Pimlico · ZeroDev · Coinbase Smart Wallet · Safe · Alchemy · Biconomy"
+  - k: "LUKSO equivalent"
+    v: "LSP25 executeRelayCall + LSP15 Transaction Relay Service API"
+    href: "/standards/lsp25-execute-relay-call/"
+  - k: "Canonical comparison"
+    v: "ercsolved.dev / standards / compare / erc4337-lsp-stack"
+    href: "/standards/compare/erc4337-lsp-stack/"
+
+interfaceDiagram:
+  - group: "user side"
+    items: ["signer (controller key)", "intent payload", "EIP-712 signature"]
+  - group: "Ethereum · 2771"
+    items: ["ForwardRequest", "trusted forwarder", "_msgSender extraction"]
+  - group: "Ethereum · 4337"
+    items: ["UserOperation", "bundler", "EntryPoint", "paymaster"]
+  - group: "Ethereum · 7702"
+    items: ["AuthorisationList", "delegated EOA", "residual ECDSA key"]
+  - group: "LUKSO"
+    items: ["LSP25 executeRelayCall", "LSP15 relayer", "LSP6 permissions"]
+
+limits:
+  - title: "The bundler centralisation problem."
+    summary: "ERC-4337 UserOperations route through an alt-mempool that's much narrower than Ethereum's L1 mempool. In production (Aug 2026), Pimlico and Alchemy together carry the majority of mainnet UserOp volume; censorship, reordering, and MEV-extraction risk concentrate on a small number of bundler operators. ERC-4337's own lead maintainer Yoav Weiss has flagged centralisation as a known concern in public talks. Consumer cost: every gasless UX in your app depends on whichever bundlers your wallet vendor talks to staying up, uncensored, and not throttling your flow during a usage spike."
+    workarounds: ["multiple bundler RPCs with failover", "shared mempool projects (Skandha, Silius)", "self-hosted bundler (high SRE cost)"]
+    href: "/problems/erc4337-bundler-tax/"
+    from:
+      chip: "ERC-4337"
+      code: "handleOps(UserOperation[], beneficiary)"
+      tags: ["alt mempool", "bundler-concentrated", "censorship surface"]
+    to:
+      chip: "LSP25"
+      code: "account.executeRelayCall(sig, nonce, validity, payload)"
+      tags: ["normal L1 mempool", "no parallel infra", "relayer can't escalate"]
+
+  - title: "The paymaster trust + funding overhead."
+    summary: "Sponsoring gas on ERC-4337 means operating a paymaster contract (its own ETH deposit at EntryPoint, its own validatePaymasterUserOp, its own postOp accounting, its own DoS surface) — or renting one from Pimlico, Stackup, ZeroDev, Biconomy, Alchemy. Either path has ongoing OPEX and abuse-prevention runtime cost. Consumer cost: a product team shipping a gasless mobile app picks up per-transaction vendor fees plus monthly quotas plus per-paymaster integration code plus a gas-tank that needs ongoing top-ups plus a fraud-prevention layer to stop users from burning the paymaster's deposit on inflated gas estimates."
+    workarounds: ["vendor SaaS paymasters (per-tx fees + SLA)", "permissioned paymasters with allowlists", "user-pays-in-stablecoin via ERC-20 paymasters"]
+    from:
+      chip: "ERC-4337"
+      code: "Paymaster.validatePaymasterUserOp + postOp"
+      tags: ["separate contract", "own deposit", "two-step trust", "vendor fees"]
+    to:
+      chip: "LSP25"
+      code: "account.executeRelayCall(...)"
+      tags: ["one function on the account", "no paymaster contract", "relayer is infra"]
+
+  - title: "Validator-module fragmentation."
+    summary: "ERC-4337 deliberately left validateUserOp to each smart-account implementation. The result in 2026: ZeroDev Kernel, Safe, Biconomy Nexus, Coinbase Smart Wallet, and Alchemy LightAccount each ship their own validator shape. ERC-7579 and ERC-6900 are converging on modular-account standards — both are still Draft as of mid-2026. Permission auditing happens per-vendor; session-key SDKs are non-portable across wallets; and 'an AA wallet' does not share a permission vocabulary with another 'AA wallet'. Consumer cost: every consumer app integrates against each wallet's SDK separately; cross-wallet sessions don't exist; security review costs scale linearly with the number of wallets you support."
+    workarounds: ["ERC-7579 modular accounts (Draft)", "ERC-6900 modular accounts (Draft)", "per-vendor session-key SDKs"]
+    href: "/problems/wallet-permissions/"
+    from:
+      chip: "ERC-4337"
+      code: "validateUserOp() — per-account validator"
+      tags: ["non-standard", "wallet-specific", "session-key SDK per vendor"]
+    to:
+      chip: "LSP6"
+      code: "Key Manager (standardised permission bitfield)"
+      tags: ["AllowedCalls", "AllowedStandards", "AllowedERC725YDataKeys", "uniform across the LSP ecosystem"]
+
+  - title: "Hybrid 7702 account semantics — the residual key problem."
+    summary: "EIP-7702 (Pectra, May 2025) lets an EOA delegate execution to contract code, which unlocks ERC-4337 features (batching, gas sponsorship, session keys) without redeploying. But the original secp256k1 key never goes away. An attacker who compromises the EOA's private key can sign another 7702 authorisation, replace the delegation, and reset whatever recovery configuration the user had set. EIP-7851 (proposed Dec 2024 by Liyi Guo and Nicolas Consigny) extends 7702 with an ECDSA-disabled delegation prefix and a SETSELFDELEGATE opcode to let wallet code burn the residual ECDSA authority — but as of mid-2026 it remains a Draft. The 7702 spec itself also flags storage-collision risk when switching delegate implementations. Consumer cost: a 'smart wallet' UX built on 7702 still has an EOA key under the hood that, if stolen, bypasses every recovery and permission layer above it. That's not a UX you can hand to a non-technical user with a straight face."
+    workarounds: ["EIP-7851 (Draft, Dec 2024) — ECDSA revocation", "fresh contract account (ERC-4337 standalone, loses address history)", "hardware-wallet-rooted EOA"]
+    from:
+      chip: "EIP-7702"
+      code: "AuthorizationList + delegated EOA"
+      tags: ["residual ECDSA key", "storage collisions", "no authoritative recovery"]
+    to:
+      chip: "LSP0 + LSP6"
+      code: "Universal Profile (contract from genesis)"
+      tags: ["no residual key", "authoritative recovery", "Key Manager replaceable"]
+
+  - title: "Per-protocol contract opt-in — the ERC-2771 tax."
+    summary: "The ERC-2771 trusted-forwarder pattern (used by OpenGSN, OpenZeppelin Defender, Gelato Relay, Biconomy SDK) requires every recipient contract in the protected call graph to inherit ERC2771Context and replace every msg.sender reference with _msgSender(). Older OpenZeppelin contracts, third-party libraries, and custom modifiers that don't propagate the convention will silently see the forwarder address as the sender — which breaks permission logic in ways audit tools don't reliably catch. Consumer cost: integrating gasless via 2771 means auditing every contract in the call graph, paying for a security review of every msg.sender reference, and committing to the trusted-forwarder list as a long-lived governance surface. Most product teams shipping consumer apps don't have the bandwidth."
+    workarounds: ["OpenZeppelin ERC2771Context base class", "Custom static-analysis rules for msg.sender", "Migrate to ERC-4337 (different tax)"]
+    from:
+      chip: "ERC-2771"
+      code: "_msgSender() + per-contract opt-in"
+      tags: ["audit every contract", "library rewrite required", "trusted-forwarder governance"]
+    to:
+      chip: "LSP0 + LSP25"
+      code: "msg.sender == account, natively"
+      tags: ["zero contract changes", "no convention to enforce", "account is the entry point"]
+
+  - title: "Wallet and SDK fragmentation — the 8-vendor consumer-app problem."
+    summary: "There is no single 'ship a gasless consumer app on Ethereum' path. In 2026 a product team picks between: Pimlico (bundler + paymaster + AA SDK), ZeroDev Kernel (modular-account SDK), Coinbase Smart Wallet (closed-vertical), Safe (treasury heritage, AA via modules), Alchemy Account Kit (bundled with their RPC), and Biconomy Nexus (cross-chain unified gas tank). OpenGSN, OpenZeppelin Defender Relayer, and Gelato Relay sit alongside on the 2771 / generic-relayer side. Each ships its own SDK shape, pricing model, SLA, and chain coverage. Consumer cost: vendor lock-in is the default outcome; the alternative is an N-vendor abstraction layer the product team has to maintain. Compare this to integrating Stripe — there's basically one shape. Gasless on Ethereum is the opposite."
+    workarounds: ["abstraction layers (Privy, Dynamic, thirdweb)", "single-vendor commitment + migration risk", "wait for ERC-7579 / 6900 to consolidate"]
+    from:
+      chip: "Ethereum AA stack"
+      code: "6+ vendor SDKs, each different"
+      tags: ["vendor lock-in", "per-wallet integration", "per-vendor abuse rules"]
+    to:
+      chip: "LSP15"
+      code: "Transaction Relay Service API standard"
+      tags: ["one spec", "swappable implementations", "reference impl open-source"]
+
+luksoRoutes:
+  - chip: "LSP25"
+    label: "Execute Relay Call"
+    summary: "The relay function on the Universal Profile itself. A controller signs a payload with a nonce; a relayer submits the call via executeRelayCall on the account and pays gas. No bundler, no EntryPoint, no paymaster contract — and LSP6 permissions still gate what the signing controller may authorise, so the relayer cannot escalate authority by virtue of paying gas."
+    href: "/standards/lsp25-execute-relay-call/"
+  - chip: "LSP15"
+    label: "Transaction Relay Service API"
+    summary: "Standardises the off-chain relayer interface a dapp talks to. The interface is the spec; the implementation is interchangeable. The reference implementation lives at lukso-network/tools-mock-relayer for self-hosting. The 'pick one of six vendor SDKs' tax becomes 'implement against one spec, swap implementations freely'."
+    href: "/standards/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "The standardised permission vocabulary — AllowedCalls, AllowedStandards, AllowedERC725YDataKeys, value caps, instant revocation. The piece ERC-4337 and EIP-7702 each leave to wallet implementations to invent. Cross-wallet sessions become possible because every wallet reads the same on-chain permission shape."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP0"
+    label: "ERC-725 Account"
+    summary: "A contract account from genesis — no EOA key under the hood, no residual ECDSA authority for an attacker to override recovery with. msg.sender at downstream targets is the account, natively, because the account IS the call entry point. No EntryPoint singleton; no trusted forwarder list to govern."
+    href: "/standards/lsp0-erc725-account/"
+  - chip: "LSP20"
+    label: "Call Verification"
+    summary: "Inline call verification at the account contract layer. The equivalent of validateUserOp, but on the normal call path rather than through an EntryPoint hop. The trace shape stays direct: controller → account → target."
+    href: "/standards/lsp20-call-verification/"
+  - chip: "LSP1"
+    label: "Universal Receiver"
+    summary: "One hook for every asset type and every transfer. The receiver-awareness piece ERC-2771 / 4337 / 7702 don't touch at all — accounts can react to incoming value through a single typed entry point, with a Universal Receiver Delegate for dispatch."
+    href: "/standards/lsp1-universal-receiver/"
+
+compareRows:
+  - row: "trust assumption"
+    left: "bundler + paymaster + trusted forwarder (per stack)"
+    right: "controller signs; relayer is just infrastructure"
+  - row: "permission model"
+    left: "per-account validator (4337) / per-protocol scope (2771) / wallet-defined (7702)"
+    right: "LSP6 Key Manager (standardised vocabulary)"
+  - row: "infrastructure required"
+    left: "EntryPoint + bundler + paymaster + (optionally) forwarder + vendor SDK"
+    right: "account contract + LSP15-compliant relayer"
+  - row: "integration surface"
+    left: "wallet SDK per vendor (6+ production stacks)"
+    right: "LSP15 spec; any compliant relayer is swappable"
+  - row: "residual ECDSA key"
+    left: "present on 7702 EOAs; EIP-7851 still Draft for revocation"
+    right: "none — Universal Profile is a contract from day one"
+  - row: "ongoing OPEX"
+    left: "bundler / paymaster funding + vendor fees + SRE"
+    right: "relayer ops or self-host LSP25 ABI"
+compareHref: "/standards/compare/erc4337-lsp-stack/"
+
+useErc: "When you have to ship on Ethereum mainnet or an EVM L2 — your users are already there, your assets are already there, your protocol composes with deployed contracts that won't migrate. ERC-4337 + EIP-7702 + paymasters is the only realistic path, and the vendor ecosystem (Pimlico, Alchemy, ZeroDev, Biconomy) is mature enough that you can pay your way through most of the integration cost. Accept the substrate; outsource the rest."
+useLsp: "When the chain choice is open. Universal Profiles ship gasless as the substrate: LSP25 is a function on the account contract, LSP15 standardises the relayer API so implementations are swappable, and there is no residual ECDSA key for an attacker to override the recovery configuration with. For a consumer app where 'the wallet' is part of the product and the cost of vendor lock-in compounds over its lifetime, the substrate-level approach is the lower-overhead path."
+
+faqs:
+  - q: "What are gasless transactions?"
+    a: "Gasless transactions are blockchain transactions where the user signs an intent off-chain and a third party (a relayer or bundler) submits it on-chain and pays the gas. The user never has to hold the chain's native token to interact with a dapp. 'Gasless' is a UX framing — gas is still paid; it's just paid by someone other than the signer (a sponsoring app, a paymaster, a relayer service, or a custodian)."
+  - q: "What is a meta transaction?"
+    a: "A meta transaction is the on-chain primitive that makes gasless flows work: a user signs an intent payload with EIP-712 typed data; a relayer submits the payload to a forwarder, bundler, or account contract; the destination contract recovers the original signer from the calldata or signature. The first standardised meta-transaction proposal was ERC-1613 (Tabookey, November 2018), succeeded by ERC-2771 (August 2020) and then absorbed into ERC-4337's UserOperation model in September 2021. On LUKSO, LSP25 is the same idea — but the relay function lives on the account contract itself rather than on a separate forwarder."
+  - q: "What's the difference between ERC-2771, ERC-4337, and EIP-7702?"
+    a: "ERC-2771 (2020) is a contract-level pattern: each recipient contract opts in to ERC2771Context, pins a trusted forwarder address, and extracts the original signer via _msgSender(). ERC-4337 (2021, mainnet Mar 2023) is a much larger architecture: contract accounts submit UserOperations through a parallel mempool, a bundler packs them, a singleton EntryPoint validates, and optional paymasters sponsor gas. EIP-7702 (Pectra, May 2025) is a protocol-level patch: it lets an existing EOA delegate execution to contract code in a single transaction without redeploying. The three are layered, not exclusive — production wallets in 2026 typically combine 7702 (to upgrade the EOA) with 4337 (for the bundler / paymaster infrastructure) and sometimes 2771 (for legacy contract integration)."
+  - q: "What is a bundler in ERC-4337?"
+    a: "A bundler is an off-chain actor that watches the ERC-4337 UserOperation mempool, validates UserOps (by simulating validateUserOp against the destination account and validatePaymasterUserOp against any paymaster), packs valid ones into a single transaction calling EntryPoint.handleOps(), and submits it on-chain. Bundlers earn fees per UserOp. The position is privileged — bundlers can censor, reorder, or extract MEV from the UserOps they see — and bundler centralisation has been flagged by ERC-4337's own maintainers as a known concern. Production bundlers in 2026 include Pimlico, Alchemy, Stackup, Biconomy, and Candide."
+  - q: "What is a paymaster?"
+    a: "A paymaster is an optional ERC-4337 contract that sponsors gas for a UserOperation. The user signs a UserOp referencing a paymaster; the bundler asks the paymaster (via validatePaymasterUserOp) whether it's willing to cover the gas; the paymaster pays from its own ETH deposit at the EntryPoint; afterwards, postOp runs for any per-user accounting (e.g., charging the user in an ERC-20 token). Paymaster operation is a separate failure surface and an ongoing OPEX line — either you run one (SRE), or you rent one from Pimlico, Stackup, ZeroDev, Biconomy, or Alchemy (per-tx fees, monthly quotas, SLAs)."
+  - q: "Why hasn't gasless onboarding broken through to consumer apps?"
+    a: "Because shipping gasless on Ethereum picks up several structural costs simultaneously: bundler centralisation risk, paymaster funding and abuse-prevention OPEX, per-account validator fragmentation (every wallet ships its own session-key SDK), per-protocol opt-in costs for ERC-2771 paths, residual ECDSA key risk on EIP-7702 EOAs, and lock-in to one of six+ vendor stacks (Pimlico, ZeroDev, Coinbase, Safe, Alchemy, Biconomy). Any individual cost is manageable; together they make 'ship a Tinder, a Spotify, or a Reddit on-chain experience' a much bigger lift than 'integrate Stripe'. The bottleneck isn't any single standard — it's that Ethereum's protocol was built around EOAs and every layered gasless standard is working around that, in different ways, with different fragmentation."
+  - q: "Does EIP-7702 fix gasless on Ethereum?"
+    a: "Partially. EIP-7702 (activated in the Pectra hard fork, May 2025) lets an existing EOA delegate execution to contract code in a single transaction, which means EOAs can now use ERC-4337's bundler and paymaster infrastructure without redeploying — closing the 'existing addresses can't become smart accounts' gap that the EIP-7702 Motivation section identified. EntryPoint v0.8 deployed alongside Pectra with native 7702 support. But the residual ECDSA key on a delegated EOA remains: an attacker who compromises the original private key can sign another 7702 authorisation to override recovery. EIP-7851 (proposed by Liyi Guo and Nicolas Consigny, December 2024) extends 7702 with an ECDSA-disabled delegation prefix and a SETSELFDELEGATE opcode to let wallet code burn the residual authority — but as of mid-2026 it's still Draft. Pectra closed one gap; the next one is open."
+  - q: "How does LUKSO handle gasless transactions?"
+    a: "LSP25 (Execute Relay Call) defines executeRelayCall(signature, nonce, validityTimestamps, payload) as a function on the Universal Profile account itself. A controller signs the payload (with a nonce-channel design for parallel relay streams), a relayer submits the on-chain call and pays gas, and LSP6 permissions still gate what the signing controller can authorise — so the relayer is just infrastructure, with no ability to escalate authority by virtue of paying gas. There is no EntryPoint singleton, no UserOperation envelope, no bundler, no paymaster contract, and no trusted-forwarder list to govern. msg.sender at downstream targets is the account itself, natively. The trace shape stays direct: controller → account → target. See the LSP25 spec at ercsolved.dev/standards/lsp25-execute-relay-call/ and the comparison at ercsolved.dev/standards/compare/erc4337-lsp-stack/."
+  - q: "What is LSP15 Transaction Relay Service API?"
+    a: "LSP15 standardises the off-chain HTTP API that a dapp uses to talk to a relayer. A dapp posts a signed payload; a compliant relayer service validates the signature, submits the transaction via LSP25 executeRelayCall on the destination Universal Profile, and pays the gas. Because LSP15 defines the wire interface, any compliant relayer implementation is swappable — a project can self-host (the reference implementation lives at github.com/lukso-network/tools-mock-relayer), pay a third-party service, or build their own. The vendor-SDK lock-in problem ERC-4337's ecosystem has (six+ different SDK shapes) doesn't exist on LSP15 because the integration is a standardised HTTP spec, not a vendor library."
+  - q: "Do I need to run my own bundler to ship a gasless app?"
+    a: "On Ethereum with ERC-4337: technically no — Pimlico, Alchemy, Stackup, Biconomy, and ZeroDev all operate bundler RPCs you can pay to use. But you do need to (a) commit to a bundler vendor, (b) manage failover when their service degrades, (c) integrate their AA SDK, and (d) accept the centralisation surface that comes with most of mainnet UserOp volume flowing through 1–2 operators. On LUKSO with LSP25 + LSP15: you can self-host the open-source mock-relayer reference implementation, build your own LSP15-compliant service, or use any compliant relayer. The relayer doesn't gate validation or carry MEV-extraction power the way bundlers do."
+  - q: "Can I pay gas in stablecoins or ERC-20 tokens?"
+    a: "Yes, via ERC-4337 paymasters that accept ERC-20 payments. The pattern: the user's UserOperation references an ERC-20 paymaster; the bundler asks the paymaster to validate; the paymaster pays ETH gas at the EntryPoint from its own deposit; postOp transfers the user's chosen ERC-20 from the user's account to the paymaster at an exchange rate the paymaster sets. Pimlico, Biconomy, and Alchemy operate ERC-20 paymasters for stablecoins (USDC, USDT, DAI). The user experience is 'I paid in USDC' but the underlying gas accounting still has to settle through ETH and through the paymaster's deposit. On LUKSO, the equivalent pattern lives at the relayer-policy layer: the LSP25 ABI is gas-agnostic, and the relayer can charge the user in any token (or sponsor entirely) via its own off-chain policy."
+  - q: "Is gasless the same as account abstraction?"
+    a: "Overlapping but not the same. Account abstraction is the broader idea that accounts supply their own validation logic via smart contract code (multisigs, passkeys, session keys, social recovery) instead of being fixed single-keypair EOAs — see ercsolved.dev/erc-4337/ for the deeper treatment. Gasless transactions are specifically about separating the signer from the payer of gas. AA enables gasless (by giving the account programmable validation that can accept a relayer-submitted call), but you can have gasless without AA (ERC-2771 trusted forwarders predate AA and work on EOAs). And you can have AA without gasless (an ERC-4337 wallet where the user pays their own gas via the EntryPoint). They're commonly bundled because the production AA stacks (Pimlico, ZeroDev, etc.) ship gasless and AA together, but the standards are distinct."
+
+timeline:
+  - year: "2017"
+    text: "Austin Griffith's Burner Wallet demonstrates gasless onboarding via custodial relayers — the UX appeal of 'user doesn't need ETH' is established."
+  - year: "Nov 2018"
+    text: "Yoav Weiss, Dror Tirosh, and Alex Forshtat (Tabookey) publish ERC-1613 (Gas Station Network v1) — the first standardised meta-transaction proposal."
+    href: "https://eips.ethereum.org/EIPS/eip-1613"
+  - year: "Aug 2020"
+    text: "ERC-2771 (Secure Protocol for Native Meta Transactions) finalised by an 11-author group including the Tabookey team and Fabian Vogelsteller."
+    href: "https://eips.ethereum.org/EIPS/eip-2771"
+  - year: "2020–22"
+    text: "OpenGSN v2, OpenZeppelin Defender Relayer, Gelato Network, and Biconomy SDK build the vendor relayer market on top of ERC-2771. Meta transactions go production."
+  - year: "Sept 2021"
+    text: "Vitalik Buterin proposes ERC-4337 with the Tabookey core team — explicitly framed as 'account abstraction without Ethereum protocol changes' in his Medium post title."
+    href: "https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a"
+  - year: "Mar 2023"
+    text: "ERC-4337 EntryPoint v0.6 deploys to Ethereum mainnet after audits by OpenZeppelin and Certora. Pimlico, Stackup, Alchemy, and Biconomy launch bundler services."
+  - year: "2023"
+    text: "LUKSO mainnet launches with LSP25 + LSP15 baked into the account stack — gasless execution becomes substrate-level on the account contract from day one."
+    href: "https://docs.lukso.tech/"
+  - year: "Nov 2024"
+    text: "At Devcon SEA, ERC-4337 co-author Yoav Weiss outlines a roadmap toward a 'modular native AA approach for L1 and L2' — the spec's own lead acknowledging the layered model's limits."
+    href: "https://etherspot.io/blog/all-about-abstraction-devcon-2024-highlights-smart-contract-revolution-yoav-weiss-on-aa-future-and-aa-developer-survey/"
+  - year: "Dec 2024"
+    text: "EIP-7851 proposed by Liyi Guo and Nicolas Consigny — adds an ECDSA-disabled delegation prefix and SETSELFDELEGATE opcode to let wallet code burn the residual EOA authority. Still Draft as of mid-2026."
+    href: "https://eips.ethereum.org/EIPS/eip-7851"
+  - year: "May 2025"
+    text: "Pectra hard fork lands EIP-7702: EOAs gain protocol-level ability to delegate execution to contract code. EntryPoint v0.8 deploys alongside with native 7702 support. ERC-7579 and ERC-6900 modular-account standards remain Draft; consolidation continues."
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+
+glossary:
+  - term: "Gasless transaction"
+    def: "A transaction where the user signs an intent off-chain and a third party pays the gas to submit it. UX framing — gas is still paid, just not by the signer."
+  - term: "Meta transaction"
+    def: "The on-chain primitive enabling gasless flows: a signed payload that a relayer submits, with the destination contract recovering the original signer."
+  - term: "Relayer"
+    def: "An off-chain actor that watches for signed payloads, submits them on-chain, and pays the gas. Can be self-hosted (mock-relayer, OpenGSN nodes) or rented (Pimlico, Defender, Gelato, Biconomy)."
+  - term: "Bundler"
+    def: "The ERC-4337 specialisation of a relayer: picks valid UserOperations from the alt-mempool, packs them into a single EntryPoint.handleOps() call, submits on-chain, earns fees. Production bundlers in 2026: Pimlico, Alchemy, Stackup, Biconomy, Candide."
+  - term: "Paymaster"
+    def: "An optional ERC-4337 contract that pays gas on behalf of users. Its own ETH deposit at EntryPoint, its own validation function, its own postOp accounting hook, its own DoS surface."
+  - term: "EntryPoint"
+    def: "The singleton ERC-4337 contract that receives bundled UserOperations, runs validation, calls into accounts and paymasters, handles gas accounting. Versions: v0.6 (Mar 2023), v0.7 (2024), v0.8 (May 2025, native 7702 support)."
+  - term: "Trusted forwarder"
+    def: "The contract an ERC-2771 recipient designates as 'allowed to attach the original signer to a meta-transaction call'. Load-bearing trust assumption — if compromised, the recipient accepts forged sender addresses."
+  - term: "_msgSender()"
+    def: "The ERC-2771 helper function recipient contracts call instead of msg.sender. Returns the original signer when called via a trusted forwarder; returns msg.sender otherwise."
+  - term: "UserOperation"
+    def: "The ERC-4337 envelope wrapping a smart-account intent — sender, nonce, calldata, gas, signature, optional initCode, optional paymasterAndData. Lives in a separate mempool from regular transactions."
+  - term: "EOA delegation (EIP-7702)"
+    def: "Pectra-era protocol upgrade letting an EOA delegate execution to contract code in a single transaction, without redeploying. Original ECDSA key still works — that's the residual-key problem EIP-7851 (Draft) aims to fix."
+  - term: "LSP25"
+    def: "LUKSO's Execute Relay Call standard. Puts the relay function on the Universal Profile account itself; controllers sign, relayers submit, LSP6 permissions enforce scope. No EntryPoint, no bundler."
+  - term: "LSP15"
+    def: "LUKSO's Transaction Relay Service API standard. Defines the HTTP interface a dapp uses to talk to a relayer, so implementations are interchangeable. Reference implementation: github.com/lukso-network/tools-mock-relayer."
+
+primarySources:
+  - label: "EIP-2771 (Secure Protocol for Native Meta Transactions, Final, Aug 2020)"
+    href: "https://eips.ethereum.org/EIPS/eip-2771"
+  - label: "EIP-4337 (Account Abstraction Using Alt Mempool, Final, Sept 2021)"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "EIP-7702 (Set Code for EOAs, Final, Pectra May 2025)"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "EIP-7851 (Code-Controlled EOA Delegation — Draft, Dec 2024)"
+    href: "https://eips.ethereum.org/EIPS/eip-7851"
+  - label: "ERC-7579 (Minimal Modular Smart Accounts — Draft)"
+    href: "https://eips.ethereum.org/EIPS/eip-7579"
+  - label: "Vitalik Buterin's original ERC-4337 Medium post — title is the constraint"
+    href: "https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a"
+  - label: "Yoav Weiss at Devcon SEA Nov 2024 — modular native AA roadmap"
+    href: "https://etherspot.io/blog/all-about-abstraction-devcon-2024-highlights-smart-contract-revolution-yoav-weiss-on-aa-future-and-aa-developer-survey/"
+  - label: "eth-infinitism / account-abstraction reference implementation"
+    href: "https://github.com/eth-infinitism/account-abstraction"
+  - label: "OpenGSN (Gas Station Network)"
+    href: "https://opengsn.org/"
+  - label: "LUKSO LSP25 Execute Relay Call docs"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "LUKSO LSP15 reference implementation (mock-relayer)"
+    href: "https://github.com/lukso-network/tools-mock-relayer"
+
+mentions:
+  - name: "ERC-1613 (Gas Station Network v1)"
+    url: "https://eips.ethereum.org/EIPS/eip-1613"
+  - name: "ERC-2771 (trusted-forwarder meta transactions)"
+    url: "https://eips.ethereum.org/EIPS/eip-2771"
+  - name: "ERC-4337 (account abstraction)"
+    url: "https://eips.ethereum.org/EIPS/eip-4337"
+  - name: "EIP-7702 (EOA delegation, Pectra)"
+    url: "https://eips.ethereum.org/EIPS/eip-7702"
+  - name: "EIP-7851 (Code-Controlled EOA Delegation — Draft)"
+    url: "https://eips.ethereum.org/EIPS/eip-7851"
+  - name: "ERC-7579 (modular smart accounts — Draft)"
+    url: "https://eips.ethereum.org/EIPS/eip-7579"
+  - name: "ERC-6900 (modular account standard — Draft)"
+    url: "https://eips.ethereum.org/EIPS/eip-6900"
+  - name: "EIP-712 (Typed structured data signing)"
+    url: "https://eips.ethereum.org/EIPS/eip-712"
+  - name: "EIP-2612 (Permit — gasless ERC-20 approvals)"
+    url: "https://eips.ethereum.org/EIPS/eip-2612"
+  - name: "OpenGSN"
+    url: "https://opengsn.org/"
+  - name: "OpenZeppelin Defender"
+    url: "https://docs.openzeppelin.com/defender/"
+  - name: "Gelato Network Relay"
+    url: "https://docs.gelato.network/"
+  - name: "Biconomy"
+    url: "https://www.biconomy.io/"
+  - name: "Pimlico"
+    url: "https://www.pimlico.io/"
+  - name: "ZeroDev Kernel"
+    url: "https://zerodev.app/"
+  - name: "LUKSO LSP25 Execute Relay Call"
+    url: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - name: "LUKSO LSP6 Key Manager"
+    url: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - name: "LUKSO LSP0 ERC725 Account"
+    url: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - name: "LUKSO LSP20 Call Verification"
+    url: "https://docs.lukso.tech/standards/accounts/lsp20-call-verification/"
+
+authorCriticism:
+  intro: "Gasless on Ethereum has been 'six months away' for nearly a decade. The clearest evidence that the bottleneck is structural — not a missing implementation detail — is that the people who designed each layer have, over time, said so publicly. Four on-the-record positions, each paired with the LUKSO LSP that addresses the underlying limit."
+  items:
+    - theme: "The original ERC-4337 design admitted the constraint in its title."
+      quote: "ERC-4337: Account Abstraction Without Ethereum Protocol Changes."
+      authorName: "Vitalik Buterin"
+      sourceLabel: "Medium / Infinitism, Sept 2021"
+      sourceUrl: "https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a"
+      lsps: ["LSP0", "LSP25"]
+      solution: "LUKSO designed account abstraction as the substrate from genesis — no fork was needed because the chain was new. Universal Profiles are contracts; there's no EOA model to work around, no alt-mempool to maintain, no EntryPoint singleton to coordinate around. LSP25 puts the relay function on the account itself."
+    - theme: "EIP-7702 exists because the layered model couldn't onboard existing addresses."
+      quote: "[Existing EOAs] cannot become ERC-4337 smart accounts without losing their address history, their ENS records, their reputation, and their airdrop eligibility."
+      authorName: "Vitalik Buterin, Sam Wilson, Ansgar Dietrichs, Matt Garnett (paraphrased from the EIP-7702 Motivation section)"
+      sourceLabel: "EIP-7702 spec, Pectra May 2025"
+      sourceUrl: "https://eips.ethereum.org/EIPS/eip-7702"
+      lsps: ["LSP0"]
+      solution: "On LUKSO, an account IS a contract from creation. There's no 'convert an existing EOA' problem because there's no EOA-first model in the first place. Identity migration is not a thing because identity lives on the contract."
+    - theme: "ERC-4337's lead maintainer has publicly outlined a 'modular native AA' roadmap."
+      quote: "Modular native AA approach for L1 and L2."
+      authorName: "Yoav Weiss"
+      authorRole: "ERC-4337 co-author, Ethereum Foundation Account-Abstraction lead, Devcon SEA November 2024"
+      sourceLabel: "Etherspot — Devcon SEA AA coverage"
+      sourceUrl: "https://etherspot.io/blog/all-about-abstraction-devcon-2024-highlights-smart-contract-revolution-yoav-weiss-on-aa-future-and-aa-developer-survey/"
+      lsps: ["LSP6", "LSP15"]
+      solution: "LSP6 ships the standardised permission vocabulary (the 'modular' part) on the substrate (the 'native' part). LSP15 standardises the relayer interface so any compliant implementation is interchangeable — modular by design, from day one, instead of as a future roadmap item."
+    - theme: "Even Pectra's 7702 leaves the original ECDSA key in place — and the proposed fix is still Draft."
+      quote: "[EIP-7851] lets wallet code control the delegation lifecycle and burn residual ECDSA authority."
+      authorName: "Liyi Guo, Nicolas Consigny (EIP-7851 authors)"
+      sourceLabel: "EIP-7851 Draft, Dec 2024"
+      sourceUrl: "https://eips.ethereum.org/EIPS/eip-7851"
+      lsps: ["LSP0", "LSP6"]
+      solution: "A Universal Profile has no residual ECDSA root above its Key Manager. Recovery and controller replacement are authoritative because there's nothing the recovered configuration can be overridden by. The 'residual key after 7702 delegation' problem doesn't exist on a contract account that was never an EOA."
+
+related:
+  - "problems/gasless-onboarding"
+  - "problems/erc4337-bundler-tax"
+  - "problems/wallet-permissions"
+  - "standards/lsp25-execute-relay-call"
+  - "standards/lsp6-key-manager"
+  - "standards/lsp0-erc725-account"
+  - "standards/lsp20-call-verification"
+  - "standards/compare/erc4337-lsp-stack"
+  - "build/gasless-onboarding"
+  - "erc/erc-20"
+  - "erc/erc-721"
+  - "erc/erc-4337"
+
+docs:
+  - label: "eips.ethereum.org / EIP-2771"
+    href: "https://eips.ethereum.org/EIPS/eip-2771"
+  - label: "eips.ethereum.org / EIP-4337"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "eips.ethereum.org / EIP-7702"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "docs.lukso.tech / LSP25 Execute Relay Call"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "github.com / lukso-network / tools-mock-relayer (LSP15 reference impl)"
+    href: "https://github.com/lukso-network/tools-mock-relayer"
+---

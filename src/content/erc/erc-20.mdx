@@ -367,53 +367,33 @@ howToMigration:
       text: "Read balances from the source ERC-20 contract at a published block height. Publish the snapshot so holders can verify their allocation before migration."
     - name: "Bridge or mint the new supply on LUKSO"
       text: "Either run a bridge that locks the source ERC-20 and mints LSP7 on LUKSO, or do a one-time mint to the snapshot addresses and freeze further issuance on the ERC-20 side."
+
+lede: |
+  ERC-20 is the standard that made Ethereum a financial substrate. Six functions, two events, no opinion about anything else — that minimalism is exactly why every token from USDC to UNI to DAI speaks the same interface, and exactly why every team since 2015 has paid an integration tax to handle what the spec left out. This page walks the history, the ABI, the limits people keep working around, and the connected LSP system that the standard's own author has spent the past six years building.
+
+origin: |
+  On **19 November 2015**, a developer at the Ethereum Foundation named [**Fabian Vogelsteller**](https://github.com/frozeman) filed [GitHub issue #20](https://github.com/ethereum/EIPs/issues/20) on the Ethereum repository proposing a minimum interface that any token contract could implement. The issue was the twentieth in the Ethereum Request for Comments series, so the number stuck: **ERC-20**.
+
+  The proposal — later co-authored by **Vitalik Buterin** and formalized as [**EIP-20**](https://eips.ethereum.org/EIPS/eip-20) — defined exactly six required functions (`totalSupply`, `balanceOf`, `transfer`, `transferFrom`, `approve`, `allowance`), two events (`Transfer`, `Approval`), and three optional metadata methods (`name`, `symbol`, `decimals`). It said nothing about how a token should behave when sent to a contract, what its icon should be, where its metadata should live, or how an account should authorize a spender. That was the point.
+
+  > The minimum interface is a feature, not a limitation. It is how a network effect happens.
+
+  Underspecification is what let an exchange, a wallet, a DEX, a lending market, and an oracle written by five different teams all transact the same token without coordination. By 2017 the standard had absorbed the ICO boom — hundreds of tokens, all interchangeable at the contract level. By 2020, Compound and Uniswap were entire economies built on the assumption that `balanceOf` and `transferFrom` mean what ERC-20 says they mean. A decade later, a trillion dollars of supply moves through that six-function interface every week.
+
+  The cost of that win is what the rest of this page is about. Every limit ERC-20 deliberately left to the application layer has, over time, become a known problem the application layer has to solve over and over.
+
+spec: |
+  The mental model is small enough to hold in one sentence: a **balance sheet** (`balanceOf`), a way to **move balances** (`transfer` / `transferFrom`), a way to **pre-authorize someone else** to move yours (`approve` / `allowance`), and two **events** so the rest of the world can watch. The optional `name`, `symbol`, and `decimals` are display hints — they are not required for the token to function. The canonical specification is at [eips.ethereum.org/EIPS/eip-20](https://eips.ethereum.org/EIPS/eip-20).
+
+whatsBroken: |
+  Five gaps, in order of how often they cost users money. Each one has produced its own follow-on EIP, its own SDK, its own startup. None of those follow-ons fix the substrate.
+
+vogelsteller: |
+  Vogelsteller did not disown ERC-20 — the spec did exactly what a minimum interface is supposed to do. But over the years after he proposed it, he kept writing the things ERC-20 deliberately wasn't. He authored [**web3.js**](https://github.com/web3/web3.js) (the original Ethereum JavaScript client), built the **Mist Browser**, and proposed [**ERC-725**](https://eips.ethereum.org/EIPS/eip-725) — a standard for smart-contract-based identity that quietly contains the seed of every later "account abstraction" idea.
+
+  In 2017 he co-founded [**LUKSO**](https://lukso.network) with Marjorie Hernandez. The thesis is direct: ship the *surrounding system* that ERC-20's minimum interface was never going to specify. Accounts are not addresses, they are smart contracts ([**LSP0**](https://docs.lukso.tech/standards/accounts/lsp0-erc725account/) / ERC-725 Account). Permissions are not allowances on a token, they are a property of the account itself ([**LSP6 Key Manager**](https://docs.lukso.tech/standards/access-control/lsp6-key-manager/)). Tokens notify their recipients ([**LSP1 Universal Receiver**](https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/)). Metadata is typed and lives on the asset (**LSP4** under **ERC-725Y**). Fungibles ([**LSP7**](https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/)) and NFTs (**LSP8**) inherit all of that for free. Gasless onboarding is a primitive (**LSP25**), not a bolted-on bundler stack.
+
+  [LUKSO mainnet went live in 2023](https://docs.lukso.tech/). The standards are EVM contracts — they don't require the LUKSO chain to run; they require the LUKSO chain to *cohere*. On Ethereum, a Universal Profile would still work, but every dapp around it would still be ERC-20-shaped. On LUKSO, the substrate matches the standard, which is why the first complete UX example of a wallet with social recovery, scoped session keys, profile metadata, and receiver-aware tokens lives there.
+
+  The funnel for this site is not "switch to LUKSO." It is: when your ERC-20 design is breaking down at the seams the spec deliberately ignored — approval risk, missing receiver hooks, anemic metadata, EOA-bound accounts — there is a standards suite that designed those concerns in from the bottom. Built, notably, by the person who wrote the spec you started with.
 ---
-
-{/* ─── slot: lede (renders in the hero) ─────────────────────────────────── */}
-<Fragment slot="lede">
-
-ERC-20 is the standard that made Ethereum a financial substrate. Six functions, two events, no opinion about anything else — that minimalism is exactly why every token from USDC to UNI to DAI speaks the same interface, and exactly why every team since 2015 has paid an integration tax to handle what the spec left out. This page walks the history, the ABI, the limits people keep working around, and the connected LSP system that the standard's own author has spent the past six years building.
-
-</Fragment>
-
-{/* ─── slot: origin ──────────────────────────────────────────────────── */}
-<Fragment slot="origin">
-
-On **19 November 2015**, a developer at the Ethereum Foundation named [**Fabian Vogelsteller**](https://github.com/frozeman) filed [GitHub issue #20](https://github.com/ethereum/EIPs/issues/20) on the Ethereum repository proposing a minimum interface that any token contract could implement. The issue was the twentieth in the Ethereum Request for Comments series, so the number stuck: **ERC-20**.
-
-The proposal — later co-authored by **Vitalik Buterin** and formalized as [**EIP-20**](https://eips.ethereum.org/EIPS/eip-20) — defined exactly six required functions (`totalSupply`, `balanceOf`, `transfer`, `transferFrom`, `approve`, `allowance`), two events (`Transfer`, `Approval`), and three optional metadata methods (`name`, `symbol`, `decimals`). It said nothing about how a token should behave when sent to a contract, what its icon should be, where its metadata should live, or how an account should authorize a spender. That was the point.
-
-> The minimum interface is a feature, not a limitation. It is how a network effect happens.
-
-Underspecification is what let an exchange, a wallet, a DEX, a lending market, and an oracle written by five different teams all transact the same token without coordination. By 2017 the standard had absorbed the ICO boom — hundreds of tokens, all interchangeable at the contract level. By 2020, Compound and Uniswap were entire economies built on the assumption that `balanceOf` and `transferFrom` mean what ERC-20 says they mean. A decade later, a trillion dollars of supply moves through that six-function interface every week.
-
-The cost of that win is what the rest of this page is about. Every limit ERC-20 deliberately left to the application layer has, over time, become a known problem the application layer has to solve over and over.
-
-</Fragment>
-
-{/* ─── slot: spec (after the SpecBlock) ─────────────────────────────── */}
-<Fragment slot="spec">
-
-The mental model is small enough to hold in one sentence: a **balance sheet** (`balanceOf`), a way to **move balances** (`transfer` / `transferFrom`), a way to **pre-authorize someone else** to move yours (`approve` / `allowance`), and two **events** so the rest of the world can watch. The optional `name`, `symbol`, and `decimals` are display hints — they are not required for the token to function. The canonical specification is at [eips.ethereum.org/EIPS/eip-20](https://eips.ethereum.org/EIPS/eip-20).
-
-</Fragment>
-
-{/* ─── slot: whatsBroken (intro paragraph before the limits list) ───── */}
-<Fragment slot="whatsBroken">
-
-Five gaps, in order of how often they cost users money. Each one has produced its own follow-on EIP, its own SDK, its own startup. None of those follow-ons fix the substrate.
-
-</Fragment>
-
-{/* ─── slot: vogelsteller (after the h2 in the second-act band) ─────── */}
-<Fragment slot="vogelsteller">
-
-Vogelsteller did not disown ERC-20 — the spec did exactly what a minimum interface is supposed to do. But over the years after he proposed it, he kept writing the things ERC-20 deliberately wasn't. He authored [**web3.js**](https://github.com/web3/web3.js) (the original Ethereum JavaScript client), built the **Mist Browser**, and proposed [**ERC-725**](https://eips.ethereum.org/EIPS/eip-725) — a standard for smart-contract-based identity that quietly contains the seed of every later "account abstraction" idea.
-
-In 2017 he co-founded [**LUKSO**](https://lukso.network) with Marjorie Hernandez. The thesis is direct: ship the *surrounding system* that ERC-20's minimum interface was never going to specify. Accounts are not addresses, they are smart contracts ([**LSP0**](https://docs.lukso.tech/standards/accounts/lsp0-erc725account/) / ERC-725 Account). Permissions are not allowances on a token, they are a property of the account itself ([**LSP6 Key Manager**](https://docs.lukso.tech/standards/access-control/lsp6-key-manager/)). Tokens notify their recipients ([**LSP1 Universal Receiver**](https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/)). Metadata is typed and lives on the asset (**LSP4** under **ERC-725Y**). Fungibles ([**LSP7**](https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/)) and NFTs (**LSP8**) inherit all of that for free. Gasless onboarding is a primitive (**LSP25**), not a bolted-on bundler stack.
-
-[LUKSO mainnet went live in 2023](https://docs.lukso.tech/). The standards are EVM contracts — they don't require the LUKSO chain to run; they require the LUKSO chain to *cohere*. On Ethereum, a Universal Profile would still work, but every dapp around it would still be ERC-20-shaped. On LUKSO, the substrate matches the standard, which is why the first complete UX example of a wallet with social recovery, scoped session keys, profile metadata, and receiver-aware tokens lives there.
-
-The funnel for this site is not "switch to LUKSO." It is: when your ERC-20 design is breaking down at the seams the spec deliberately ignored — approval risk, missing receiver hooks, anemic metadata, EOA-bound accounts — there is a standards suite that designed those concerns in from the bottom. Built, notably, by the person who wrote the spec you started with.
-
-</Fragment>

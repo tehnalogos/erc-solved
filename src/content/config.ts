@@ -111,12 +111,23 @@ const erc = defineCollection({
     description: z.string(),
     tagline: z.string(),
     bootStrip: z.string(),
-    standardAuthors: z.array(z.string()),
-    proposed: z.string(),
+    standardAuthors: z.array(z.string()).optional(),
+    proposed: z.string().optional(),
     eipNumber: z.string().optional(),
-    abi: z.string(),
+    abi: z.string().optional(),
     tldr: z.string(),
     definition: z.string().optional(),
+
+    // Narrative prose for each major section. Rendered as Markdown via marked.
+    // (Replaces the previous <Fragment slot="..."> pattern, which silently
+    // dropped content because Astro doesn't hoist named slots from inside
+    // <Content /> renders of content-collection MDX.)
+    lede: z.string().optional(),
+    origin: z.string().optional(),
+    spec: z.string().optional(),
+    whatsBroken: z.string().optional(),
+    vogelsteller: z.string().optional(),
+
     limits: z
       .array(
         z.object({
@@ -228,10 +239,14 @@ const erc = defineCollection({
     // Renders as a dedicated band between What's-broken and the Second-act.
     authorCriticism: z
       .object({
-        authorName: z.string(),
-        authorRole: z.string(),
-        sourceLabel: z.string(),
-        sourceUrl: z.string().url(),
+        // Top-level author info is the default used when items don't specify
+        // their own. Pages citing a single author (e.g. /erc-721/ → Shirley)
+        // can populate just these and omit per-item overrides; pages citing
+        // multiple authors (e.g. /gasless-transactions/) populate per-item.
+        authorName: z.string().optional(),
+        authorRole: z.string().optional(),
+        sourceLabel: z.string().optional(),
+        sourceUrl: z.string().url().optional(),
         intro: z.string(),
         items: z.array(
           z.object({
@@ -239,6 +254,11 @@ const erc = defineCollection({
             theme: z.string(),
             lsps: z.array(z.string()),
             solution: z.string(),
+            // Per-item overrides for multi-author pages
+            authorName: z.string().optional(),
+            authorRole: z.string().optional(),
+            sourceLabel: z.string().optional(),
+            sourceUrl: z.string().url().optional(),
           }),
         ),
         outro: z.string().optional(),
