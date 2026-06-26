@@ -1,0 +1,156 @@
+---
+id: "4906"
+title: "ERC-4906"
+headline: "What is ERC-4906?"
+pageTitle: "What is ERC-4906? NFT Metadata Update Events"
+description: "ERC-4906 adds MetadataUpdate and BatchMetadataUpdate events so NFT contracts can signal that token metadata changed."
+tagline: "The refresh-metadata button, turned into an event."
+bootStrip: "standard · nft metadata updates · event signal · ready"
+standardAuthors:
+  - "DoubleQ"
+  - "emo"
+  - "Shrug"
+  - "0xMaki"
+proposed: "March 2022"
+eipNumber: "EIP-4906"
+termCode: "EIP-4906"
+updated: 2026-06-26
+
+definition: "ERC-4906 is an NFT metadata update extension. It defines MetadataUpdate(tokenId) and BatchMetadataUpdate(fromTokenId, toTokenId) events so off-chain clients can know when to refresh token metadata."
+
+abi: |
+  event MetadataUpdate(uint256 _tokenId);
+  event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);
+
+tldr: "ERC-4906 fixes a narrow but important ERC-721 problem: clients need a standard signal that metadata changed. It does not carry the new metadata, define a schema, prove off-chain content integrity, or make metadata contract-readable. LSP4 goes deeper by storing typed metadata under ERC-725Y keys."
+
+stats:
+  - k: "Standard"
+    v: "ERC-4906 / EIP-4906"
+  - k: "Core events"
+    v: "MetadataUpdate · BatchMetadataUpdate"
+  - k: "Extends"
+    v: "ERC-721 metadata"
+    href: "/erc-721/"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-4906"
+    href: "https://eips.ethereum.org/EIPS/eip-4906"
+
+interfaceDiagram:
+  - group: "events"
+    items: ["MetadataUpdate", "BatchMetadataUpdate"]
+  - group: "clients"
+    items: ["marketplaces", "wallets", "indexers"]
+
+limits:
+  - title: "It says refresh, not what changed."
+    summary: "The event tells clients that metadata should be refreshed. It does not include the changed field, new value, schema, or content hash."
+    workarounds: ["refetch tokenURI", "custom events", "indexer diffs"]
+    href: "/problems/erc721-dynamic-metadata/"
+    from:
+      chip: "ERC-4906"
+      code: "emit MetadataUpdate(id)"
+      tags: ["signal only"]
+    to:
+      chip: "LSP4"
+      code: "setData(key, value)"
+      tags: ["typed update"]
+  - title: "It still depends on tokenURI infrastructure."
+    summary: "After the event, clients usually refetch the same tokenURI path. If the server, gateway, JSON schema, or media URL fails, the event cannot repair that dependency chain."
+    workarounds: ["IPFS pinning", "Arweave", "data URIs", "redundant gateways"]
+    from:
+      chip: "ERC-721"
+      code: "tokenURI -> JSON"
+      tags: ["off-chain"]
+    to:
+      chip: "VerifiableURI"
+      code: "hash-anchored metadata"
+      tags: ["integrity"]
+  - title: "Contracts cannot reason about the metadata."
+    summary: "The update signal is useful for off-chain clients, but downstream contracts still cannot read typed metadata fields from a tokenURI string."
+    workarounds: ["custom on-chain fields", "oracles", "indexer proofs"]
+    from:
+      chip: "event"
+      code: "log only"
+      tags: ["off-chain consumption"]
+    to:
+      chip: "ERC-725Y"
+      code: "getData(key)"
+      tags: ["contract-readable"]
+
+luksoRoutes:
+  - chip: "LSP4"
+    label: "Digital Asset Metadata"
+    summary: "Typed metadata keys for assets, with support for VerifiableURI data."
+    href: "/standards/lsp4-digital-asset-metadata/"
+  - chip: "LSP8"
+    label: "Identifiable Digital Asset"
+    summary: "Per-token data on identifiable assets, not just a refetch event."
+    href: "/standards/lsp8-identifiable-digital-asset/"
+  - chip: "ERC725Y"
+    label: "Key-value data store"
+    summary: "The storage substrate LSP metadata is built on."
+    href: "/standards/erc725/"
+
+compareRows:
+  - row: "metadata change"
+    left: "event says refresh"
+    right: "typed key data changes"
+  - row: "new value included"
+    left: "no"
+    right: "yes, in ERC-725Y storage"
+  - row: "content integrity"
+    left: "not defined"
+    right: "VerifiableURI can hash-anchor off-chain data"
+  - row: "contract-readable"
+    left: "no"
+    right: "yes"
+compareRight:
+  chip: "LSP4"
+  kind: "lsp"
+  id: "4"
+  label: "LSP4 Digital Asset Metadata"
+
+useErc: "Use ERC-4906 when you are building ERC-721 or ERC-1155-style assets and need marketplaces or wallets to refresh metadata after changes."
+useLsp: "Use LSP4 and LSP8 when metadata itself should be typed, inspectable, and contract-readable rather than only refreshed by off-chain clients."
+
+faqs:
+  - q: "What does ERC-4906 do?"
+    a: "It adds standard metadata update events so clients can know when to refresh token metadata."
+  - q: "Does ERC-4906 store metadata on-chain?"
+    a: "No. It only emits events. The underlying metadata can still live behind tokenURI or another off-chain path."
+  - q: "Which event updates one NFT?"
+    a: "MetadataUpdate(tokenId) signals that one token's metadata changed. BatchMetadataUpdate signals a range."
+
+aliases:
+  - "EIP-4906"
+  - "MetadataUpdate"
+  - "NFT metadata update"
+  - "ERC4906"
+related:
+  - "erc/erc-721"
+  - "erc/erc-721a"
+  - "erc/erc-2981"
+  - "problems/erc721-dynamic-metadata"
+docs:
+  - label: "eips.ethereum.org / EIP-4906"
+    href: "https://eips.ethereum.org/EIPS/eip-4906"
+primarySources:
+  - label: "EIP-4906"
+    href: "https://eips.ethereum.org/EIPS/eip-4906"
+
+lede: |
+  ERC-4906 exists because dynamic NFTs need a standard refresh signal. Without it, marketplaces rely on manual refresh buttons, polling, or collection-specific adapters.
+
+origin: |
+  As NFT metadata became mutable - reveals, evolving art, game state, traits, and redemption status - clients needed to know when tokenURI output should be fetched again.
+
+spec: |
+  The standard defines two events. MetadataUpdate names one token. BatchMetadataUpdate names a range. Clients watch logs and refresh their cached metadata.
+
+whatsBroken: |
+  An event is only a signal. It does not define the metadata schema, include the updated value, or protect off-chain media from disappearing or changing silently.
+
+vogelsteller: |
+  LSP4 treats metadata as typed data under known keys. Updates can be read directly from ERC-725Y storage, and off-chain blobs can be hash-anchored with VerifiableURI.
+---

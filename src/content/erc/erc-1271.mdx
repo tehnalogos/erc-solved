@@ -1,0 +1,153 @@
+---
+id: "1271"
+title: "ERC-1271"
+headline: "What is ERC-1271?"
+pageTitle: "What is ERC-1271? Smart Contract Signatures and isValidSignature"
+description: "ERC-1271 defines isValidSignature, the standard way a smart contract account can validate signatures without an EOA private key."
+tagline: "The signature standard for smart accounts, multisigs, and contract wallets."
+bootStrip: "standard · smart contract signatures · account primitive · ready"
+standardAuthors:
+  - "Richard Meissner"
+  - "Oliver Spooner"
+  - "Pedro Gomes"
+proposed: "July 2018"
+eipNumber: "EIP-1271"
+termCode: "EIP-1271"
+updated: 2026-06-26
+
+definition: "ERC-1271 is the Ethereum standard for validating signatures from smart contracts. Instead of recovering an EOA address with ecrecover, a caller asks the contract account whether a hash and signature are valid by calling isValidSignature."
+
+abi: |
+  function isValidSignature(bytes32 hash, bytes memory signature) external view returns (bytes4 magicValue);
+
+tldr: "ERC-1271 is the bridge between ECDSA-era apps and smart accounts. It lets a contract wallet, multisig, DAO, or Universal Profile say whether a signature is valid under its own rules. The important limitation is that the standard only defines the validation question, not the permission system behind the answer."
+
+stats:
+  - k: "Standard"
+    v: "ERC-1271 / EIP-1271"
+  - k: "Core function"
+    v: "isValidSignature(hash, signature)"
+  - k: "Return value"
+    v: "0x1626ba7e magic value"
+  - k: "Used by"
+    v: "smart wallets · multisigs · account abstraction"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-1271"
+    href: "https://eips.ethereum.org/EIPS/eip-1271"
+
+interfaceDiagram:
+  - group: "read"
+    items: ["isValidSignature"]
+  - group: "common users"
+    items: ["wallets", "marketplaces", "permit flows", "orders"]
+
+limits:
+  - title: "It validates, but does not define permissions."
+    summary: "ERC-1271 tells callers how to ask whether a signature is valid. It does not standardize roles, session keys, allowed calls, guardians, value limits, or recovery."
+    workarounds: ["wallet-specific modules", "Safe owners/modules", "ERC-4337 validators", "custom policy contracts"]
+    from:
+      chip: "ERC-1271"
+      code: "isValidSignature(hash, sig)"
+      tags: ["yes/no", "policy undefined"]
+    to:
+      chip: "LSP6"
+      code: "Key Manager permissions"
+      tags: ["standard policy", "scoped"]
+  - title: "Callers still need wallet-specific expectations."
+    summary: "Two accounts can both support ERC-1271 while using totally different signature schemes, owner sets, modules, or validity windows behind the function."
+    workarounds: ["account SDKs", "signature adapters", "simulation"]
+    from:
+      chip: "smart wallets"
+      code: "same function, different policy"
+      tags: ["fragmented"]
+    to:
+      chip: "Universal Profile"
+      code: "standard controller data"
+      tags: ["inspectable"]
+  - title: "It does not make EOAs recoverable."
+    summary: "ERC-1271 only applies to contract accounts. If the user is still an EOA, signature validity is still tied to the private key unless another standard such as EIP-7702 or a smart-wallet wrapper is involved."
+    workarounds: ["contract account migration", "EIP-7702 delegation", "ERC-4337 smart accounts"]
+    from:
+      chip: "EOA"
+      code: "ecrecover"
+      tags: ["single key"]
+    to:
+      chip: "LSP0"
+      code: "contract account"
+      tags: ["controllers", "recovery"]
+
+luksoRoutes:
+  - chip: "LSP0"
+    label: "ERC-725 Account"
+    summary: "A contract account that can validate signatures and execute calls as the user."
+    href: "/standards/lsp0-erc725-account/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "The permission layer behind controller signatures."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP20"
+    label: "Call Verification"
+    summary: "Inline call verification for smart accounts."
+    href: "/standards/lsp20-call-verification/"
+
+compareRows:
+  - row: "standardizes"
+    left: "signature validation function"
+    right: "account plus permission model"
+  - row: "policy"
+    left: "wallet-defined"
+    right: "LSP6 permission vocabulary"
+  - row: "caller asks"
+    left: "is this signature valid?"
+    right: "is this controller allowed to do this?"
+  - row: "account type"
+    left: "any contract wallet"
+    right: "Universal Profile"
+compareRight:
+  chip: "LSP0+6"
+  kind: "topic"
+  label: "LSP account stack"
+
+useErc: "Use ERC-1271 whenever a protocol accepts signatures from smart contract accounts, multisigs, or account-abstraction wallets."
+useLsp: "Use LSP0 and LSP6 when you want the signature validator and the permission model to be part of the same standardized account surface."
+
+faqs:
+  - q: "What is ERC-1271?"
+    a: "ERC-1271 is the standard for smart contract signature validation. A caller sends a hash and signature to isValidSignature, and the contract returns a magic value if the signature is valid."
+  - q: "Why do smart wallets need ERC-1271?"
+    a: "A smart wallet may not have one private key that ecrecover can check. Its valid signature may depend on owners, modules, guardians, thresholds, session keys, or custom logic."
+  - q: "Is ERC-1271 part of account abstraction?"
+    a: "It is a supporting primitive. ERC-4337 smart accounts and many contract wallets use ERC-1271-style signature validation, but ERC-1271 by itself is not a full account abstraction system."
+
+aliases:
+  - "EIP-1271"
+  - "isValidSignature"
+  - "smart contract signatures"
+  - "contract wallet signatures"
+related:
+  - "erc/erc-4337"
+  - "erc/eip-7702"
+  - "standards/lsp0-erc725-account"
+  - "standards/lsp6-key-manager"
+docs:
+  - label: "eips.ethereum.org / EIP-1271"
+    href: "https://eips.ethereum.org/EIPS/eip-1271"
+primarySources:
+  - label: "EIP-1271"
+    href: "https://eips.ethereum.org/EIPS/eip-1271"
+
+lede: |
+  ERC-1271 exists because not every signer is an EOA. A contract account may require two owners, a module check, a guardian rule, or a session-key policy before it treats a signature as valid.
+
+origin: |
+  As multisigs and contract wallets became common, protocols needed a way to accept orders, permits, and messages from accounts that could not be verified with a plain ecrecover check.
+
+spec: |
+  The caller passes a hash and signature to isValidSignature. If the contract accepts the signature under its own rules, it returns the ERC-1271 magic value. Otherwise it fails or returns a different value.
+
+whatsBroken: |
+  The standard stops at validation. It does not tell the caller which controller signed, what that controller may do, or how the account can recover if the signer is lost.
+
+vogelsteller: |
+  LUKSO treats the account as a contract from the start. LSP0 supplies the account surface, LSP6 supplies the permission vocabulary, and signature validation becomes one part of a broader account system.
+---

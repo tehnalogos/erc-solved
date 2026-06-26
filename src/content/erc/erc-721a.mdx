@@ -1,0 +1,139 @@
+---
+id: "erc-721a"
+standardKind: "Topic"
+title: "ERC-721A"
+headline: "What is ERC-721A?"
+pageTitle: "What is ERC-721A? Azuki's Gas-Optimized ERC-721 Implementation"
+description: "ERC-721A is Azuki's gas-optimized implementation of ERC-721 for batch minting. It is not an Ethereum ERC standard, but it is a widely referenced NFT contract pattern."
+tagline: "The NFT mint optimization everyone calls an ERC, even though it is an implementation."
+bootStrip: "topic · azuki implementation · batch minting · production"
+updated: 2026-06-26
+
+definition: "ERC-721A is a gas-optimized implementation of the ERC-721 NFT standard created by Chiru Labs for Azuki. It reduces gas for minting multiple NFTs in one transaction by packing ownership data and inferring ownership across sequential token IDs."
+
+tldr: "ERC-721A is high-yield for NFT teams because it attacks one painful part of ERC-721: batch mint gas. It does not change the ERC-721 external standard. Transfers, approvals, tokenURI metadata, and marketplace expectations remain ERC-721-shaped. If the problem is richer token IDs, typed metadata, receiver hooks, or account permissions, LSP8 is the deeper alternative."
+
+stats:
+  - k: "Type"
+    v: "ERC-721 implementation, not an ERC standard"
+  - k: "Creator"
+    v: "Chiru Labs / Azuki"
+    href: "https://github.com/chiru-labs/ERC721A"
+  - k: "Primary optimization"
+    v: "batch minting"
+  - k: "External compatibility"
+    v: "ERC-721 interface"
+    href: "/erc-721/"
+
+limits:
+  - title: "It optimizes minting, not the NFT standard."
+    summary: "ERC-721A keeps the ERC-721 external interface. It reduces storage writes during batch mints, but tokenURI, approvals, transfer hooks, and uint256 IDs are still ERC-721 problems."
+    workarounds: ["ERC-721A", "custom metadata contracts", "ERC-4906", "marketplace adapters"]
+    from:
+      chip: "ERC-721A"
+      code: "_mint(to, quantity)"
+      tags: ["mint gas", "same ABI"]
+    to:
+      chip: "LSP8"
+      code: "bytes32 IDs + token data"
+      tags: ["different NFT substrate"]
+  - title: "Sequential ownership inference has edge cases."
+    summary: "The gas savings come from packed storage and inferred ownership across ranges. That is efficient, but contract authors must understand burn, transfer, and explicit ownership initialization behavior."
+    workarounds: ["use audited versions", "avoid unnecessary customization", "test burns/transfers heavily"]
+    from:
+      chip: "ERC-721A"
+      code: "packed ownership"
+      tags: ["optimized", "implementation-sensitive"]
+    to:
+      chip: "simple ERC-721"
+      code: "one owner slot per token"
+      tags: ["more obvious", "more gas"]
+  - title: "It does not solve metadata durability."
+    summary: "Most ERC-721A collections still rely on tokenURI and off-chain JSON. The implementation saves mint gas, but does not change where metadata lives or how updates are signaled."
+    workarounds: ["IPFS pinning", "Arweave", "ERC-4906", "on-chain metadata"]
+    href: "/problems/erc721-dynamic-metadata/"
+    from:
+      chip: "ERC-721A"
+      code: "tokenURI(id)"
+      tags: ["off-chain", "same metadata gap"]
+    to:
+      chip: "LSP4"
+      code: "typed metadata keys"
+      tags: ["structured", "hash anchored"]
+
+luksoRoutes:
+  - chip: "LSP8"
+    label: "Identifiable Digital Asset"
+    summary: "A deeper NFT alternative with bytes32 IDs, per-token data, and receiver-aware transfers."
+    href: "/standards/lsp8-identifiable-digital-asset/"
+  - chip: "LSP4"
+    label: "Digital Asset Metadata"
+    summary: "Typed metadata instead of relying only on tokenURI JSON."
+    href: "/standards/lsp4-digital-asset-metadata/"
+  - chip: "LSP25"
+    label: "Execute Relay Call"
+    summary: "Can bundle or sponsor account actions without changing the NFT ABI."
+    href: "/standards/lsp25-execute-relay-call/"
+
+compareRows:
+  - row: "status"
+    left: "implementation"
+    right: "asset standard"
+  - row: "main win"
+    left: "cheaper batch mint"
+    right: "richer identifiable asset model"
+  - row: "external ABI"
+    left: "ERC-721"
+    right: "LSP8"
+  - row: "metadata"
+    left: "tokenURI by default"
+    right: "LSP4 / ERC-725Y typed data"
+compareRight:
+  chip: "LSP8"
+  kind: "lsp"
+  id: "8"
+  label: "LSP8 Identifiable Digital Asset"
+
+useErc: "Use ERC-721A when you need ERC-721 compatibility and your main cost problem is minting many sequential NFTs efficiently."
+useLsp: "Use LSP8 when the design needs bytes32 token IDs, typed per-token metadata, receiver-aware transfer behavior, or account-level permission scoping."
+
+faqs:
+  - q: "Is ERC-721A an official ERC standard?"
+    a: "No. ERC-721A is a widely used implementation of ERC-721 by Chiru Labs, not a finalized Ethereum ERC specification."
+  - q: "What is ERC-721A good for?"
+    a: "It is primarily good for reducing gas when minting multiple NFTs in one transaction while keeping ERC-721 compatibility."
+  - q: "Does ERC-721A change NFT metadata?"
+    a: "No. It normally keeps the ERC-721 tokenURI model, so metadata durability and update signaling remain separate problems."
+
+aliases:
+  - "ERC721A"
+  - "Azuki ERC721A"
+  - "ERC-721A vs ERC-721"
+  - "gas optimized NFT"
+related:
+  - "erc/erc-721"
+  - "erc/erc-4906"
+  - "erc/erc-2981"
+  - "erc/erc-6551"
+docs:
+  - label: "github.com / chiru-labs / ERC721A"
+    href: "https://github.com/chiru-labs/ERC721A"
+primarySources:
+  - label: "Chiru Labs ERC721A repository"
+    href: "https://github.com/chiru-labs/ERC721A"
+
+lede: |
+  ERC-721A is famous because NFT drops were expensive. If a buyer minted five NFTs, a naive ERC-721 implementation wrote ownership five times. ERC-721A made that path cheaper.
+
+origin: |
+  Chiru Labs built ERC-721A for Azuki-era NFT minting, where batch mint gas had become a product problem. The pattern spread because it preserved ERC-721 compatibility while reducing mint cost.
+
+spec: |
+  The external contract still behaves like ERC-721. The optimization is internal: packed ownership data and sequential inference reduce storage writes for consecutive mints.
+
+whatsBroken: |
+  ERC-721A is not a fix for ERC-721's larger surface. It does not change tokenURI, setApprovalForAll, safeTransferFrom, uint256 token IDs, or the absence of typed per-token metadata.
+
+vogelsteller: |
+  LSP8 is not an ERC-721 gas optimization. It is a different identifiable-asset standard. Use ERC-721A when ERC-721 compatibility plus mint gas is the job; use LSP8 when the NFT substrate itself is the problem.
+---

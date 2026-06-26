@@ -1,0 +1,283 @@
+---
+id: "1155"
+title: "ERC-1155"
+standardKind: "ERC"
+headline: "What is ERC-1155?"
+pageTitle: "What is ERC-1155? Multi-Token Contracts, Their Limits, and What Comes Next"
+description: "ERC-1155 is Ethereum's multi-token standard: one contract can manage fungible, semi-fungible, and non-fungible token IDs. This page walks the ABI, the batch-transfer model, the metadata convention, the integration tax, and the LUKSO LSP7 + LSP8 split that moves asset semantics back into the standard."
+tagline: "The multi-token standard that compressed assets into IDs — and pushed semantics into every integration."
+bootStrip: "standard · proposed jun 2018 · game asset substrate · ready"
+standardAuthors:
+  - "Witek Radomski"
+  - "Andrew Cooke"
+  - "Philippe Castonguay"
+  - "James Therien"
+  - "Eric Binet"
+  - "Ronan Sandford"
+proposed: "June 2018"
+eipNumber: "EIP-1155"
+termCode: "EIP-1155"
+updated: 2026-06-26
+
+definition: "ERC-1155 is the Ethereum multi-token standard. It defines a single contract interface that can manage many token IDs, where each ID may represent a fungible, non-fungible, semi-fungible, or application-specific asset type. The standard was created in June 2018 by Witek Radomski and co-authors for game and multi-asset systems that needed batch transfers, batch balance queries, one approval surface, and one deployed contract instead of separate ERC-20 and ERC-721 contracts for every asset."
+
+abi: |
+  // EIP-1155 — core
+  function balanceOf(address account, uint256 id) external view returns (uint256);
+  function balanceOfBatch(address[] calldata accounts, uint256[] calldata ids)
+    external view returns (uint256[] memory);
+  function setApprovalForAll(address operator, bool approved) external;
+  function isApprovedForAll(address account, address operator) external view returns (bool);
+  function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes calldata data) external;
+  function safeBatchTransferFrom(address from, address to, uint256[] calldata ids, uint256[] calldata values, bytes calldata data) external;
+
+  event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value);
+  event TransferBatch(address indexed operator, address indexed from, address indexed to, uint256[] ids, uint256[] values);
+  event ApprovalForAll(address indexed account, address indexed operator, bool approved);
+  event URI(string value, uint256 indexed id);
+
+  // EIP-165 — required
+  function supportsInterface(bytes4 interfaceId) external view returns (bool);
+
+  // EIP-1155 metadata extension
+  function uri(uint256 id) external view returns (string memory);
+
+  // Receiver hooks
+  function onERC1155Received(address operator, address from, uint256 id, uint256 value, bytes calldata data)
+    external returns (bytes4);
+  function onERC1155BatchReceived(address operator, address from, uint256[] calldata ids, uint256[] calldata values, bytes calldata data)
+    external returns (bytes4);
+
+tldr: "ERC-1155 solved one real problem: ERC-20 and ERC-721 were too expensive and awkward for games, editions, inventories, and collections with many asset types. One contract, one approval, batch transfers, batch balance reads. The cost is semantic compression: every token ID becomes a local namespace where fungibility, metadata, supply, and behavior are conventions only that contract understands. LSP7 + LSP8 take the opposite path: use separate standards for fungible and identifiable assets, then share metadata, receiver hooks, and account permissions across both."
+
+stats:
+  - k: "Standard"
+    v: "ERC-1155 / EIP-1155"
+  - k: "Created"
+    v: "17 June 2018"
+    href: "https://eips.ethereum.org/EIPS/eip-1155"
+  - k: "Authors"
+    v: "Radomski · Cooke · Castonguay · Therien · Binet · Sandford"
+  - k: "Required dependency"
+    v: "ERC-165"
+    href: "https://eips.ethereum.org/EIPS/eip-165"
+  - k: "Core shape"
+    v: "one contract, many token IDs"
+  - k: "Modern alternative"
+    v: "LUKSO LSP7 + LSP8"
+    href: "/standards/compare/erc1155-lsp7-lsp8/"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-1155"
+    href: "https://eips.ethereum.org/EIPS/eip-1155"
+
+interfaceDiagram:
+  - group: "read"
+    items: ["balanceOf", "balanceOfBatch", "isApprovedForAll", "uri"]
+  - group: "write"
+    items: ["safeTransferFrom", "safeBatchTransferFrom", "setApprovalForAll"]
+  - group: "emit"
+    items: ["TransferSingle", "TransferBatch", "ApprovalForAll", "URI"]
+  - group: "receive"
+    items: ["onERC1155Received", "onERC1155BatchReceived"]
+
+limits:
+  - title: "Token IDs hide asset semantics."
+    summary: "ERC-1155 tells you that ID 42 exists and has a balance. It does not tell you whether ID 42 is a fungible currency, a semi-fungible edition, a unique game item, a claim ticket, or a packed bitfield. Every collection invents its own ID convention. Wallets, indexers, and marketplaces either treat every ID generically or learn per-contract rules."
+    workarounds: ["type-bit token IDs", "off-chain collection manifests", "custom indexer adapters", "per-game metadata registries"]
+    href: "/problems/erc1155-complexity/"
+    from:
+      chip: "ERC-1155"
+      code: "balanceOf(owner, id)"
+      tags: ["id-local meaning", "fungibility by convention", "indexer tax"]
+    to:
+      chip: "LSP7 + LSP8"
+      code: "standard chosen by asset shape"
+      tags: ["fungible in LSP7", "identifiable in LSP8", "interface-level semantics"]
+
+  - title: "Metadata is one URI template."
+    summary: "The optional metadata extension returns uri(id), typically a template with an {id} substitution. That works for game assets, but the contract still does not expose typed fields, per-id structured data, creator metadata, verification hashes, or update semantics. The JSON remains an off-chain convention."
+    workarounds: ["centralized metadata APIs", "IPFS JSON by token ID", "OpenSea-style attributes", "ERC-4906-style refetch events"]
+    from:
+      chip: "ERC-1155"
+      code: "uri(id) returns (string)"
+      tags: ["off-chain JSON", "template convention", "untyped"]
+    to:
+      chip: "LSP4 + ERC-725Y"
+      code: "typed asset + per-token data keys"
+      tags: ["structured", "VerifiableURI", "contract-readable"]
+
+  - title: "setApprovalForAll is contract-wide."
+    summary: "The operator approval covers every token ID in the contract. That is ergonomic for marketplaces, but it couples every asset type in the collection to one blanket permission. If a game mixes currencies, rare items, badges, and claims in one ERC-1155 contract, one approval can move all of them."
+    workarounds: ["per-id escrow contracts", "marketplace allowlists", "custom transfer validators", "separate ERC-1155 contracts per asset family"]
+    from:
+      chip: "ERC-1155"
+      code: "setApprovalForAll(operator, true)"
+      tags: ["all ids", "forever approval", "phishable"]
+    to:
+      chip: "LSP6"
+      code: "AllowedCalls + controller permissions"
+      tags: ["account scoped", "revocable", "standard vocabulary"]
+
+  - title: "The receiver surface is still asset-specific."
+    summary: "ERC-1155 improved safety by requiring receiver hooks for contract recipients, but the hook is ERC-1155-specific. A wallet or vault that handles ERC-20, ERC-721, ERC-1155, and custom assets still implements multiple receiver shapes, each with its own data model."
+    workarounds: ["holder mixins", "adapter contracts", "rescue functions", "asset-specific receiver interfaces"]
+    from:
+      chip: "ERC-1155"
+      code: "onERC1155Received / onERC1155BatchReceived"
+      tags: ["one token family", "batch-specific", "receiver branching"]
+    to:
+      chip: "LSP1"
+      code: "universalReceiver(typeId, data)"
+      tags: ["one hook", "all assets", "typed notifications"]
+
+  - title: "One contract becomes one product boundary."
+    summary: "The reason ERC-1155 is efficient is also why it gets heavy: supply rules, transfer rules, metadata rules, permission rules, and indexer assumptions all accumulate inside one deployment. If the product's asset taxonomy changes, the token ID convention has to carry the migration."
+    workarounds: ["new contract versions", "collection registries", "proxy upgrades", "per-id branching"]
+    from:
+      chip: "ERC-1155"
+      code: "one contract, many meanings"
+      tags: ["monolith", "branch-heavy", "adapter-heavy"]
+    to:
+      chip: "LSP7 + LSP8"
+      code: "split contracts by semantics"
+      tags: ["smaller surfaces", "clear dispatch", "shared LSP substrate"]
+
+luksoRoutes:
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "The fungible side of the split: balances, amount-scoped operators, transfer data, and LSP1 notifications."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP8"
+    label: "Identifiable Digital Asset"
+    summary: "The identifiable side: bytes32 token IDs, per-token ERC-725Y data, and the same receiver-aware transfer model."
+    href: "/standards/lsp8-identifiable-digital-asset/"
+  - chip: "LSP4"
+    label: "Digital Asset Metadata"
+    summary: "Typed metadata for both LSP7 and LSP8 assets, including VerifiableURI references and extensible ERC-725Y keys."
+    href: "/standards/lsp4-digital-asset-metadata/"
+  - chip: "LSP1"
+    label: "Universal Receiver"
+    summary: "One receiver hook for every asset family instead of ERC-721 and ERC-1155-specific callback shapes."
+    href: "/standards/lsp1-universal-receiver/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Move broad operator authority from token contracts to a standard account permission layer."
+    href: "/standards/lsp6-key-manager/"
+
+compareRows:
+  - row: "asset boundary"
+    left: "token ID convention inside one contract"
+    right: "standard choice: LSP7 for fungible, LSP8 for identifiable"
+  - row: "metadata"
+    left: "uri(id) string template"
+    right: "LSP4 + ERC-725Y typed data"
+  - row: "receiver hook"
+    left: "IERC1155Receiver single + batch"
+    right: "LSP1 universalReceiver"
+  - row: "approval"
+    left: "setApprovalForAll over every ID"
+    right: "LSP6 account permissions + LSP7/LSP8 operators"
+  - row: "batching"
+    left: "safeBatchTransferFrom(ids, values)"
+    right: "batch execution at account/app layer"
+  - row: "indexer cost"
+    left: "learn per-contract ID semantics"
+    right: "dispatch by standard interface"
+compareHref: "/standards/compare/erc1155-lsp7-lsp8/"
+compareRight:
+  chip: "LSP7+8"
+  kind: "topic"
+  label: "LSP7 + LSP8"
+
+useErc: "When one deployment must manage a large inventory of mixed assets, cross-ID batch transfer is core product behavior, and downstream code can tolerate contract-specific token ID semantics. Games, editions, coupons, and marketplace inventory systems can still be better served by ERC-1155 than by many separate contracts."
+useLsp: "When the integration surface matters more than one-contract compression. If downstream apps need to know whether an asset is fungible or identifiable without parsing collection-specific ID bits, use LSP7 for fungible assets and LSP8 for identifiable assets, then share LSP4 metadata, LSP1 hooks, and LSP6 account permissions."
+
+aliases:
+  - "ERC1155"
+  - "EIP-1155"
+  - "multi-token standard"
+  - "semi-fungible token standard"
+  - "ERC-1155 metadata"
+  - "safeBatchTransferFrom"
+
+faqs:
+  - q: "What is ERC-1155?"
+    a: "ERC-1155 is Ethereum's multi-token standard. One smart contract can manage many token IDs, and each ID can represent a fungible, non-fungible, semi-fungible, or custom asset type. The standard is widely used for games, editions, inventory systems, and collections that need batch transfer."
+  - q: "How is ERC-1155 different from ERC-721?"
+    a: "ERC-721 has one owner per tokenId and is designed for identifiable NFTs. ERC-1155 has balances per owner per id, so a single token ID can have supply greater than one, and a single contract can mix many asset types. ERC-1155 also includes batch transfer and batch balance functions."
+  - q: "How is ERC-1155 different from ERC-20?"
+    a: "ERC-20 is one fungible balance per contract. ERC-1155 is many balances per contract, keyed by token ID. An ERC-1155 ID can behave like a fungible token if multiple users hold units of the same ID, but that fungibility is a convention of the contract."
+  - q: "Does ERC-1155 solve NFT metadata?"
+    a: "It improves the shape for multi-asset collections by defining uri(id), but it does not make metadata typed, on-chain, verified, or contract-readable. The returned URI still usually points to off-chain JSON."
+  - q: "What is the LUKSO alternative to ERC-1155?"
+    a: "LUKSO does not use one multi-token standard as the primary answer. It splits by asset shape: LSP7 for fungible assets and LSP8 for identifiable assets. Both share LSP4 metadata, LSP1 receiver hooks, and LSP6 account permissions."
+
+related:
+  - "erc/ethereum-token-standards"
+  - "erc/erc-2981"
+  - "erc/erc-4906"
+  - "problems/erc1155-complexity"
+  - "standards/compare/erc1155-lsp7-lsp8"
+  - "build/migrate/erc1155-to-lsp7-lsp8"
+  - "erc/erc-721"
+  - "standards/lsp7-digital-asset"
+  - "standards/lsp8-identifiable-digital-asset"
+
+docs:
+  - label: "eips.ethereum.org / EIP-1155"
+    href: "https://eips.ethereum.org/EIPS/eip-1155"
+  - label: "docs.lukso.tech / LSP7 Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+
+primarySources:
+  - label: "EIP-1155: Multi Token Standard"
+    href: "https://eips.ethereum.org/EIPS/eip-1155"
+  - label: "LUKSO LSP7 Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+  - label: "LUKSO LSP8 Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+
+timeline:
+  - year: "Jun 2018"
+    text: "ERC-1155 is created as a multi-token standard for contracts that need many token types and batch transfers."
+    href: "https://eips.ethereum.org/EIPS/eip-1155"
+  - year: "2019"
+    text: "The standard becomes the default mental model for games and multi-asset collections where ERC-721's one-token transfer shape is too expensive."
+  - year: "2023"
+    text: "LUKSO mainnet ships the LSP asset stack, splitting fungible and identifiable assets into LSP7 and LSP8 while sharing metadata and receiver hooks."
+
+glossary:
+  - term: "token ID"
+    def: "The uint256 key ERC-1155 uses to identify a particular asset type inside a multi-token contract."
+  - term: "semi-fungible"
+    def: "An asset pattern where units are fungible within one ID but distinct from units of another ID."
+  - term: "safeBatchTransferFrom"
+    def: "The ERC-1155 batch transfer function that moves many token IDs and amounts in one call."
+  - term: "URI template"
+    def: "The ERC-1155 metadata pattern where uri(id) may return a string containing {id}, which clients replace with the token ID."
+
+lede: |
+  ERC-1155 was the right answer to a real Ethereum problem: deploying one contract per token type is wasteful, and moving a player's inventory one item at a time is miserable. It gave games and multi-asset apps one contract, one approval surface, batch transfers, and a metadata convention that could describe many IDs from one URI function.
+
+  The tradeoff is that the standard compresses asset meaning into token IDs. ERC-1155 can tell an app that an owner has 12 units of ID 9. It cannot tell the app whether ID 9 is currency, an edition, a badge, a claim ticket, or a sword without collection-specific context.
+
+origin: |
+  ERC-1155 was created on **17 June 2018** by Witek Radomski and co-authors from the Enjin / Horizon games orbit. The motivation was practical: games and multi-asset applications needed thousands of token types, batch transfers, batch balance reads, and one approval path. ERC-20 required one deployment per fungible asset. ERC-721 required one transfer per NFT. Neither fit a real inventory.
+
+  ERC-1155's key move was to make the token ID the asset boundary. A single contract can emit `TransferSingle` and `TransferBatch` events for any number of IDs, and every balance is a pair: `(owner, id)`. That move saved gas and simplified deployment. It also moved semantic interpretation out of the standard.
+
+spec: |
+  The mental model is a two-dimensional balance sheet: `balanceOf(account, id)` instead of `balanceOf(account)` or `ownerOf(tokenId)`. A transfer moves a quantity of one ID; a batch transfer moves arrays of IDs and quantities. `setApprovalForAll` gives an operator authority over all IDs owned by the account inside that contract. `uri(id)` points clients to metadata for one ID, usually through an off-chain JSON template.
+
+  The standard requires ERC-165 interface detection and receiver hooks for contract recipients. That makes ERC-1155 safer than raw ERC-20 transfer, but the callback surface is still specific to ERC-1155. The canonical specification is at [eips.ethereum.org/EIPS/eip-1155](https://eips.ethereum.org/EIPS/eip-1155).
+
+whatsBroken: |
+  ERC-1155 is not broken because it batches. It is powerful because it batches. The integration tax comes from the other half of the design: once every asset type is one token ID inside one contract, every app has to learn what those IDs mean.
+
+vogelsteller: |
+  The LUKSO answer does not try to recreate ERC-1155 as one bigger multi-token standard. It splits the question by asset shape. If the thing is fungible, use **LSP7**. If the thing is identifiable, use **LSP8**. If both need metadata, use **LSP4**. If both need receiver hooks, use **LSP1**. If both need permissions, use **LSP6** on the account.
+
+  That means more deployments for some products. It also means wallets, marketplaces, indexers, and account systems can dispatch by standard interface rather than reverse-engineering ID conventions. The savings move from deployment gas to integration clarity.
+---

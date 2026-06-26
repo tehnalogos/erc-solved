@@ -1,0 +1,54 @@
+---
+title: "ERC-4337 vs EIP-7702"
+left: { chip: "ERC-4337", label: "alt-mempool smart accounts" }
+right: { chip: "EIP-7702", label: "EOA delegation" }
+description: "ERC-4337 and EIP-7702 are complementary account-abstraction paths: 4337 defines the UserOperation, EntryPoint, bundler, and paymaster architecture; 7702 lets existing EOAs delegate execution to contract code."
+updated: 2026-06-26
+verdict:
+  useLeft: "Use ERC-4337 when the product is a contract-account wallet flow that needs UserOperations, bundlers, paymasters, validation modules, and the current AA vendor ecosystem."
+  useRight: "Use EIP-7702 when the product must upgrade existing EOAs in place: keep the same address, ENS, history, reputation, and airdrop footprint while delegating execution to wallet code."
+  neither: "Neither removes the need for a clear permission model. ERC-4337 leaves validator policy to the account implementation; EIP-7702 keeps residual EOA-key risk unless the wallet design handles delegation lifecycle carefully."
+matrix:
+  - row: "primary object"
+    left: "UserOperation from a smart account"
+    right: "set-code transaction from an EOA"
+  - row: "infrastructure"
+    left: "bundler + EntryPoint + optional paymaster"
+    right: "normal transaction path plus delegated code"
+  - row: "existing address migration"
+    left: "not by itself; new smart account address is common"
+    right: "yes; existing EOA keeps its address"
+  - row: "gas sponsorship"
+    left: "paymaster via EntryPoint"
+    right: "usually paired with 4337/paymaster infrastructure"
+  - row: "signature / validation"
+    left: "validateUserOp on account"
+    right: "EOA authorizes delegation; delegated code handles execution"
+  - row: "residual EOA key"
+    left: "not present for native contract accounts"
+    right: "present unless future revocation patterns are added"
+docs:
+  - label: "eips.ethereum.org / EIP-4337"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "eips.ethereum.org / EIP-7702"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+related:
+  - "erc/erc-4337"
+  - "erc/eip-7702"
+  - "erc/gasless-transactions"
+  - "compare/erc4337-lsp-stack"
+---
+
+## The clean distinction
+
+ERC-4337 is an account-abstraction architecture. It defines the UserOperation object, EntryPoint validation flow, bundler role, paymaster sponsorship path, and account-side validation hook.
+
+EIP-7702 is an EOA upgrade primitive. It lets an externally owned account temporarily behave as if it had contract code, which gives existing addresses a path into smart-wallet behavior without redeployment.
+
+## Why they are complementary
+
+7702 solves the migration problem that 4337 alone could not solve: users already have EOAs with assets, ENS records, transaction history, reputation, and airdrop eligibility. 4337 solves the ecosystem problem around bundlers, paymasters, and wallet infrastructure. In production, wallets can use 7702 to upgrade the address and 4337 infrastructure to route sponsored or bundled operations.
+
+## The remaining gap
+
+Neither standard is a complete permission vocabulary. ERC-4337 leaves validation policy to each account implementation. EIP-7702 delegates execution to code, but the original EOA key remains a serious lifecycle question. The LUKSO comparison is useful because LSP0 and LSP6 start from the account and permission layer instead of patching it around an EOA.

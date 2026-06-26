@@ -1,0 +1,287 @@
+---
+id: "7702"
+title: "EIP-7702"
+standardKind: "EIP"
+headline: "What is EIP-7702?"
+pageTitle: "What is EIP-7702? EOA Delegation, Pectra, and the Residual-Key Problem"
+description: "EIP-7702 is Ethereum's Pectra-era account delegation primitive. It lets an externally owned account temporarily behave like a smart account by delegating execution to contract code. This page explains the authorization tuple, how it relates to ERC-4337, what it fixes, what it leaves open, and why the LSP account stack starts from a different premise."
+tagline: "The protocol patch that lets EOAs borrow smart-account behavior — without removing the EOA root key."
+bootStrip: "core eip · proposed may 2024 · pectra account primitive · ready"
+standardAuthors:
+  - "Vitalik Buterin"
+  - "Sam Wilson"
+  - "Ansgar Dietrichs"
+  - "lightclient"
+proposed: "May 2024"
+eipNumber: "EIP-7702"
+termCode: "EIP-7702"
+updated: 2026-06-26
+
+definition: "EIP-7702 is an Ethereum Core EIP that adds a transaction type allowing an externally owned account (EOA) to set a delegation pointer to contract code. The transaction carries authorization tuples signed by EOAs; once installed, calls to the EOA execute the delegated contract code in the EOA's account context. It was proposed in May 2024 by Vitalik Buterin, Sam Wilson, Ansgar Dietrichs, and lightclient, and activated with Ethereum's Pectra upgrade in May 2025."
+
+abi: |
+  // EIP-7702 is a protocol transaction type, not a contract ABI.
+  // The set-code transaction payload is RLP-encoded:
+  //
+  // rlp([
+  //   chain_id,
+  //   nonce,
+  //   max_priority_fee_per_gas,
+  //   max_fee_per_gas,
+  //   gas_limit,
+  //   destination,
+  //   value,
+  //   data,
+  //   access_list,
+  //   authorization_list,
+  //   signature_y_parity,
+  //   signature_r,
+  //   signature_s
+  // ])
+  //
+  // Each authorization tuple:
+  struct Authorization {
+    uint256 chainId;
+    address delegationTarget;
+    uint64 nonce;
+    uint8 yParity;
+    bytes32 r;
+    bytes32 s;
+  }
+  //
+  // Installed account code:
+  // 0xef0100 || delegationTarget
+
+tldr: "EIP-7702 fixes one of ERC-4337's hardest adoption problems: existing EOAs cannot become smart accounts without moving assets, approvals, ENS, history, and reputation. With 7702, an existing address can delegate execution to wallet code and use batching, gas sponsorship, session keys, and ERC-4337 infrastructure. The catch is the root key does not disappear. A compromised EOA key can sign another authorization and replace the delegation. LUKSO Universal Profiles start from the opposite premise: the account is a contract from genesis, and authority lives in standard controllers, not in a residual private key."
+
+stats:
+  - k: "Standard"
+    v: "EIP-7702"
+  - k: "Track"
+    v: "Core"
+  - k: "Created"
+    v: "7 May 2024"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - k: "Activated"
+    v: "Pectra, May 2025"
+  - k: "Transaction type"
+    v: "SET_CODE_TX_TYPE 0x04"
+  - k: "Delegation marker"
+    v: "0xef0100 || address"
+  - k: "Closest account stack"
+    v: "ERC-4337 EntryPoint v0.8"
+    href: "/erc-4337/"
+  - k: "LUKSO contrast"
+    v: "LSP0 + LSP6 + LSP20 + LSP25"
+    href: "/standards/lsp0-erc725-account/"
+
+interfaceDiagram:
+  - group: "tx"
+    items: ["SET_CODE_TX_TYPE", "destination", "data", "authorization_list"]
+  - group: "auth"
+    items: ["chain_id", "address", "nonce", "y_parity", "r", "s"]
+  - group: "installed"
+    items: ["0xef0100", "delegation target"]
+  - group: "wallet layer"
+    items: ["batching", "sponsorship", "session keys", "validation logic"]
+
+limits:
+  - title: "The residual ECDSA key remains."
+    summary: "EIP-7702 gives an EOA code-like behavior, but the original private key is still the account's root authority. If that key is compromised, an attacker can sign a new authorization tuple and point the account at hostile code. Recovery above the delegation is not authoritative unless the residual key can be revoked."
+    workarounds: ["hardware-wallet-rooted EOAs", "EIP-7851 draft for ECDSA disablement", "fresh contract account migration", "strict wallet warnings for authorizations"]
+    href: "/problems/eoa-key-risk/"
+    from:
+      chip: "EIP-7702"
+      code: "EOA key signs another authorization"
+      tags: ["residual root", "override risk", "recovery not final"]
+    to:
+      chip: "LSP0 + LSP6"
+      code: "contract account + controllers"
+      tags: ["no hidden root", "controller rotation", "authoritative recovery"]
+
+  - title: "Delegated EOAs are hybrid accounts."
+    summary: "A 7702 account has an address with delegation code, but it is still an EOA-shaped account in important ways. Tools, contracts, and assumptions built around 'EOA has no code' and 'contract has deployed storage and init flow' now meet a third category."
+    workarounds: ["wallet-specific detection", "account abstraction SDK wrappers", "defensive tx.origin assumptions", "simulation before signing"]
+    from:
+      chip: "EIP-7702"
+      code: "EOA address executes delegated code"
+      tags: ["hybrid semantics", "tooling gap", "invariant breaks"]
+    to:
+      chip: "LSP0"
+      code: "account is always a contract"
+      tags: ["predictable", "ERC-725 storage", "contract semantics"]
+
+  - title: "Initialization and storage are wallet problems."
+    summary: "A 7702 delegation points to code; it does not deploy and initialize a new account contract in the normal sense. Delegate implementations execute against the EOA's account context, so wallet authors must handle initialization ordering, storage layout, and delegate replacement carefully."
+    workarounds: ["guarded initialization", "namespaced storage", "single-vendor delegate discipline", "formal storage-layout reviews"]
+    from:
+      chip: "EIP-7702"
+      code: "delegation target executes in EOA context"
+      tags: ["init hazards", "storage collision", "implementation trust"]
+    to:
+      chip: "LSP17 + ERC-725Y"
+      code: "standard extension + account data store"
+      tags: ["registered selectors", "typed keys", "replaceable modules"]
+
+  - title: "Authorizations are a new phishing surface."
+    summary: "The signature a user is asked for is no longer just a transaction or a permit; it can change what code controls the account. Wallet UI has to explain delegation authority clearly enough that non-technical users do not sign away execution control."
+    workarounds: ["human-readable delegation registries", "wallet allowlists", "simulation", "short-lived delegates where possible"]
+    from:
+      chip: "EIP-7702"
+      code: "sign Authorization(chainId, target, nonce)"
+      tags: ["high authority", "hard to explain", "phishing target"]
+    to:
+      chip: "LSP6"
+      code: "grant controller permissions"
+      tags: ["scoped calls", "inspectable", "revocable"]
+
+  - title: "It is not a permission vocabulary."
+    summary: "EIP-7702 installs delegation. It does not standardize session keys, spending limits, recovery, app permissions, received assets, profile metadata, or relay policy. Those features live in the delegated wallet implementation and the ERC-4337 stack around it."
+    workarounds: ["ERC-4337 smart account implementations", "ERC-7579 modules", "wallet SDKs", "vendor-specific permission schemas"]
+    href: "/problems/wallet-permissions/"
+    from:
+      chip: "EIP-7702"
+      code: "delegate to wallet code"
+      tags: ["mechanism only", "wallet-specific", "no shared policy"]
+    to:
+      chip: "LSP6 + LSP25"
+      code: "permissions + relay on the account"
+      tags: ["standard policy", "gasless native", "tool-readable"]
+
+luksoRoutes:
+  - chip: "LSP0"
+    label: "ERC-725 Account"
+    summary: "The account is a contract from day one. No residual EOA key sits above the account's permission system."
+    href: "/standards/lsp0-erc725-account/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "A standard permission vocabulary for controllers, allowed calls, value limits, and ERC-725Y data access."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP20"
+    label: "Call Verification"
+    summary: "Inline verification on the normal call path, rather than validation through an EntryPoint or delegated wallet-specific module."
+    href: "/standards/lsp20-call-verification/"
+  - chip: "LSP25"
+    label: "Execute Relay Call"
+    summary: "Gasless execution as an account function: a controller signs, a relayer submits, permissions still gate the payload."
+    href: "/standards/lsp25-execute-relay-call/"
+  - chip: "LSP17"
+    label: "Contract Extension"
+    summary: "A selector-based extension mechanism that avoids treating delegated EOA storage as an upgrade substrate."
+    href: "/standards/lsp17-contract-extension/"
+
+compareRows:
+  - row: "account root"
+    left: "EOA private key remains"
+    right: "contract account controlled by LSP6"
+  - row: "upgrade shape"
+    left: "delegation target pointer"
+    right: "account modules/extensions and Key Manager replacement"
+  - row: "permission model"
+    left: "wallet implementation decides"
+    right: "LSP6 permission bitfield + allowed calls/data keys"
+  - row: "gasless flow"
+    left: "usually through ERC-4337 bundler/paymaster infrastructure"
+    right: "LSP25 executeRelayCall on the account"
+  - row: "identity/data"
+    left: "not specified"
+    right: "ERC-725Y + LSP3 profile data"
+  - row: "main advantage"
+    left: "upgrades existing Ethereum addresses in place"
+    right: "clean account semantics from genesis"
+compareRight:
+  chip: "LSP0+6+20+25"
+  kind: "topic"
+  label: "LSP account stack"
+
+useErc: "When the product must upgrade existing Ethereum or L2 EOAs in place. If the address history, ENS name, approvals, assets, reputation, and airdrop eligibility cannot move, EIP-7702 is the practical bridge from EOA UX to smart-account UX."
+useLsp: "When the account model is part of the product and chain choice is open. A Universal Profile avoids the residual-root problem entirely: no ECDSA key above recovery, one standard permission vocabulary, profile metadata, receiver hooks, and gasless relay execution designed into the account."
+
+aliases:
+  - "EIP7702"
+  - "EIP-7702 explained"
+  - "Pectra account abstraction"
+  - "EOA delegation"
+  - "set code for EOAs"
+  - "ERC-4337 vs EIP-7702"
+
+faqs:
+  - q: "What is EIP-7702?"
+    a: "EIP-7702 is an Ethereum protocol change that lets an EOA delegate execution to contract code through a signed authorization. It gives existing addresses smart-account-like behavior without redeploying or moving assets."
+  - q: "Is EIP-7702 the same as ERC-4337?"
+    a: "No. ERC-4337 is a higher-layer smart account architecture built around UserOperations, EntryPoint, bundlers, and paymasters. EIP-7702 is a protocol transaction type that lets an existing EOA point to contract code. EntryPoint v0.8 can use 7702 accounts, so the two are complementary."
+  - q: "Did Pectra activate EIP-7702?"
+    a: "Yes. Ethereum's Pectra upgrade in May 2025 activated EIP-7702, making EOA delegation available at the protocol layer."
+  - q: "What is the residual-key problem?"
+    a: "A delegated EOA still has its original private key. If that key is stolen, the attacker can sign another EIP-7702 authorization and replace the delegate code, bypassing recovery or session limits implemented above the delegation."
+  - q: "How does LUKSO differ from EIP-7702?"
+    a: "LUKSO Universal Profiles are contract accounts from genesis. Authority lives in controllers managed through LSP6, not in a residual EOA key. Gasless execution is LSP25 on the account, and profile data uses ERC-725Y/LSP3."
+
+related:
+  - "erc/erc-4337"
+  - "compare/erc4337-eip7702"
+  - "erc/erc-1271"
+  - "problems/eoa-key-risk"
+  - "problems/wallet-permissions"
+  - "problems/gasless-onboarding"
+  - "standards/lsp0-erc725-account"
+  - "standards/lsp6-key-manager"
+
+docs:
+  - label: "eips.ethereum.org / EIP-7702"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "eips.ethereum.org / ERC-4337"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "docs.lukso.tech / LSP0 ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+
+primarySources:
+  - label: "EIP-7702: Set Code for EOAs"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "ERC-4337: Account Abstraction Using Alt Mempool"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "LUKSO LSP0 ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+
+timeline:
+  - year: "May 2024"
+    text: "Vitalik Buterin, Sam Wilson, Ansgar Dietrichs, and lightclient create EIP-7702."
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - year: "May 2025"
+    text: "Ethereum's Pectra upgrade activates EIP-7702, and ERC-4337 EntryPoint v0.8 adds native support for delegated EOAs."
+  - year: "2026"
+    text: "Wallets and account-abstraction stacks continue converging around 7702 + 4337, while residual key revocation remains an active design topic."
+
+glossary:
+  - term: "EOA"
+    def: "Externally Owned Account: an Ethereum account controlled by a secp256k1 private key."
+  - term: "authorization tuple"
+    def: "The signed EIP-7702 data structure that names a chain, delegation target, nonce, and signature."
+  - term: "delegation indicator"
+    def: "The account-code marker 0xef0100 followed by the delegation target address."
+  - term: "residual key"
+    def: "The original EOA private key that remains able to sign new authorizations after delegation is installed."
+
+lede: |
+  EIP-7702 is the most important account-abstraction patch Ethereum has shipped since ERC-4337 went live. It answers the question ERC-4337 could not answer cleanly: how does an address that already owns assets, approvals, ENS, reputation, and history become programmable without moving everything to a new contract account?
+
+  The answer is delegation. The price is that the address still has an EOA root.
+
+origin: |
+  ERC-4337 deliberately avoided protocol changes. That was its strength: it could ship by deploying an EntryPoint contract and an off-chain bundler network. But avoiding protocol changes meant existing EOAs stayed outside the model. A user could deploy a smart account, but their original address, approvals, ENS, assets, and history stayed behind.
+
+  EIP-7702 was created in May 2024 to patch that gap at the protocol layer. Its motivation names three UX goals directly: batching, sponsorship, and privilege de-escalation. In practice, that means a normal Ethereum address can temporarily behave like wallet code: one click can approve and swap, a sponsor can pay gas, and a session key can be delegated a smaller set of powers than the main key.
+
+spec: |
+  EIP-7702 adds a set-code transaction type. The transaction contains one or more authorization tuples. Each tuple is signed by an EOA and names the delegate code address the EOA wants to use. The protocol writes a small delegation indicator into the account's code slot: `0xef0100 || address`. When code execution touches the EOA, clients load and execute the target contract code.
+
+  That sounds like the EOA has become a contract. It has not, fully. It has delegated behavior. The original signing key remains capable of authorizing a different delegation unless another future mechanism disables that authority.
+
+whatsBroken: |
+  EIP-7702 is a major improvement, not a mistake. The important question is what kind of account it creates. A delegated EOA is powerful because it preserves an existing address. It is risky because it preserves the same root authority that made EOAs hard to recover in the first place.
+
+vogelsteller: |
+  The LUKSO account stack takes the opposite route. It does not try to retrofit code onto an EOA. A Universal Profile is a contract account from the start. LSP6 defines controllers and permissions. LSP20 verifies calls inline. LSP25 handles relayed execution. LSP3 and ERC-725Y give the account a standard data model.
+
+  This does not help an existing Ethereum address keep its history. EIP-7702 wins that use case. The LSP win is cleaner semantics: no hidden EOA root, no hybrid account category, and no wallet-specific permission vocabulary sitting behind a generic delegation pointer.
+---

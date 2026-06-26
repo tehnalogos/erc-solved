@@ -215,6 +215,10 @@ compareRows:
     left: "handleOps + EntryPoint hop"
     right: "direct call into the account contract"
 compareHref: "/standards/compare/erc4337-lsp-stack/"
+compareRight:
+  chip: "LSP0+6+20+25"
+  kind: "topic"
+  label: "LSP account stack"
 
 useErc: "When you need account abstraction layered onto a chain whose native transaction model is EOA-anchored, with pluggable per-account validators and a separate aggregation/sponsorship plane decoupled from the account contract itself. The strength is decoupling: validators are swappable, mixable per UserOp, and the EntryPoint is the shared coordination plane."
 useLsp: "When you want the account contract to be the call entry point — no EntryPoint, no UserOperation envelope, no bundler. msg.sender at downstream targets is the account; LSP6 vocabulary expresses permissions in one standard; LSP25 makes sponsored execution a function on the account contract itself."
@@ -384,6 +388,9 @@ mentions:
     url: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
 
 related:
+  - "erc/eip-7702"
+  - "erc/erc-1271"
+  - "compare/erc4337-eip7702"
   - "problems/erc4337-bundler-tax"
   - "problems/wallet-permissions"
   - "problems/gasless-onboarding"
@@ -492,4 +499,3 @@ vogelsteller: |
 
   [LUKSO mainnet went live in 2023](https://docs.lukso.tech/) with this stack as native standards rather than layered patterns. The funnel for this site is not "switch to LUKSO." It is: when your ERC-4337 + Pectra design is paying the tax that comes from stacking half-baked standards on top of each other — residual EOA keys, validator fragmentation, per-protocol identity invention, ownership-transition mistakes, hybrid-account semantics — there is a coherent account system designed from the bottom up by one of the people who watched those tradeoffs accumulate from inside ERC-20 and ERC-2771 and ERC-725. The funnel works when the cost lands on you.
 ---
-

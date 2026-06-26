@@ -1,0 +1,140 @@
+---
+id: "permit2"
+standardKind: "Topic"
+title: "Permit2"
+headline: "What is Permit2?"
+pageTitle: "What is Permit2? Uniswap's Shared Token Approval Contract, Benefits, and Risks"
+description: "Permit2 is Uniswap's shared approval and signature-transfer contract for ERC-20 tokens. It gives permit-like UX to tokens that do not implement ERC-2612, but it also centralizes approval power in one widely used spender."
+tagline: "A shared approval router for ERC-20 UX - powerful, and very load-bearing."
+bootStrip: "topic · uniswap · shared approvals · production"
+updated: 2026-06-26
+
+definition: "Permit2 is a set of Uniswap contracts that let users grant and spend ERC-20 approvals through a common approval router. It supports signature-based transfers and allowance-based approvals for tokens that do not implement ERC-2612."
+
+tldr: "Permit2 solves a real adoption problem: most ERC-20 tokens do not implement ERC-2612, so a universal permit-like path has to live outside the token. The tradeoff is that users approve a shared contract that many apps rely on. The risk moves from 'every token needs permit' to 'one approval router is extremely important to understand, display, and revoke correctly.'"
+
+stats:
+  - k: "Maintainer"
+    v: "Uniswap Labs"
+    href: "https://github.com/Uniswap/permit2"
+  - k: "Works with"
+    v: "Existing ERC-20 tokens"
+  - k: "Primary modes"
+    v: "SignatureTransfer · AllowanceTransfer"
+  - k: "Closest ERC"
+    v: "ERC-2612 for token-native permit"
+    href: "/erc-2612/"
+
+limits:
+  - title: "The approval router becomes load-bearing."
+    summary: "Permit2 improves UX by concentrating approval logic in one contract. That also means users and wallets must understand when they are approving Permit2 itself and when an app is spending through it."
+    workarounds: ["wallet spender labels", "Permit2-specific revoke UIs", "short expirations", "per-token caps"]
+    from:
+      chip: "Permit2"
+      code: "approve(Permit2) + signed spend"
+      tags: ["shared router", "load-bearing"]
+    to:
+      chip: "LSP6"
+      code: "controller permissions"
+      tags: ["account-native", "named"]
+  - title: "It is still an ERC-20 allowance story."
+    summary: "Permit2 can add deadlines, nonces, and better signature UX, but the underlying asset remains an ERC-20 moved through transferFrom-like authority."
+    workarounds: ["SignatureTransfer", "limited allowances", "expiry"]
+    from:
+      chip: "ERC-20"
+      code: "spender can move tokens"
+      tags: ["allowance", "pull model"]
+    to:
+      chip: "LSP7 + LSP6"
+      code: "operator + account scope"
+      tags: ["asset + account policy"]
+  - title: "Wallet comprehension is the product."
+    summary: "A shared approval router is only safe when wallet prompts clearly show token, spender, amount, expiration, and the app receiving the permission. Weak displays turn a UX tool into a signing-phishing surface."
+    workarounds: ["typed-data previews", "simulation", "domain reputation", "spender warnings"]
+    from:
+      chip: "Permit2"
+      code: "EIP-712 signature"
+      tags: ["off-chain", "prompt-sensitive"]
+    to:
+      chip: "Universal Profile"
+      code: "visible account controllers"
+      tags: ["persistent", "auditable"]
+
+luksoRoutes:
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Account-native permission scoping without a universal approval router."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "Fungible asset operators that compose with LSP6 controller permissions."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP25"
+    label: "Execute Relay Call"
+    summary: "Signed execution at the account layer, submitted by a relayer that cannot escalate authority."
+    href: "/standards/lsp25-execute-relay-call/"
+
+compareRows:
+  - row: "where approval lives"
+    left: "Permit2 contract plus token allowance"
+    right: "Universal Profile permissions"
+  - row: "works with old tokens"
+    left: "yes"
+    right: "only when using the LSP account/asset stack"
+  - row: "signature scope"
+    left: "Permit2 transfer or allowance fields"
+    right: "LSP6 allowed calls / standards / keys"
+  - row: "revocation"
+    left: "Permit2 allowance and token approval"
+    right: "controller permission removal"
+compareRight:
+  chip: "LSP6"
+  kind: "lsp"
+  id: "6"
+  label: "LSP6 Key Manager"
+
+useErc: "Use Permit2 when you need permit-like UX for arbitrary ERC-20 tokens in the existing Ethereum ecosystem."
+useLsp: "Use LSP6 and LSP25 when the account is part of the product surface and you can avoid long-lived shared spender approvals entirely."
+
+faqs:
+  - q: "Is Permit2 an ERC?"
+    a: "No. Permit2 is a production contract system from Uniswap, not an Ethereum ERC standard. It is widely used because it gives permit-like flows to ERC-20 tokens that do not implement ERC-2612."
+  - q: "How is Permit2 different from ERC-2612?"
+    a: "ERC-2612 is implemented by each token contract. Permit2 is a separate shared contract that users approve and apps use for signature-based transfer or allowance flows."
+  - q: "Is Permit2 safe?"
+    a: "The contracts are designed for production use, but the user-risk model still depends on clear wallet prompts, limited amounts, expirations, and revocation. It does not remove the need to understand who can move tokens."
+
+aliases:
+  - "Uniswap Permit2"
+  - "Permit 2"
+  - "Permit2 approval"
+  - "Permit2 vs ERC-2612"
+related:
+  - "erc/erc-20"
+  - "erc/erc-20-allowance"
+  - "erc/erc-2612"
+  - "problems/erc20-approval-risks"
+docs:
+  - label: "github.com / Uniswap Permit2"
+    href: "https://github.com/Uniswap/permit2"
+  - label: "Uniswap Docs / Permit2"
+    href: "https://docs.uniswap.org/contracts/permit2/overview"
+primarySources:
+  - label: "Uniswap Permit2 repository"
+    href: "https://github.com/Uniswap/permit2"
+
+lede: |
+  Permit2 exists because token-native permit did not become universal. Instead of waiting for every ERC-20 to add ERC-2612, Uniswap shipped a shared approval and signature-transfer layer that apps could integrate once.
+
+origin: |
+  The adoption problem was straightforward: ERC-20 is everywhere, ERC-2612 is not. A shared contract could give modern approval UX to legacy tokens, provided users first approve that shared contract.
+
+spec: |
+  Permit2 exposes two broad paths: signature transfer for one-off signed movement, and allowance transfer for reusable approvals with expirations and nonces. The asset itself remains a normal ERC-20.
+
+whatsBroken: |
+  The tradeoff is concentration. A shared router makes integration easier, but it also becomes a spender users must recognize, wallets must label, and security tools must monitor.
+
+vogelsteller: |
+  LUKSO's account-first model avoids needing a universal approval router for basic app permissions. The account can express what a controller may call directly, and relayed execution is handled by LSP25 rather than by token-specific permits.
+---

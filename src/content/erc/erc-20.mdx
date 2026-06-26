@@ -160,6 +160,11 @@ compareRows:
     left: "none — workaround via wrappers"
     right: "bytes calldata data — native"
 compareHref: "/standards/compare/erc20-lsp7/"
+compareRight:
+  chip: "LSP7"
+  kind: "lsp"
+  id: "7"
+  label: "LSP7 Digital Asset"
 
 useErc: "Compatibility is the product. A wrapped reserve asset, a stablecoin where the universe of integrating contracts expects the ERC-20 ABI, or any protocol whose audit assumes no recipient-side code execution on transfer."
 useLsp: "Receiver awareness, structured metadata, or account-level permission scoping is the design goal. Vaults that need to credit on deposit, governance tokens that link to proposal data, apps that should hold narrow authority instead of blanket allowance."
@@ -193,6 +198,10 @@ faqs:
     a: "Every EVM-compatible chain supports ERC-20 — the standard is a contract interface, not a protocol-level feature. ERC-20 tokens exist on Ethereum mainnet, every Layer 2, every sidechain, every fork. The same contract code can deploy unchanged across chains, which is what made ERC-20 a network-effect standard rather than a vendor specification."
 
 related:
+  - "erc/erc-20-allowance"
+  - "erc/erc-2612"
+  - "erc/permit2"
+  - "erc/erc-4626"
   - "problems/erc20-approval-risks"
   - "problems/erc20-transfer-hooks"
   - "standards/lsp7-digital-asset"

@@ -1,7 +1,7 @@
 ---
 interface Props {
   chip?: string;
-  chipKind?: 'erc' | 'lsp';
+  chipKind?: 'erc' | 'eip' | 'lsp' | 'topic';
   caption?: string;
   lang?: string;
 }
@@ -39,7 +39,7 @@ const { chip, chipKind = 'lsp', caption, lang = 'solidity' } = Astro.props;
     padding: 1px var(--s-2);
     border: 1px solid currentColor;
   }
-  .chip-erc { color: var(--erc-sand); }
+  .chip-erc, .chip-eip, .chip-topic { color: var(--erc-sand); }
   .chip-lsp { color: var(--signal-pink); }
   .caption { color: var(--ink-bone-dim); }
   .lang { margin-left: auto; color: var(--ink-fog); }

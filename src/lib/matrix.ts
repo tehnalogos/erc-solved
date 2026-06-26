@@ -38,6 +38,7 @@ export const matrixRows: MatrixRow[] = [
     lspChip: '(kept)',
     lspLabel: 'still used by LSPs',
     verdict: 'LSPs publish ERC-165 interface IDs — no replacement needed',
+    href: '/erc-165/',
   },
   {
     ercChip: 'ERC-725',
@@ -53,6 +54,7 @@ export const matrixRows: MatrixRow[] = [
     lspChip: 'LSP7+1',
     lspLabel: 'safer receiver model',
     verdict: 'LSP1 universal receiver, no reentrancy-prone tokensReceived',
+    href: '/erc-777/',
   },
   {
     ercChip: 'ERC-1271',
@@ -60,6 +62,7 @@ export const matrixRows: MatrixRow[] = [
     lspChip: 'LSP0',
     lspLabel: 'profile-native',
     verdict: 'same isValidSignature shape, account is the canonical signer',
+    href: '/erc-1271/',
   },
   {
     ercChip: 'ERC-1363',
@@ -67,6 +70,7 @@ export const matrixRows: MatrixRow[] = [
     lspChip: 'LSP7+1',
     lspLabel: 'native, not opt-in',
     verdict: 'transfer + receiver hook is the default, not a wrapper',
+    href: '/erc-1363/',
   },
   {
     ercChip: 'ERC-2535',
@@ -82,6 +86,15 @@ export const matrixRows: MatrixRow[] = [
     lspChip: 'LSP6+25',
     lspLabel: 'account-level relay',
     verdict: 'authorization at the account, not per-token signatures',
+    href: '/erc-2612/',
+  },
+  {
+    ercChip: 'ERC-4626',
+    ercLabel: 'tokenized vault',
+    lspChip: '(complement)',
+    lspLabel: 'LSP account layer',
+    verdict: 'keep vault accounting, improve permissions/metadata/relay around it',
+    href: '/erc-4626/',
   },
   {
     ercChip: 'ERC-4337',
@@ -97,6 +110,7 @@ export const matrixRows: MatrixRow[] = [
     lspChip: 'LSP4+725Y',
     lspLabel: 'native dynamic keys',
     verdict: 'metadata is typed key-value, not an event saying "go refetch"',
+    href: '/erc-4906/',
   },
   {
     ercChip: 'ERC-6551',
@@ -104,13 +118,15 @@ export const matrixRows: MatrixRow[] = [
     lspChip: 'LSP0',
     lspLabel: 'profile contract',
     verdict: 'a Universal Profile is already a contract account',
+    href: '/erc-6551/',
   },
   {
-    ercChip: 'ERC-7702',
+    ercChip: 'EIP-7702',
     ercLabel: 'EOA delegation',
     lspChip: 'LSP0',
     lspLabel: 'full smart account',
     verdict: 'profile is a permanent contract account — no per-tx delegation',
+    href: '/eip-7702/',
   },
   {
     ercChip: 'EOA',

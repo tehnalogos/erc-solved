@@ -1,0 +1,164 @@
+---
+id: "777"
+title: "ERC-777"
+headline: "What is ERC-777?"
+pageTitle: "What is ERC-777? Token Hooks, Operators, and Why Adoption Stayed Limited"
+description: "ERC-777 is a fungible token standard with send/receive hooks and operators. It tried to improve ERC-20, but hook-related reentrancy risk and compatibility friction limited adoption."
+tagline: "The fungible-token hook standard that exposed how hard receiver callbacks are to retrofit."
+bootStrip: "standard · token hooks · operator model · niche"
+standardAuthors:
+  - "Jacques Dafflon"
+  - "Jordi Baylina"
+  - "Thomas Shababi"
+proposed: "November 2017"
+eipNumber: "EIP-777"
+termCode: "EIP-777"
+updated: 2026-06-26
+
+definition: "ERC-777 is an Ethereum fungible token standard that adds send and receive hooks, operator authorization, and ERC-1820-based interface discovery while remaining broadly compatible with ERC-20-style balances."
+
+abi: |
+  function name() external view returns (string memory);
+  function symbol() external view returns (string memory);
+  function granularity() external view returns (uint256);
+  function totalSupply() external view returns (uint256);
+  function balanceOf(address owner) external view returns (uint256);
+  function send(address recipient, uint256 amount, bytes calldata data) external;
+  function burn(uint256 amount, bytes calldata data) external;
+  function isOperatorFor(address operator, address tokenHolder) external view returns (bool);
+  function authorizeOperator(address operator) external;
+  function revokeOperator(address operator) external;
+  function operatorSend(address sender, address recipient, uint256 amount, bytes calldata data, bytes calldata operatorData) external;
+  function operatorBurn(address account, uint256 amount, bytes calldata data, bytes calldata operatorData) external;
+
+tldr: "ERC-777 tried to fix ERC-20's receiver blindness with hooks and operators. The idea was right; the deployment reality was hard. Recipient hooks introduce reentrancy surfaces, ERC-1820 adds registry dependence, and ERC-20 compatibility still matters. LSP7 keeps the receiver-aware direction but puts it inside the broader LUKSO account and metadata stack."
+
+stats:
+  - k: "Standard"
+    v: "ERC-777 / EIP-777"
+  - k: "Core additions"
+    v: "tokensToSend · tokensReceived · operators"
+  - k: "Discovery"
+    v: "ERC-1820 registry"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-777"
+    href: "https://eips.ethereum.org/EIPS/eip-777"
+
+interfaceDiagram:
+  - group: "holder"
+    items: ["send", "burn", "authorizeOperator", "revokeOperator"]
+  - group: "operator"
+    items: ["operatorSend", "operatorBurn"]
+  - group: "hooks"
+    items: ["tokensToSend", "tokensReceived"]
+
+limits:
+  - title: "Hooks create reentrancy risk."
+    summary: "Calling sender and recipient hooks during token movement gives contracts useful context, but it also lets external code run in the middle of transfer flow. Integrators have to design for reentrancy."
+    workarounds: ["checks-effects-interactions", "reentrancy guards", "ERC-20 wrappers", "hook allowlists"]
+    from:
+      chip: "ERC-777"
+      code: "tokensReceived hook"
+      tags: ["external call", "reentrancy"]
+    to:
+      chip: "LSP1"
+      code: "universalReceiver"
+      tags: ["known hook surface", "account-aware"]
+  - title: "ERC-1820 became another dependency."
+    summary: "ERC-777 uses the ERC-1820 registry for interface implementers. That gives dynamic discovery, but it is another global dependency that token integrators must understand."
+    workarounds: ["registry checks", "fallback ERC-20 paths", "custom adapters"]
+    from:
+      chip: "ERC-777"
+      code: "ERC1820Registry lookup"
+      tags: ["global registry"]
+    to:
+      chip: "LSPs"
+      code: "ERC-165 + ERC-725Y"
+      tags: ["interface + typed data"]
+  - title: "ERC-20 network effects were stronger."
+    summary: "Most DeFi integrations standardized on ERC-20. A richer token interface had to either masquerade as ERC-20 or ask the ecosystem to integrate another surface."
+    workarounds: ["ERC-20 compatibility", "adapter contracts", "wrapped tokens"]
+    from:
+      chip: "ERC-777"
+      code: "richer fungible token"
+      tags: ["compat friction"]
+    to:
+      chip: "LSP7"
+      code: "new ecosystem surface"
+      tags: ["designed stack"]
+
+luksoRoutes:
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "Fungible tokens with transfer data, force semantics, operators, metadata, and LSP1 receiver notifications."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP1"
+    label: "Universal Receiver"
+    summary: "One receiver hook for many asset and account events instead of token-specific hook interfaces."
+    href: "/standards/lsp1-universal-receiver/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Scopes which controllers may call asset functions."
+    href: "/standards/lsp6-key-manager/"
+
+compareRows:
+  - row: "fungible balance"
+    left: "yes"
+    right: "yes"
+  - row: "receiver notification"
+    left: "tokensReceived via ERC-1820"
+    right: "LSP1 universalReceiver"
+  - row: "operator model"
+    left: "authorizeOperator / revokeOperator"
+    right: "operators plus LSP6 account permissions"
+  - row: "metadata"
+    left: "limited token fields"
+    right: "LSP4 typed metadata"
+compareRight:
+  chip: "LSP7+1"
+  kind: "topic"
+  label: "LSP7 plus LSP1"
+
+useErc: "Use ERC-777 only when you are deliberately integrating an existing ERC-777 token or need its exact hook/operator semantics."
+useLsp: "Use LSP7 and LSP1 when receiver awareness, transfer data, and account permissions should be part of a coherent asset stack rather than a retrofit over ERC-20."
+
+faqs:
+  - q: "Is ERC-777 compatible with ERC-20?"
+    a: "ERC-777 was designed with ERC-20 compatibility in mind, but its hook behavior and ERC-1820 dependency make integrations different from plain ERC-20."
+  - q: "Why did ERC-777 adoption stay limited?"
+    a: "ERC-20 network effects were strong, and receiver hooks introduced reentrancy concerns that many DeFi protocols preferred to avoid."
+  - q: "What is the LUKSO alternative to ERC-777?"
+    a: "LSP7 covers fungible assets, LSP1 handles receiver notifications, LSP4 handles metadata, and LSP6 handles account-level permissions."
+
+aliases:
+  - "EIP-777"
+  - "ERC777"
+  - "tokensReceived"
+  - "ERC-777 hooks"
+related:
+  - "erc/erc-20"
+  - "erc/erc-1363"
+  - "problems/erc20-transfer-hooks"
+  - "standards/lsp7-digital-asset"
+docs:
+  - label: "eips.ethereum.org / EIP-777"
+    href: "https://eips.ethereum.org/EIPS/eip-777"
+primarySources:
+  - label: "EIP-777"
+    href: "https://eips.ethereum.org/EIPS/eip-777"
+
+lede: |
+  ERC-777 is what happens when the ecosystem recognizes that ERC-20 transfer is too silent. The standard gives senders and recipients hooks, and gives token holders operator controls.
+
+origin: |
+  The standard was proposed after ERC-20's receiver and approval problems were already visible. It aimed to make fungible tokens more expressive without throwing away the balance model developers understood.
+
+spec: |
+  ERC-777 adds send, burn, operatorSend, and operatorBurn. Hooks are discovered through ERC-1820 so sender and receiver contracts can react to movement.
+
+whatsBroken: |
+  The same hook that lets a receiver react also runs external code during token movement. That made ERC-777 harder to compose safely with DeFi contracts that were written around ERC-20's no-callback assumption.
+
+vogelsteller: |
+  LSP7 carries forward the receiver-aware idea while pairing it with LSP1, LSP4, and LSP6. The point is not a hook alone; it is the whole account and asset system around the hook.
+---

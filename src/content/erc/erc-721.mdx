@@ -201,6 +201,11 @@ compareRows:
     left: "ERC-721 selectors — consumed by code that hardcodes them"
     right: "distinct LSP8 selectors — won't accidentally dispatch as ERC-721"
 compareHref: "/standards/compare/erc721-lsp8/"
+compareRight:
+  chip: "LSP8"
+  kind: "lsp"
+  id: "8"
+  label: "LSP8 Identifiable Digital Asset"
 
 useErc: "When the tokenId is a counter, the metadata is immutable (or already pinned with broad redundancy), and the contract is built to be consumed by code that hardcodes the ERC-721 ABI. The smaller surface is the feature — fewer bytes, simpler reasoning, no force flag or per-token data store to decide on."
 useLsp: "When the tokenId itself needs to carry meaning (hash, serial, encoded reference), per-token state mutates after mint, recipient logic needs to fire on every transfer through LSP1 — not only on safeTransferFrom — or you want approval scoping at the account layer instead of collection-wide blanket grants."
@@ -367,6 +372,11 @@ howToMigration:
       text: "Either run a bridge that locks the source ERC-721 and mints LSP8 on LUKSO, or do a one-time mint to the snapshot addresses and freeze further issuance on the ERC-721 side."
 
 related:
+  - "erc/erc-721a"
+  - "erc/erc-2981"
+  - "erc/erc-4906"
+  - "erc/erc-6551"
+  - "erc/erc-1155"
   - "problems/erc721-dynamic-metadata"
   - "problems/erc721-safe-transfer"
   - "problems/erc721-tokenid-limits"
@@ -446,4 +456,3 @@ vogelsteller: |
 
   The funnel for this site is not "switch to LUKSO." It is: when your ERC-721 design is breaking down at the seams the spec deliberately ignored — dead tokenURIs, drained collections from `setApprovalForAll` phishing, stranded NFTs in non-receiver-aware contracts, gas tax on every per-token transfer, the three shortcomings Shirley named in retrospect — there is a standards suite that designed those concerns in from the bottom. Built, notably, by the same person who wrote the original ERC-20.
 ---
-

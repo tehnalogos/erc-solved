@@ -6,6 +6,8 @@ const sideSchema = z.object({
   tags: z.array(z.string()),
 });
 
+const chipKindSchema = z.enum(['erc', 'eip', 'lsp', 'topic']);
+
 const ercEnum = z.enum(['20', '721', '1155', 'EOA', '4337', '725', '165', 'other']);
 
 const problems = defineCollection({
@@ -106,6 +108,7 @@ const erc = defineCollection({
   schema: z.object({
     id: z.string(),
     title: z.string(),
+    standardKind: z.enum(['ERC', 'EIP', 'Topic']).default('ERC'),
     headline: z.string(),
     pageTitle: z.string(),
     description: z.string(),
@@ -153,6 +156,14 @@ const erc = defineCollection({
     compareRows: z
       .array(z.object({ row: z.string(), left: z.string(), right: z.string() }))
       .default([]),
+    compareRight: z
+      .object({
+        chip: z.string(),
+        kind: chipKindSchema.default('lsp'),
+        id: z.string().optional(),
+        label: z.string().optional(),
+      })
+      .optional(),
     compareHref: z.string().optional(),
     useErc: z.string(),
     useLsp: z.string(),

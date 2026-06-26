@@ -1,0 +1,173 @@
+---
+id: "6551"
+title: "ERC-6551"
+headline: "What is ERC-6551?"
+pageTitle: "What is ERC-6551? Token-Bound Accounts for NFTs"
+description: "ERC-6551 defines token-bound accounts: smart contract accounts deterministically associated with NFTs, letting a token own assets and interact with applications."
+tagline: "NFTs with accounts attached - powerful, but another account layer."
+bootStrip: "standard · token-bound accounts · nft composability · review"
+standardAuthors:
+  - "Jayden Windle"
+  - "Benny Giang"
+  - "Steve Jang"
+  - "Sena Zhu"
+proposed: "February 2023"
+eipNumber: "EIP-6551"
+termCode: "EIP-6551"
+updated: 2026-06-26
+
+definition: "ERC-6551 is the token-bound account standard. It defines a registry that can create and compute smart contract accounts associated with ERC-721 tokens, allowing NFTs to own assets and interact with contracts."
+
+abi: |
+  interface IERC6551Registry {
+    function createAccount(
+      address implementation,
+      bytes32 salt,
+      uint256 chainId,
+      address tokenContract,
+      uint256 tokenId
+    ) external returns (address);
+
+    function account(
+      address implementation,
+      bytes32 salt,
+      uint256 chainId,
+      address tokenContract,
+      uint256 tokenId
+    ) external view returns (address);
+  }
+
+tldr: "ERC-6551 patches a real ERC-721 limitation: tokens cannot naturally own assets or act as accounts. It gives an NFT a deterministic smart account. The tradeoff is layered complexity: the token, registry, account implementation, chain ID, and ownership semantics all have to line up. LUKSO's account model starts from the other direction: a Universal Profile is already an account that owns assets."
+
+stats:
+  - k: "Standard"
+    v: "ERC-6551 / EIP-6551"
+  - k: "Status"
+    v: "Review on eips.ethereum.org"
+    href: "https://eips.ethereum.org/EIPS/eip-6551"
+  - k: "Core idea"
+    v: "token-bound accounts"
+  - k: "Primary asset"
+    v: "ERC-721 NFTs"
+    href: "/erc-721/"
+
+interfaceDiagram:
+  - group: "registry"
+    items: ["createAccount", "account"]
+  - group: "binding"
+    items: ["chainId", "tokenContract", "tokenId"]
+  - group: "account"
+    items: ["execute", "owner from NFT"]
+
+limits:
+  - title: "The account is bound to NFT ownership."
+    summary: "Control of the token-bound account follows ownership of the NFT. That is powerful for composability, but it can be surprising when selling or transferring the NFT also transfers control of everything the account owns."
+    workarounds: ["clear wallet UI", "inventory warnings", "pre-transfer checks", "asset sweeping"]
+    from:
+      chip: "ERC-6551"
+      code: "NFT owns account"
+      tags: ["composable", "transfer-sensitive"]
+    to:
+      chip: "LSP0"
+      code: "account owns assets"
+      tags: ["direct account", "clear owner"]
+  - title: "It adds registry and implementation complexity."
+    summary: "The address is derived from registry inputs and an implementation contract. Integrators need to reason about the registry, implementation, salt, chain ID, token contract, token ID, and account behavior."
+    workarounds: ["canonical registry", "audited account implementations", "SDKs"]
+    from:
+      chip: "ERC-6551"
+      code: "registry.account(...)"
+      tags: ["deterministic", "multi-parameter"]
+    to:
+      chip: "Universal Profile"
+      code: "account address"
+      tags: ["direct"]
+  - title: "It does not fix ERC-721 metadata or approvals."
+    summary: "The NFT that controls the account is still an ERC-721. tokenURI, setApprovalForAll, safeTransferFrom, and uint256 token ID limits remain unless other standards or custom logic address them."
+    workarounds: ["ERC-4906", "ERC-2981", "transfer warnings", "custom metadata"]
+    from:
+      chip: "ERC-721 + 6551"
+      code: "token-bound account"
+      tags: ["layered"]
+    to:
+      chip: "LSP8 + LSP0"
+      code: "asset and account standards"
+      tags: ["native composition"]
+
+luksoRoutes:
+  - chip: "LSP0"
+    label: "ERC-725 Account"
+    summary: "A Universal Profile is already a smart account that can own assets and interact with contracts."
+    href: "/standards/lsp0-erc725-account/"
+  - chip: "LSP8"
+    label: "Identifiable Digital Asset"
+    summary: "NFT-like assets with bytes32 IDs and typed per-token data."
+    href: "/standards/lsp8-identifiable-digital-asset/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Controls who can act through an account and with what scope."
+    href: "/standards/lsp6-key-manager/"
+
+compareRows:
+  - row: "account relation"
+    left: "account bound to an NFT"
+    right: "account is first-class"
+  - row: "ownership"
+    left: "follows ERC-721 owner"
+    right: "managed by account ownership/permissions"
+  - row: "asset composition"
+    left: "NFT can own assets via account"
+    right: "Universal Profile owns assets directly"
+  - row: "metadata"
+    left: "still ERC-721 tokenURI unless extended"
+    right: "LSP3/LSP4 typed metadata"
+compareRight:
+  chip: "LSP0"
+  kind: "lsp"
+  id: "0"
+  label: "LSP0 ERC-725 Account"
+
+useErc: "Use ERC-6551 when an ERC-721 token itself should control an account, own assets, or act in apps while staying in the Ethereum NFT ecosystem."
+useLsp: "Use LSP0 and LSP8 when account and asset composition should be native, with permissions and metadata standardized around the account rather than layered onto an NFT."
+
+faqs:
+  - q: "What is a token-bound account?"
+    a: "A token-bound account is a smart contract account associated with a specific NFT. Whoever owns the NFT controls the associated account under the implementation's rules."
+  - q: "Is ERC-6551 final?"
+    a: "As of June 26, 2026, the EIP page lists ERC-6551 with Review status, so teams should verify current status before treating it as finalized."
+  - q: "What happens when an ERC-6551 NFT is sold?"
+    a: "Control of the token-bound account generally follows ownership of the NFT, so assets held by that account may effectively move under the buyer's control unless handled before transfer."
+
+aliases:
+  - "EIP-6551"
+  - "token bound accounts"
+  - "token-bound account"
+  - "NFT account"
+  - "ERC6551"
+related:
+  - "erc/erc-721"
+  - "erc/erc-721a"
+  - "erc/erc-1271"
+  - "standards/lsp0-erc725-account"
+docs:
+  - label: "eips.ethereum.org / EIP-6551"
+    href: "https://eips.ethereum.org/EIPS/eip-6551"
+primarySources:
+  - label: "EIP-6551"
+    href: "https://eips.ethereum.org/EIPS/eip-6551"
+
+lede: |
+  ERC-6551 gives an NFT an account. That one move unlocks game inventories, composable avatars, NFT-owned assets, and agent-like behavior tied to a token.
+
+origin: |
+  ERC-721 made tokens ownable, but it did not make tokens capable of owning other assets or calling contracts. ERC-6551 adds that missing account layer without changing existing ERC-721 contracts.
+
+spec: |
+  A registry computes or deploys an account address from an implementation, salt, chain ID, token contract, and token ID. The account implementation can then use the NFT's owner as its authority source.
+
+whatsBroken: |
+  The model is powerful but easy to misunderstand. If the account is controlled by NFT ownership, then transferring the NFT can transfer control of the account and whatever the account holds.
+
+vogelsteller: |
+  LUKSO starts with the account. A Universal Profile owns assets, exposes profile metadata, and delegates permissions through LSP6. ERC-6551 recreates an account under an NFT; LSP0 makes the account the primary object.
+---

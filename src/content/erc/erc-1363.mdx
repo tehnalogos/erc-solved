@@ -1,0 +1,156 @@
+---
+id: "1363"
+title: "ERC-1363"
+headline: "What is ERC-1363?"
+pageTitle: "What is ERC-1363? Payable ERC-20, transferAndCall, and approveAndCall"
+description: "ERC-1363 extends ERC-20 with transferAndCall and approveAndCall so token receivers and spenders can react in the same transaction."
+tagline: "ERC-20 with callback functions for payments and approvals."
+bootStrip: "standard · payable token · callbacks · ready"
+standardAuthors:
+  - "Vittorio Minacori"
+proposed: "August 2018"
+eipNumber: "EIP-1363"
+termCode: "EIP-1363"
+updated: 2026-06-26
+
+definition: "ERC-1363 is an ERC-20 extension that adds transferAndCall, transferFromAndCall, and approveAndCall. The recipient or spender contract receives a callback in the same transaction, making ERC-20 tokens behave more like payable assets."
+
+abi: |
+  function transferAndCall(address to, uint256 value) external returns (bool);
+  function transferAndCall(address to, uint256 value, bytes calldata data) external returns (bool);
+  function transferFromAndCall(address from, address to, uint256 value) external returns (bool);
+  function transferFromAndCall(address from, address to, uint256 value, bytes calldata data) external returns (bool);
+  function approveAndCall(address spender, uint256 value) external returns (bool);
+  function approveAndCall(address spender, uint256 value, bytes calldata data) external returns (bool);
+
+tldr: "ERC-1363 is a practical patch for ERC-20's silent transfer problem. It gives tokens a one-transaction 'send and notify' or 'approve and notify' flow. The tradeoff is adoption: both token and receiver/spender contracts need to support the extension. LSP7 plus LSP1 makes the receiver-aware path native to the asset standard."
+
+stats:
+  - k: "Standard"
+    v: "ERC-1363 / EIP-1363"
+  - k: "Extends"
+    v: "ERC-20"
+    href: "/erc-20/"
+  - k: "Core methods"
+    v: "transferAndCall · transferFromAndCall · approveAndCall"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-1363"
+    href: "https://eips.ethereum.org/EIPS/eip-1363"
+
+interfaceDiagram:
+  - group: "token"
+    items: ["transferAndCall", "transferFromAndCall", "approveAndCall"]
+  - group: "receiver"
+    items: ["onTransferReceived"]
+  - group: "spender"
+    items: ["onApprovalReceived"]
+
+limits:
+  - title: "Both sides have to opt in."
+    summary: "A token has to implement ERC-1363, and the receiver or spender has to implement the callback interface. Existing ERC-20 tokens and contracts do not get the behavior automatically."
+    workarounds: ["wrappers", "routers", "custom adapters"]
+    from:
+      chip: "ERC-1363"
+      code: "transferAndCall"
+      tags: ["optional", "two-sided adoption"]
+    to:
+      chip: "LSP7 + LSP1"
+      code: "transfer with universalReceiver"
+      tags: ["standard path", "receiver-aware"]
+  - title: "Callbacks add execution risk."
+    summary: "Calling a receiver or spender during token logic adds reentrancy and failure-mode questions that plain ERC-20 transfers avoid."
+    workarounds: ["reentrancy guards", "callback allowlists", "pull payments"]
+    from:
+      chip: "callback"
+      code: "onTransferReceived"
+      tags: ["external call"]
+    to:
+      chip: "LSP1"
+      code: "known receiver hook"
+      tags: ["generalized", "explicit"]
+  - title: "It does not fix allowance itself."
+    summary: "approveAndCall notifies the spender, but the resulting approval is still ERC-20 allowance with the same standing-spender risks if the amount is broad."
+    workarounds: ["exact amounts", "short-lived flows", "Permit2", "revocation"]
+    from:
+      chip: "approveAndCall"
+      code: "approve + notify"
+      tags: ["allowance remains"]
+    to:
+      chip: "LSP6"
+      code: "account permission"
+      tags: ["scoped"]
+
+luksoRoutes:
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "Fungible assets with transfer data and receiver-aware transfers."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP1"
+    label: "Universal Receiver"
+    summary: "The generalized receiver hook for account and asset events."
+    href: "/standards/lsp1-universal-receiver/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Account-level permissions for controllers and apps."
+    href: "/standards/lsp6-key-manager/"
+
+compareRows:
+  - row: "base asset"
+    left: "ERC-20 extension"
+    right: "LSP7 asset standard"
+  - row: "receiver callback"
+    left: "onTransferReceived"
+    right: "LSP1 universalReceiver"
+  - row: "approval callback"
+    left: "approveAndCall"
+    right: "LSP6-scoped controller permission"
+  - row: "adoption path"
+    left: "token and receiver opt in"
+    right: "native within LSP asset/account stack"
+compareRight:
+  chip: "LSP7+1"
+  kind: "topic"
+  label: "LSP7 plus LSP1"
+
+useErc: "Use ERC-1363 when you need an ERC-20-compatible token with callback payments and your receivers explicitly support the extension."
+useLsp: "Use LSP7 and LSP1 when receiver awareness should be the normal transfer model and account permissions matter as much as token callbacks."
+
+faqs:
+  - q: "What does ERC-1363 add to ERC-20?"
+    a: "It adds transferAndCall, transferFromAndCall, and approveAndCall, plus receiver/spender callback interfaces."
+  - q: "Is ERC-1363 the same as ERC-777?"
+    a: "No. Both add callback behavior for fungible tokens, but ERC-1363 is a smaller ERC-20 extension while ERC-777 defines a broader token model with ERC-1820 discovery and operators."
+  - q: "What problem does transferAndCall solve?"
+    a: "It lets a token transfer notify the receiving contract in the same transaction, avoiding the pattern where a contract receives ERC-20 tokens but has no callback to credit the deposit."
+
+aliases:
+  - "EIP-1363"
+  - "ERC1363"
+  - "transferAndCall"
+  - "approveAndCall"
+related:
+  - "erc/erc-20"
+  - "erc/erc-777"
+  - "problems/erc20-transfer-hooks"
+docs:
+  - label: "eips.ethereum.org / EIP-1363"
+    href: "https://eips.ethereum.org/EIPS/eip-1363"
+primarySources:
+  - label: "EIP-1363"
+    href: "https://eips.ethereum.org/EIPS/eip-1363"
+
+lede: |
+  ERC-1363 is the "do the token transfer and call the app" extension for ERC-20. It exists because plain transfer is silent.
+
+origin: |
+  ERC-20 became the standard, but it never gave receiving contracts a callback. ERC-1363 adds a lightweight callback path without replacing the whole ERC-20 model.
+
+spec: |
+  transferAndCall moves tokens and calls the receiver. approveAndCall approves a spender and calls the spender. The callbacks return selectors so the token can verify the recipient or spender accepted the operation.
+
+whatsBroken: |
+  The issue is adoption and execution risk. A callback extension only works when both sides implement it, and calling external code during token flow requires defensive integration.
+
+vogelsteller: |
+  LSP7 makes transfer data and receiver notification part of the normal asset model. LSP1 generalizes the callback so every asset type does not need its own bespoke receiver interface.
+---

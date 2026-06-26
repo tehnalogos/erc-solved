@@ -27,6 +27,16 @@ const { data, slug } = entry;
 const path = `/${slug}/`;
 const canonical = absoluteUrl(path);
 const editHref = `https://github.com/tehnalogos/erc-solved/edit/main/src/content/erc/${slug}.mdx`;
+const standardKind = data.standardKind ?? 'ERC';
+const pageChipKind = standardKind === 'EIP' ? 'eip' : standardKind === 'Topic' ? 'topic' : 'erc';
+const compareRight = data.compareRight ?? {
+  chip: 'LSP7',
+  kind: 'lsp',
+  id: '7',
+  label: 'LSP7',
+};
+const compareRightLabel = compareRight.label ?? compareRight.chip;
+const comparisonLabel = `${data.title} vs ${compareRight.chip}`;
 
 const aboutTerms = [
   data.title,
@@ -44,7 +54,7 @@ const keywords = [
   `what is ${data.title}`,
   `${data.title} standard`,
   `${data.title} explained`,
-  `${data.title} vs LSP7`,
+  comparisonLabel,
   ...(data.standardAuthors ?? []),
 ];
 
@@ -117,7 +127,7 @@ const updatedStr = data.updated
 // Graceful-degradation flags for topic pages (entries that aren't a single
 // ERC standard — e.g. /gasless-transactions/). The chip-row, spec section,
 // and comparison table all skip ERC-specific pieces when not applicable.
-const hasIdChip = !isNaN(Number(data.id));
+const hasIdChip = standardKind !== 'Topic' && !!data.id;
 const hasEip = !!data.eipNumber;
 const hasAuthors = (data.standardAuthors ?? []).length > 0;
 const hasAbi = !!data.abi;
@@ -152,7 +162,7 @@ const toc = [
     : []),
   { depth: 2, text: pivot.tocLabel,             slug: 'vogelsteller-pivot' },
   ...(data.compareRows?.length
-    ? [{ depth: 2, text: `${data.title} vs LSP7`, slug: 'compare' }]
+    ? [{ depth: 2, text: comparisonLabel, slug: 'compare' }]
     : []),
   { depth: 2, text: 'When to use which',        slug: 'when-to-use-which' },
   ...(data.faqs?.length
@@ -201,7 +211,7 @@ const toc = [
 
         {(hasIdChip || hasEip || hasAuthors) && (
           <div class="chip-row">
-            {hasIdChip && <StandardChip kind="erc" id={data.id} />}
+            {hasIdChip && <StandardChip kind={pageChipKind} id={data.id} />}
             {hasEip && (
               <>
                 {hasIdChip && <span class="sep">·</span>}
@@ -247,7 +257,7 @@ const toc = [
           </a>
           {data.compareHref && (
             <span class="cta-meta">
-              or read <a href={data.compareHref}>{data.title} vs LSP7</a>
+              or read <a href={data.compareHref}>{comparisonLabel}</a>
             </span>
           )}
         </div>
@@ -337,7 +347,7 @@ const toc = [
         <span class="eyebrow">{hasAbi ? 'the spec, end to end' : 'the stack, end to end'}</span>
         <h2>{hasAbi ? `What ${data.title} actually is.` : `How ${data.title} actually works.`}<a class="anchor" href="#the-spec" aria-label="Link to this section">#</a></h2>
         {hasAbi && (
-          <SpecBlock chip={data.title} chipKind="erc" caption={`${data.eipNumber ?? data.title} interface`} lang="solidity">{data.abi}</SpecBlock>
+          <SpecBlock chip={data.title} chipKind={pageChipKind} caption={`${data.eipNumber ?? data.title} interface`} lang="solidity">{data.abi}</SpecBlock>
         )}
 
         {data.interfaceDiagram?.length > 0 && (
@@ -485,7 +495,7 @@ const toc = [
       <section class="band" id="compare">
         <div class="band-inner">
           <span class="eyebrow">spec to spec, at a glance</span>
-          <h2>{data.title} vs LSP7 in one table.<a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
+          <h2>{comparisonLabel} in one table.<a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
           <div class="compare-wrap" data-reveal>
             <table class="compare">
               <thead>
@@ -493,10 +503,14 @@ const toc = [
                   <th class="row-label">row</th>
                   <th class="left">
                     {hasIdChip
-                      ? <StandardChip kind="erc" id={data.id} />
-                      : <span class="erc-fallback-chip">Ethereum</span>}
+                      ? <StandardChip kind={pageChipKind} id={data.id} />
+                      : <span class="erc-fallback-chip">{data.title}</span>}
                   </th>
-                  <th class="right"><StandardChip kind="lsp" id="7" /></th>
+                  <th class="right">
+                    {compareRight.id
+                      ? <StandardChip kind={compareRight.kind} id={compareRight.id} />
+                      : <span class="lsp-fallback-chip">{compareRightLabel}</span>}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -512,7 +526,7 @@ const toc = [
           </div>
           {data.compareHref && (
             <p class="compare-foot">
-              full matrix → <Crossref href={data.compareHref}>standards/compare/erc20-lsp7</Crossref>
+              full matrix → <Crossref href={data.compareHref}>{comparisonLabel.toLowerCase()}</Crossref>
             </p>
           )}
         </div>
@@ -615,7 +629,7 @@ const toc = [
           {data.compareHref && (
             <li>
               <a class="next-row" href={data.compareHref}>
-                <span class="next-q">{data.title.toLowerCase()} vs lsp-7 (full matrix)</span>
+                <span class="next-q">{comparisonLabel.toLowerCase()} (full matrix)</span>
                 <span class="next-arrow" aria-hidden="true">→</span>
                 <span class="next-a">comparison</span>
               </a>
@@ -1116,7 +1130,8 @@ const toc = [
   .compare thead th { background: var(--ink-black); }
   .compare tbody tr:last-child td { border-bottom: none; }
   .compare .row-label { color: var(--ink-fog); white-space: nowrap; }
-  .erc-fallback-chip {
+  .erc-fallback-chip,
+  .lsp-fallback-chip {
     padding: 2px var(--s-2);
     border: 1px solid var(--erc-sand);
     color: var(--erc-sand);
@@ -1124,6 +1139,10 @@ const toc = [
     font-size: var(--t-mono-xs);
     line-height: 1.4;
     white-space: nowrap;
+  }
+  .lsp-fallback-chip {
+    border-color: var(--signal-pink);
+    color: var(--signal-pink);
   }
   .compare .left { color: var(--ink-bone-dim); }
   .compare .right { color: var(--ink-bone); }

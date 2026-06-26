@@ -1,0 +1,155 @@
+---
+id: "ethereum-token-standards"
+standardKind: "Topic"
+title: "Ethereum Token Standards"
+headline: "Ethereum token standards, mapped"
+pageTitle: "Ethereum Token Standards: ERC-20, ERC-721, ERC-1155, ERC-4626, and the LSP Alternatives"
+description: "A practical map of Ethereum token standards: ERC-20, ERC-721, ERC-1155, ERC-4626, and the adjacent extension standards that patch approvals, metadata, royalties, and account ownership."
+tagline: "A map of the token standards Ethereum apps actually meet in production."
+bootStrip: "topic · token standards · erc map · ready"
+updated: 2026-06-26
+
+definition: "Ethereum token standards are ERC and EIP specifications that define common contract interfaces for assets on EVM chains. ERC-20 covers fungible tokens, ERC-721 covers non-fungible tokens, ERC-1155 covers multi-token contracts, ERC-4626 covers tokenized vaults, and extension standards such as ERC-2612, ERC-2981, ERC-4906, and ERC-6551 patch specific gaps around approvals, royalties, metadata updates, and token-bound accounts."
+
+tldr: "Ethereum token standards are not one stack. They are a family of minimum interfaces, each optimized around a narrow integration surface. That is why the ecosystem also has so many patch standards: permit for approvals, royaltyInfo for royalties, MetadataUpdate for refresh signals, token-bound accounts for composability. LUKSO's LSP suite takes the opposite shape: account, metadata, receiver hooks, permissions, relay, and asset standards are designed as one connected substrate."
+
+stats:
+  - k: "Core token standards"
+    v: "ERC-20 · ERC-721 · ERC-1155 · ERC-4626"
+  - k: "Common patches"
+    v: "ERC-2612 · ERC-2981 · ERC-4906 · ERC-6551"
+  - k: "Shared detection"
+    v: "ERC-165 for many non-ERC-20 interfaces"
+    href: "/erc-165/"
+  - k: "LUKSO equivalent"
+    v: "LSP7 + LSP8 + LSP4 + LSP6 + LSP1"
+    href: "/standards/matrix/"
+
+limits:
+  - title: "The standards are fragmented by use case."
+    summary: "ERC-20, ERC-721, ERC-1155, and ERC-4626 do not share one account model, one metadata model, one receiver hook, or one permission vocabulary. Integrators learn each asset shape separately, then add extension standards when the minimum interface is not enough."
+    workarounds: ["OpenZeppelin presets", "marketplace adapters", "wallet token lists", "indexer-specific metadata conventions"]
+    from:
+      chip: "ERC family"
+      code: "20 + 721 + 1155 + 4626 + extensions"
+      tags: ["fragmented", "minimum interfaces", "adapter-heavy"]
+    to:
+      chip: "LSP suite"
+      code: "LSP7 + LSP8 + LSP4 + LSP6 + LSP1"
+      tags: ["connected", "typed metadata", "shared receiver hook"]
+  - title: "Metadata is still mostly convention."
+    summary: "ERC-20 has three optional strings, ERC-721 has tokenURI, ERC-1155 has a URI template, and ERC-4626 has no vault metadata model beyond the underlying ERC-20 shape. Wallets and marketplaces rely on token lists, JSON schemas, and refresh buttons because the token standards leave rich metadata out."
+    workarounds: ["OpenSea metadata schema", "token lists", "ERC-4906 update events", "centralized metadata APIs"]
+    from:
+      chip: "ERC metadata"
+      code: "name / symbol / tokenURI / uri"
+      tags: ["off-chain", "schema by convention"]
+    to:
+      chip: "LSP4 + ERC-725Y"
+      code: "typed key-value metadata"
+      tags: ["schema'd", "contract-readable", "VerifiableURI"]
+  - title: "Permissions are bolted on after the asset."
+    summary: "ERC-20 uses allowance, ERC-721 and ERC-1155 use approvals, ERC-2612 adds signatures, and Permit2 adds a shared approval router. None of those is an account-level permission model with named controllers, call scopes, value limits, and recovery."
+    workarounds: ["ERC-2612", "Permit2", "approval revocation dashboards", "wallet-specific session keys"]
+    from:
+      chip: "approval standards"
+      code: "approve / permit / setApprovalForAll"
+      tags: ["asset-local", "standing grants"]
+    to:
+      chip: "LSP6"
+      code: "Key Manager permissions"
+      tags: ["account-level", "scoped", "revocable"]
+
+luksoRoutes:
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "The LUKSO fungible-token standard: balances plus transfer data, receiver hooks, and operator authorization."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP8"
+    label: "Identifiable Digital Asset"
+    summary: "The LUKSO identifiable-asset standard: bytes32 IDs, per-token data, and the same receiver-aware transfer model."
+    href: "/standards/lsp8-identifiable-digital-asset/"
+  - chip: "LSP4"
+    label: "Digital Asset Metadata"
+    summary: "Typed metadata under ERC-725Y keys instead of tokenURI strings and external conventions."
+    href: "/standards/lsp4-digital-asset-metadata/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Account-level permissions that can scope calls, standards, data keys, and values."
+    href: "/standards/lsp6-key-manager/"
+
+compareRows:
+  - row: "fungible tokens"
+    left: "ERC-20"
+    right: "LSP7 Digital Asset"
+  - row: "NFTs"
+    left: "ERC-721"
+    right: "LSP8 Identifiable Digital Asset"
+  - row: "multi-token contracts"
+    left: "ERC-1155"
+    right: "split LSP7 / LSP8 by asset semantics"
+  - row: "metadata"
+    left: "tokenURI / uri / token lists"
+    right: "LSP4 typed ERC-725Y keys"
+  - row: "permissions"
+    left: "allowance / approvals / permits"
+    right: "LSP6 account permissions"
+compareRight:
+  chip: "LSP suite"
+  kind: "topic"
+  label: "LUKSO LSP suite"
+
+useErc: "Use the ERC token standards when compatibility is the product: existing DeFi, marketplaces, bridges, wallet indexing, and audited code that expect the exact ERC ABI."
+useLsp: "Use the LSP stack when the product needs account-native permissions, structured metadata, receiver awareness, and gasless execution as one system instead of a set of extension standards."
+
+faqs:
+  - q: "What are the main Ethereum token standards?"
+    a: "The main production token standards are ERC-20 for fungible tokens, ERC-721 for non-fungible tokens, ERC-1155 for multi-token contracts, and ERC-4626 for tokenized vaults. ERC-165, ERC-2612, ERC-2981, ERC-4906, and ERC-6551 are common supporting standards."
+  - q: "Which Ethereum token standard should I use?"
+    a: "Use ERC-20 for interchangeable balances, ERC-721 for unique one-of-one assets, ERC-1155 for mixed or batched asset sets, and ERC-4626 for yield vault shares. Then add extension standards only when your use case needs their specific behavior."
+  - q: "How does LUKSO map to Ethereum token standards?"
+    a: "LSP7 maps closest to ERC-20, LSP8 maps closest to ERC-721, LSP4 handles rich metadata, LSP1 handles universal receiver hooks, and LSP6 handles account permissions. ERC-1155 usually maps to a split of LSP7 and LSP8 assets rather than one mixed contract."
+
+aliases:
+  - "Ethereum token standards"
+  - "ERC token standards"
+  - "ERC standards"
+  - "token standards Ethereum"
+related:
+  - "erc/erc-20"
+  - "erc/erc-721"
+  - "erc/erc-1155"
+  - "erc/erc-4626"
+  - "erc/erc-2612"
+  - "erc/erc-2981"
+  - "standards/matrix"
+docs:
+  - label: "eips.ethereum.org / ERC standards"
+    href: "https://eips.ethereum.org/erc"
+  - label: "OpenZeppelin Contracts / Tokens"
+    href: "https://docs.openzeppelin.com/contracts"
+primarySources:
+  - label: "EIP-20"
+    href: "https://eips.ethereum.org/EIPS/eip-20"
+  - label: "EIP-721"
+    href: "https://eips.ethereum.org/EIPS/eip-721"
+  - label: "EIP-1155"
+    href: "https://eips.ethereum.org/EIPS/eip-1155"
+  - label: "EIP-4626"
+    href: "https://eips.ethereum.org/EIPS/eip-4626"
+
+lede: |
+  Ethereum token standards are the APIs that let wallets, exchanges, marketplaces, vaults, and indexers agree on what an asset contract means. The power is the common surface. The cost is that every standard is deliberately narrow, so the missing behavior moves into companion EIPs, off-chain conventions, or application-specific adapters.
+
+origin: |
+  ERC-20 gave Ethereum a common fungible-token ABI in 2015. ERC-721 did the same for NFTs in 2018. ERC-1155 followed with a multi-token shape for games and asset batches, and ERC-4626 standardized tokenized vault shares. Around those core standards, the ecosystem added specialized patches: ERC-2612 for signed approvals, ERC-2981 for royalty discovery, ERC-4906 for metadata update signals, and ERC-6551 for token-bound accounts.
+
+spec: |
+  The practical question is not "which ERC is best?" It is "what integration surface do you need?" ERC-20 maximizes compatibility. ERC-721 maximizes NFT marketplace support. ERC-1155 optimizes batch operations and mixed asset sets. ERC-4626 gives vault integrators a common preview/deposit/withdraw/accounting interface. Everything else is a patch for a gap the core standard left out.
+
+whatsBroken: |
+  The fragmentation shows up when one product touches several asset types. A wallet needs one path for ERC-20 allowances, another for ERC-721 approvals, another for ERC-1155 operator approvals, another for tokenURI and URI metadata, another for vault previews, and another for gas sponsorship. LUKSO's answer is to standardize the surrounding substrate instead of only the asset ABI.
+
+vogelsteller: |
+  The LSP suite keeps the useful separation between fungible and identifiable assets, but moves metadata, permissions, receiver hooks, and relay execution into shared standards. That is the higher-yield design lesson: the asset interface is only one part of the product surface users experience.
+---

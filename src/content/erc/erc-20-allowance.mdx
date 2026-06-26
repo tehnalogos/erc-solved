@@ -1,0 +1,150 @@
+---
+id: "erc-20-allowance"
+standardKind: "Topic"
+title: "ERC-20 Allowance"
+headline: "ERC-20 allowance, explained"
+pageTitle: "ERC-20 Allowance: approve, transferFrom, Permit, Permit2, and Safer Alternatives"
+description: "ERC-20 allowance is the approve / transferFrom mechanism that lets a spender move tokens from an owner. It powers DeFi, but max approvals and split intent create one of Ethereum's most common user-risk surfaces."
+tagline: "The DeFi primitive that turns one approval into a standing permission."
+bootStrip: "topic · approve / transferfrom · live everywhere · risky"
+updated: 2026-06-26
+
+definition: "ERC-20 allowance is the amount an owner has approved a spender to transfer with transferFrom. The allowance lives inside the token contract, is set with approve(spender, value), read with allowance(owner, spender), and reduced or consumed by transferFrom(owner, recipient, value)."
+
+tldr: "ERC-20 allowance is useful because it lets routers, vaults, bridges, and markets pull tokens after a user approves them. It is risky because the approval and the later spend are separate events. Wallets cannot bind the user's intent to a particular swap, bridge, or deposit unless the app adds another layer. Permit, Permit2, and approve-and-call reduce friction, but LUKSO's stronger answer is to move permission scoping to the account with LSP6."
+
+stats:
+  - k: "Core functions"
+    v: "approve · allowance · transferFrom"
+  - k: "Canonical spec"
+    v: "EIP-20"
+    href: "https://eips.ethereum.org/EIPS/eip-20"
+  - k: "Common patches"
+    v: "ERC-2612 · Permit2 · ERC-1363"
+  - k: "LUKSO equivalent"
+    v: "LSP7 operators + LSP6 permissions"
+    href: "/standards/lsp6-key-manager/"
+
+interfaceDiagram:
+  - group: "owner"
+    items: ["approve", "decreaseAllowance", "permit"]
+  - group: "spender"
+    items: ["transferFrom"]
+  - group: "read"
+    items: ["allowance"]
+
+limits:
+  - title: "Approval and intent are split."
+    summary: "The user approves a spender first. The spender chooses the later transferFrom parameters. A wallet can show the approval amount, but it cannot prove that the future spend will match the swap, bridge, or deposit the user thinks they are authorizing."
+    workarounds: ["EIP-2612 permit", "Permit2 signature scopes", "transaction simulation", "revoke dashboards"]
+    href: "/problems/erc20-approval-risks/"
+    from:
+      chip: "ERC-20"
+      code: "approve(spender, value)"
+      tags: ["split intent", "standing grant"]
+    to:
+      chip: "LSP6"
+      code: "AllowedCalls + permissions"
+      tags: ["account-scoped", "call-scoped"]
+  - title: "Max approvals become the default UX."
+    summary: "Dapps request uint256 max allowances because asking for a fresh approval on every action is expensive and annoying. That makes the spender a long-lived risk even after the user leaves the app."
+    workarounds: ["exact approvals", "approval expiration in Permit2", "revoke.cash", "wallet warnings"]
+    from:
+      chip: "ERC-20"
+      code: "approve(router, type(uint256).max)"
+      tags: ["unbounded", "phishable"]
+    to:
+      chip: "LSP6"
+      code: "scoped controller"
+      tags: ["revocable", "least privilege"]
+  - title: "Allowance is token-local."
+    summary: "Each token contract owns its own approval table. A user has to audit permissions one token at a time, and a wallet cannot express one coherent policy such as 'this app can swap up to 50 USDC per day and nothing else' across assets."
+    workarounds: ["Permit2 shared router", "wallet policy engines", "custom vault wrappers"]
+    from:
+      chip: "allowance"
+      code: "token.allowance(owner, spender)"
+      tags: ["per-token", "hard to inventory"]
+    to:
+      chip: "Universal Profile"
+      code: "account permissions"
+      tags: ["central policy", "cross-asset"]
+
+luksoRoutes:
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "LSP7 replaces allowance with operators and transfer data, then composes with account-level permissions."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Scopes what a controller can call, which standards it can touch, and what data keys it can mutate."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP0"
+    label: "ERC-725 Account"
+    summary: "The account becomes the policy object. Permissions live with the user, not scattered across token approvals."
+    href: "/standards/lsp0-erc725-account/"
+
+compareRows:
+  - row: "grant location"
+    left: "inside each ERC-20 token"
+    right: "on the account via LSP6"
+  - row: "spender action"
+    left: "transferFrom(owner, to, amount)"
+    right: "controller calls through Universal Profile"
+  - row: "common UX"
+    left: "max approval"
+    right: "scoped controller permission"
+  - row: "revocation"
+    left: "per token / per spender"
+    right: "remove or narrow controller"
+compareRight:
+  chip: "LSP6"
+  kind: "lsp"
+  id: "6"
+  label: "LSP6 Key Manager"
+
+useErc: "Use ERC-20 allowance when the protocol must integrate with existing DeFi routers, vaults, bridges, and exchanges that expect approve and transferFrom."
+useLsp: "Use LSP6 and LSP7 when you control the account and asset stack and want app permissions to be explicit, narrow, revocable, and visible from the user's account."
+
+faqs:
+  - q: "What is ERC-20 allowance?"
+    a: "Allowance is the amount of a token that an owner has approved a spender to transfer with transferFrom. It is set with approve and read with allowance."
+  - q: "Why do dapps ask for unlimited allowance?"
+    a: "Unlimited allowance avoids repeated approval transactions. The tradeoff is that the spender keeps a standing permission until the user revokes it or the token contract changes the allowance."
+  - q: "Does permit remove ERC-20 allowance risk?"
+    a: "No. ERC-2612 permit moves the approval into a signature, but the result is still an ERC-20 allowance. It improves UX and can reduce approval transactions; it does not make the spender model disappear."
+
+aliases:
+  - "ERC20 allowance"
+  - "ERC-20 approve"
+  - "approve transferFrom"
+  - "token allowance"
+related:
+  - "erc/erc-20"
+  - "erc/erc-2612"
+  - "erc/permit2"
+  - "erc/erc-1363"
+  - "problems/erc20-approval-risks"
+docs:
+  - label: "eips.ethereum.org / EIP-20"
+    href: "https://eips.ethereum.org/EIPS/eip-20"
+  - label: "OpenZeppelin Contracts / ERC20"
+    href: "https://docs.openzeppelin.com/contracts/5.x/erc20"
+primarySources:
+  - label: "EIP-20"
+    href: "https://eips.ethereum.org/EIPS/eip-20"
+
+lede: |
+  Allowance is the reason a Uniswap router, lending vault, bridge, or marketplace can pull ERC-20 tokens from a user's wallet. It is also the reason users accumulate invisible standing approvals across years of DeFi usage.
+
+origin: |
+  ERC-20 included approve, allowance, and transferFrom from the beginning. The pattern solved a real problem: contracts needed a way to pull tokens as part of a larger operation. The ERC-20 spec intentionally kept that mechanism small, and the ecosystem filled in the missing UX with routers, signatures, dashboards, and wallet warnings.
+
+spec: |
+  The state is simple: allowance[owner][spender] is a number. approve writes it. transferFrom checks it and moves tokens. A spender can spend up to that number until the allowance is reduced, consumed, or reset.
+
+whatsBroken: |
+  The risk is not that allowance is complicated. The risk is that it is too simple for modern app intent. A user wants to approve one swap, one deposit, or one bridge action. The token contract records a generic spender limit.
+
+vogelsteller: |
+  LSP7 keeps an operator model for assets, but the meaningful shift comes when that model is paired with LSP6. The spender is no longer just an address in a token mapping. It can be a named controller whose powers are constrained by the user's account.
+---

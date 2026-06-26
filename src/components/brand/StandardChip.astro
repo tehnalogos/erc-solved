@@ -1,17 +1,21 @@
 ---
 interface Props {
-  kind: 'erc' | 'lsp';
+  kind: 'erc' | 'eip' | 'lsp' | 'topic';
   id: string | number;
   emphasis?: 'normal' | 'strong';
 }
 const { kind, id, emphasis = 'normal' } = Astro.props;
 const label = kind === 'lsp'
   ? `LSP${id}`
-  : id === 'EOA'
-    ? 'EOA'
-    : id === 'other'
-      ? 'EVM'
-      : `ERC-${id}`;
+  : kind === 'eip'
+    ? `EIP-${id}`
+    : kind === 'topic'
+      ? String(id)
+      : id === 'EOA'
+        ? 'EOA'
+        : id === 'other'
+          ? 'EVM'
+          : `ERC-${id}`;
 ---
 <span class={`chip chip-${kind} chip-${emphasis}`}>{label}</span>
 
@@ -27,7 +31,7 @@ const label = kind === 'lsp'
     letter-spacing: 0;
     white-space: nowrap;
   }
-  .chip-erc { color: var(--erc-sand); }
+  .chip-erc, .chip-eip, .chip-topic { color: var(--erc-sand); }
   .chip-lsp { color: var(--signal-pink); }
   .chip-strong { font-weight: 500; }
 </style>

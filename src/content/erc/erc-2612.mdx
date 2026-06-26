@@ -1,0 +1,172 @@
+---
+id: "2612"
+title: "ERC-2612"
+headline: "What is ERC-2612?"
+pageTitle: "What is ERC-2612? Permit, Gasless Approvals, and the Remaining Allowance Risk"
+description: "ERC-2612 adds permit to ERC-20, letting a holder set allowance with an EIP-712 signature instead of an on-chain approve transaction."
+tagline: "Gasless ERC-20 approval by signature - useful, but still allowance."
+bootStrip: "standard · permit · erc-20 extension · ready"
+standardAuthors:
+  - "Merunas Grincalaitis"
+  - "Theo Diamandis"
+  - "Joey Santoro"
+  - "Ross Campbell"
+  - "Marcin Arys"
+proposed: "April 2020"
+eipNumber: "EIP-2612"
+termCode: "EIP-2612"
+updated: 2026-06-26
+
+definition: "ERC-2612 is an ERC-20 extension that adds permit(owner, spender, value, deadline, v, r, s), nonces(owner), and DOMAIN_SEPARATOR(). A holder signs an EIP-712 message off-chain, and anyone can submit that signature on-chain to set ERC-20 allowance without the holder first sending an approve transaction."
+
+abi: |
+  function permit(
+    address owner,
+    address spender,
+    uint256 value,
+    uint256 deadline,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external;
+
+  function nonces(address owner) external view returns (uint256);
+  function DOMAIN_SEPARATOR() external view returns (bytes32);
+
+tldr: "ERC-2612 fixes one ERC-20 UX problem: users no longer need ETH just to submit approve. It does not remove the allowance model. After permit executes, the spender still has ERC-20 allowance and can still call transferFrom up to the signed value. The high-yield LUKSO comparison is LSP25 for relayed execution and LSP6 for account-level permission scoping."
+
+stats:
+  - k: "Standard"
+    v: "ERC-2612 / EIP-2612"
+  - k: "Extends"
+    v: "ERC-20"
+    href: "/erc-20/"
+  - k: "Signature format"
+    v: "EIP-712 typed data"
+  - k: "Core function"
+    v: "permit(owner, spender, value, deadline, v, r, s)"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-2612"
+    href: "https://eips.ethereum.org/EIPS/eip-2612"
+
+interfaceDiagram:
+  - group: "write"
+    items: ["permit"]
+  - group: "read"
+    items: ["nonces", "DOMAIN_SEPARATOR"]
+  - group: "inherits"
+    items: ["allowance", "transferFrom"]
+
+limits:
+  - title: "Permit still creates allowance."
+    summary: "The signature removes the approve transaction, but the end state is the same ERC-20 approval table. The spender still receives a value-limited permission inside the token contract."
+    workarounds: ["short deadlines", "exact values", "Permit2 scoped signatures", "approval revocation"]
+    href: "/erc-20-allowance/"
+    from:
+      chip: "ERC-2612"
+      code: "permit(...) -> allowance"
+      tags: ["signature UX", "same spender model"]
+    to:
+      chip: "LSP6"
+      code: "account permission"
+      tags: ["call-scoped", "revocable"]
+  - title: "Every token has to implement it."
+    summary: "Permit is an ERC-20 extension, not a universal router. Tokens without ERC-2612 cannot be approved by this path, and implementations can diverge in domain separators, nonces, or wallet support."
+    workarounds: ["Permit2", "custom permit adapters", "fallback approve transactions"]
+    from:
+      chip: "ERC-2612"
+      code: "token implements permit"
+      tags: ["per-token", "optional"]
+    to:
+      chip: "LSP25"
+      code: "account relay call"
+      tags: ["account-native", "one relay shape"]
+  - title: "The signature is only as clear as the wallet UI."
+    summary: "EIP-712 improves structured signing, but users still have to understand spender, value, nonce, and deadline. If the wallet renders the typed data poorly, permit can still become a phishing surface."
+    workarounds: ["human-readable wallet prompts", "simulation", "spender reputation"]
+    from:
+      chip: "permit"
+      code: "sign typed approval"
+      tags: ["off-chain", "phishable"]
+    to:
+      chip: "LSP6"
+      code: "named controller"
+      tags: ["account visible", "auditable"]
+
+luksoRoutes:
+  - chip: "LSP25"
+    label: "Execute Relay Call"
+    summary: "Lets a controller sign a call that a relayer submits and pays for, without introducing token-specific permit extensions."
+    href: "/standards/lsp25-execute-relay-call/"
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Moves authorization policy to the account instead of embedding long-lived allowances in each token."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "Fungible assets with operators, transfer data, and receiver hooks."
+    href: "/standards/lsp7-digital-asset/"
+
+compareRows:
+  - row: "primary goal"
+    left: "set ERC-20 allowance by signature"
+    right: "relay account execution and scope permissions"
+  - row: "state changed"
+    left: "token allowance mapping"
+    right: "account call path / controller permission"
+  - row: "gasless scope"
+    left: "approval only"
+    right: "any permitted account call"
+  - row: "spender risk"
+    left: "still present"
+    right: "bounded by LSP6 permission"
+compareRight:
+  chip: "LSP25+6"
+  kind: "topic"
+  label: "LSP relay and permission stack"
+
+useErc: "Use ERC-2612 when your asset must remain ERC-20 compatible and you want gasless or single-transaction approval flows for DeFi integrations."
+useLsp: "Use LSP25 plus LSP6 when the account is the programmable surface and the product needs relayed execution plus durable permission scoping beyond one token's allowance table."
+
+faqs:
+  - q: "What does ERC-2612 add to ERC-20?"
+    a: "It adds permit, nonces, and DOMAIN_SEPARATOR. permit lets an ERC-20 holder sign an approval off-chain and have someone else submit it on-chain."
+  - q: "Is ERC-2612 the same as Permit2?"
+    a: "No. ERC-2612 is a token-level extension each token implements. Permit2 is an external shared approval contract from Uniswap that can support tokens even when they do not implement ERC-2612."
+  - q: "Does ERC-2612 make approvals safe?"
+    a: "It improves approval UX and reduces the need for a separate approve transaction. The resulting permission is still ERC-20 allowance, so spender selection, amount, deadline, and wallet display still matter."
+
+aliases:
+  - "ERC2612"
+  - "EIP-2612"
+  - "permit ERC20"
+  - "ERC-20 permit"
+related:
+  - "erc/erc-20"
+  - "erc/erc-20-allowance"
+  - "erc/permit2"
+  - "erc/gasless-transactions"
+docs:
+  - label: "eips.ethereum.org / EIP-2612"
+    href: "https://eips.ethereum.org/EIPS/eip-2612"
+  - label: "OpenZeppelin Contracts / ERC20Permit"
+    href: "https://docs.openzeppelin.com/contracts/5.x/api/token/erc20#ERC20Permit"
+primarySources:
+  - label: "EIP-2612"
+    href: "https://eips.ethereum.org/EIPS/eip-2612"
+
+lede: |
+  ERC-2612 is the standard behind "permit" in ERC-20 flows. Instead of sending approve first, the token holder signs an EIP-712 approval message and the app submits it alongside the action that needs the allowance.
+
+origin: |
+  Permit emerged from the same pressure that made ERC-20 allowances painful: users needed ETH to approve a token before they could use the token. ERC-2612 standardized the permit shape so wallets and protocols could support gasless approvals consistently.
+
+spec: |
+  permit verifies the owner's signature, checks the nonce and deadline, then writes allowance[owner][spender] = value. nonces prevents replay. DOMAIN_SEPARATOR binds the signature to a chain and token contract.
+
+whatsBroken: |
+  The approval transaction disappeared, but the approval risk did not. A bad spender, misleading typed-data prompt, or overbroad signed value still leaves a spender with transferFrom power.
+
+vogelsteller: |
+  LSP25 handles the "someone else pays gas" part at the account layer, while LSP6 handles "what may this signer do?" as account policy. That splits the two concerns ERC-2612 has to compress into one token-level permit.
+---

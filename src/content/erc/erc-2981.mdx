@@ -1,0 +1,155 @@
+---
+id: "2981"
+title: "ERC-2981"
+headline: "What is ERC-2981?"
+pageTitle: "What is ERC-2981? NFT RoyaltyInfo and Royalty Signaling"
+description: "ERC-2981 standardizes royaltyInfo(tokenId, salePrice), a way for NFT contracts to tell marketplaces the suggested royalty recipient and amount for a sale."
+tagline: "NFT royalties as a discovery signal, not an enforcement mechanism."
+bootStrip: "standard · nft royalties · royaltyInfo · ready"
+standardAuthors:
+  - "Zach Burks"
+  - "James Morgan"
+proposed: "September 2020"
+eipNumber: "EIP-2981"
+termCode: "EIP-2981"
+updated: 2026-06-26
+
+definition: "ERC-2981 is the Ethereum royalty standard for NFTs and other assets. It defines royaltyInfo(tokenId, salePrice), which returns a royalty receiver and royalty amount for a given sale price."
+
+abi: |
+  function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (address receiver, uint256 royaltyAmount);
+
+tldr: "ERC-2981 makes royalties discoverable. It does not enforce payment. Marketplaces can call royaltyInfo and choose to honor the returned receiver and amount, but the token transfer itself does not require royalty settlement. That distinction matters: ERC-2981 is metadata for marketplaces, not a protocol-level creator-enforcement rail."
+
+stats:
+  - k: "Standard"
+    v: "ERC-2981 / EIP-2981"
+  - k: "Core function"
+    v: "royaltyInfo(tokenId, salePrice)"
+  - k: "Detection"
+    v: "ERC-165 interface ID"
+    href: "/erc-165/"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-2981"
+    href: "https://eips.ethereum.org/EIPS/eip-2981"
+
+interfaceDiagram:
+  - group: "read"
+    items: ["royaltyInfo"]
+  - group: "inputs"
+    items: ["tokenId", "salePrice"]
+  - group: "outputs"
+    items: ["receiver", "royaltyAmount"]
+
+limits:
+  - title: "Royalties are signaled, not enforced."
+    summary: "The standard returns a suggested receiver and amount. It does not force marketplaces, private transfers, or escrow contracts to pay that amount."
+    workarounds: ["marketplace policy", "transfer validators", "allowlists", "custom sale contracts"]
+    from:
+      chip: "ERC-2981"
+      code: "royaltyInfo(...)"
+      tags: ["discovery", "voluntary"]
+    to:
+      chip: "policy"
+      code: "marketplace enforces"
+      tags: ["off-standard"]
+  - title: "It does not define royalty metadata."
+    summary: "ERC-2981 returns payment data. It does not define creator profiles, license text, splits metadata, or rich attribution fields."
+    workarounds: ["off-chain metadata", "custom split contracts", "marketplace pages"]
+    from:
+      chip: "ERC-2981"
+      code: "receiver + amount"
+      tags: ["minimal"]
+    to:
+      chip: "LSP4"
+      code: "typed metadata keys"
+      tags: ["richer context"]
+  - title: "It depends on marketplace behavior."
+    summary: "A standard royalty function only helps if buyers and marketplaces route through software that calls it and honors the result."
+    workarounds: ["operator filters", "creator-enforced marketplaces", "legal terms"]
+    from:
+      chip: "NFT sale"
+      code: "marketplace decides"
+      tags: ["policy layer"]
+    to:
+      chip: "account stack"
+      code: "explicit permission / sale flow"
+      tags: ["app-specific"]
+
+luksoRoutes:
+  - chip: "LSP4"
+    label: "Digital Asset Metadata"
+    summary: "A typed metadata layer that can carry richer asset and creator data alongside royalty signaling."
+    href: "/standards/lsp4-digital-asset-metadata/"
+  - chip: "LSP8"
+    label: "Identifiable Digital Asset"
+    summary: "NFT-like identifiable assets with typed per-token data."
+    href: "/standards/lsp8-identifiable-digital-asset/"
+  - chip: "LSP3"
+    label: "Profile Metadata"
+    summary: "Creator and holder identities can be Universal Profiles with first-class metadata."
+    href: "/standards/lsp3-profile-metadata/"
+
+compareRows:
+  - row: "purpose"
+    left: "royalty discovery"
+    right: "asset and creator metadata substrate"
+  - row: "enforces payment"
+    left: "no"
+    right: "no by itself; app policy required"
+  - row: "data shape"
+    left: "receiver + amount"
+    right: "typed metadata keys"
+  - row: "asset fit"
+    left: "NFT royalty-aware marketplaces"
+    right: "LSP8 assets and Universal Profiles"
+compareRight:
+  chip: "LSP4+8"
+  kind: "topic"
+  label: "LSP metadata and asset stack"
+
+useErc: "Use ERC-2981 when an NFT contract needs standard royalty discovery for marketplaces that call royaltyInfo."
+useLsp: "Use LSP4 and LSP8 when royalties are only one part of a richer asset, creator, and metadata model."
+
+faqs:
+  - q: "Does ERC-2981 enforce NFT royalties?"
+    a: "No. It standardizes royalty discovery. Marketplaces and sale contracts still decide whether to pay the returned royalty."
+  - q: "What does royaltyInfo return?"
+    a: "It returns a receiver address and a royalty amount for a given tokenId and salePrice."
+  - q: "Does ERC-2981 only work with ERC-721?"
+    a: "No. It can be used by NFT-style contracts generally, and it is detected through ERC-165."
+
+aliases:
+  - "EIP-2981"
+  - "NFT royalty standard"
+  - "royaltyInfo"
+  - "ERC2981"
+related:
+  - "erc/erc-721"
+  - "erc/erc-1155"
+  - "erc/erc-165"
+  - "erc/erc-4906"
+docs:
+  - label: "eips.ethereum.org / EIP-2981"
+    href: "https://eips.ethereum.org/EIPS/eip-2981"
+  - label: "OpenZeppelin Contracts / ERC2981"
+    href: "https://docs.openzeppelin.com/contracts/5.x/api/token/common#ERC2981"
+primarySources:
+  - label: "EIP-2981"
+    href: "https://eips.ethereum.org/EIPS/eip-2981"
+
+lede: |
+  ERC-2981 is the NFT royalty standard most marketplaces know how to ask for. It answers one question: if this token sells for this price, who should receive royalties and how much?
+
+origin: |
+  NFT royalties were originally marketplace-specific. ERC-2981 standardized the read path so contracts could publish royalty information without every marketplace inventing a custom adapter.
+
+spec: |
+  royaltyInfo takes a tokenId and salePrice, then returns a receiver and royaltyAmount. The contract can compute that amount however it wants, as long as it returns the amount in the same unit as the sale price.
+
+whatsBroken: |
+  The standard deliberately does not enforce royalties. That keeps transfers simple and composable, but it means royalty payment is a marketplace or sale-contract policy choice.
+
+vogelsteller: |
+  LUKSO's metadata and profile standards make creator and asset information richer than one royalty function. Royalty payment still needs application policy, but the identity and metadata substrate is less ad hoc.
+---

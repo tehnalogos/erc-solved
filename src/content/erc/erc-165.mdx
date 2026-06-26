@@ -1,0 +1,152 @@
+---
+id: "165"
+title: "ERC-165"
+headline: "What is ERC-165?"
+pageTitle: "What is ERC-165? Interface Detection on Ethereum"
+description: "ERC-165 defines supportsInterface(bytes4), the standard way contracts declare which interfaces they implement. ERC-721, ERC-1155, ERC-2981, and many LUKSO standards use it."
+tagline: "The tiny function behind interface detection for NFTs, multi-tokens, royalties, and LSPs."
+bootStrip: "standard · interface detection · small but everywhere · ready"
+standardAuthors:
+  - "Christian Reitwiessner"
+  - "Nick Johnson"
+  - "Fabian Vogelsteller"
+  - "Jordi Baylina"
+  - "William Entriken"
+proposed: "January 2018"
+eipNumber: "EIP-165"
+termCode: "EIP-165"
+updated: 2026-06-26
+
+definition: "ERC-165 is the Ethereum standard for interface detection. A contract implements supportsInterface(bytes4 interfaceID) and returns true when it supports a given interface identifier."
+
+abi: |
+  function supportsInterface(bytes4 interfaceID) external view returns (bool);
+
+tldr: "ERC-165 is not a token standard. It is the discovery primitive that lets callers ask a contract what interfaces it claims to support. It matters because ERC-721, ERC-1155, ERC-2981, and many LSP contracts publish interface IDs through the same small function."
+
+stats:
+  - k: "Standard"
+    v: "ERC-165 / EIP-165"
+  - k: "Core function"
+    v: "supportsInterface(bytes4)"
+  - k: "Used by"
+    v: "ERC-721 · ERC-1155 · ERC-2981 · LSPs"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-165"
+    href: "https://eips.ethereum.org/EIPS/eip-165"
+
+interfaceDiagram:
+  - group: "read"
+    items: ["supportsInterface"]
+  - group: "common callers"
+    items: ["wallets", "marketplaces", "protocol adapters"]
+
+limits:
+  - title: "It is a claim, not a proof."
+    summary: "supportsInterface says what a contract claims to implement. It does not prove the implementation is correct, complete, or safe for the caller's assumptions."
+    workarounds: ["runtime probing", "try/catch calls", "audited implementations", "conformance tests"]
+    from:
+      chip: "ERC-165"
+      code: "supportsInterface(id) == true"
+      tags: ["claim", "not behavior proof"]
+    to:
+      chip: "tests"
+      code: "probe behavior"
+      tags: ["verify", "defensive"]
+  - title: "ERC-20 never adopted it."
+    summary: "The most common token standard predates ERC-165 and does not expose supportsInterface. That is why ERC-20 detection still relies on ABI assumptions, calls, token lists, and indexers."
+    workarounds: ["static call balanceOf", "token lists", "indexer heuristics"]
+    from:
+      chip: "ERC-20"
+      code: "no supportsInterface"
+      tags: ["heuristic detection"]
+    to:
+      chip: "ERC-165"
+      code: "standard detection"
+      tags: ["explicit"]
+  - title: "Interface support can be too coarse."
+    summary: "A contract can support an interface but still vary in optional extensions, metadata conventions, or permission behavior. Callers still need feature-specific checks."
+    workarounds: ["extension-specific IDs", "metadata reads", "capability registries"]
+    from:
+      chip: "interface ID"
+      code: "one bytes4"
+      tags: ["coarse"]
+    to:
+      chip: "ERC-725Y"
+      code: "typed data keys"
+      tags: ["richer capability data"]
+
+luksoRoutes:
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "LSP7 publishes interface support so integrations can detect the token shape."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP8"
+    label: "Identifiable Digital Asset"
+    summary: "LSP8 uses interface detection alongside typed metadata and receiver-aware transfers."
+    href: "/standards/lsp8-identifiable-digital-asset/"
+  - chip: "ERC725Y"
+    label: "Key-value data store"
+    summary: "Typed data keys can expose richer metadata and capabilities than one interface ID."
+    href: "/standards/erc725/"
+
+compareRows:
+  - row: "question answered"
+    left: "does this contract claim interface X?"
+    right: "what typed data and standards does this account or asset expose?"
+  - row: "return type"
+    left: "bool"
+    right: "bytes under known keys"
+  - row: "used by LSPs"
+    left: "yes"
+    right: "yes, alongside ERC-725Y"
+compareRight:
+  chip: "ERC725Y"
+  kind: "topic"
+  label: "ERC-725Y typed data"
+
+useErc: "Use ERC-165 whenever your contract implements an interface that other contracts need to detect, especially ERC-721, ERC-1155, ERC-2981, or LSP interfaces."
+useLsp: "Use ERC-165 for interface detection, then use ERC-725Y/LSP metadata when callers need richer structured information than a boolean interface claim."
+
+faqs:
+  - q: "What is ERC-165 used for?"
+    a: "It lets contracts declare support for interfaces through supportsInterface(bytes4), so callers can detect standards such as ERC-721, ERC-1155, and ERC-2981."
+  - q: "Does ERC-20 support ERC-165?"
+    a: "No. ERC-20 predates ERC-165 and does not include supportsInterface in its standard interface."
+  - q: "How is an ERC-165 interface ID calculated?"
+    a: "An interface ID is the XOR of the function selectors in the interface, with special handling described in the EIP."
+
+aliases:
+  - "EIP-165"
+  - "supportsInterface"
+  - "interface detection"
+  - "ERC165"
+related:
+  - "erc/erc-721"
+  - "erc/erc-1155"
+  - "erc/erc-2981"
+  - "standards/erc725"
+docs:
+  - label: "eips.ethereum.org / EIP-165"
+    href: "https://eips.ethereum.org/EIPS/eip-165"
+  - label: "OpenZeppelin Contracts / ERC165"
+    href: "https://docs.openzeppelin.com/contracts/5.x/api/utils#ERC165"
+primarySources:
+  - label: "EIP-165"
+    href: "https://eips.ethereum.org/EIPS/eip-165"
+
+lede: |
+  ERC-165 is easy to miss because it is just one function. But it is the reason a marketplace can ask whether a contract is an ERC-721, an ERC-1155, or an ERC-2981 royalty source before it starts calling token-specific functions.
+
+origin: |
+  As Ethereum contracts became more composable, callers needed a standard way to discover interfaces without relying only on ABI registries or failed calls. ERC-165 standardized that discovery path.
+
+spec: |
+  A contract returns true for the ERC-165 interface ID and for every interface ID it supports. Callers use a static call to supportsInterface and branch from there.
+
+whatsBroken: |
+  Interface detection is useful, but it is not a guarantee of behavior. Contracts can lie, implement an interface badly, or support the base interface while leaving important optional behavior out.
+
+vogelsteller: |
+  LUKSO standards keep ERC-165 where it is useful, then add ERC-725Y-backed data for richer metadata and capability description.
+---

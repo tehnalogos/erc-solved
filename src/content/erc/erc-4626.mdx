@@ -1,0 +1,278 @@
+---
+id: "4626"
+title: "ERC-4626"
+standardKind: "ERC"
+headline: "What is ERC-4626?"
+pageTitle: "What is ERC-4626? Tokenized Vaults, Integration Wins, and the Remaining Risks"
+description: "ERC-4626 is Ethereum's tokenized vault standard. It extends ERC-20 shares with a common API for deposits, withdrawals, share conversion, preview functions, and vault accounting. This page explains the standard, why it became DeFi infrastructure, the risks it does not remove, and how LUKSO account and asset standards complement rather than replace vault accounting."
+tagline: "The vault standard that made yield-bearing ERC-20 shares composable — without standardizing the strategy inside."
+bootStrip: "standard · proposed dec 2021 · defi adapter layer · ready"
+standardAuthors:
+  - "Joey Santoro"
+  - "t11s"
+  - "Jet Jadeja"
+  - "Alberto Cuesta Canada"
+  - "Senor Doggo"
+proposed: "December 2021"
+eipNumber: "EIP-4626"
+termCode: "EIP-4626"
+updated: 2026-06-26
+
+definition: "ERC-4626 is the Ethereum tokenized vault standard. It extends ERC-20 with a common interface for vault shares backed by one underlying ERC-20 asset: asset(), totalAssets(), convertToShares(), convertToAssets(), max and preview functions, deposit(), mint(), withdraw(), redeem(), and Deposit/Withdraw events. The standard was created in December 2021 to reduce adapter complexity across lending markets, aggregators, yield vaults, and interest-bearing tokens."
+
+abi: |
+  // EIP-4626 — tokenized vault over one ERC-20 asset
+  function asset() external view returns (address assetTokenAddress);
+  function totalAssets() external view returns (uint256 totalManagedAssets);
+
+  function convertToShares(uint256 assets) external view returns (uint256 shares);
+  function convertToAssets(uint256 shares) external view returns (uint256 assets);
+
+  function maxDeposit(address receiver) external view returns (uint256 maxAssets);
+  function previewDeposit(uint256 assets) external view returns (uint256 shares);
+  function deposit(uint256 assets, address receiver) external returns (uint256 shares);
+
+  function maxMint(address receiver) external view returns (uint256 maxShares);
+  function previewMint(uint256 shares) external view returns (uint256 assets);
+  function mint(uint256 shares, address receiver) external returns (uint256 assets);
+
+  function maxWithdraw(address owner) external view returns (uint256 maxAssets);
+  function previewWithdraw(uint256 assets) external view returns (uint256 shares);
+  function withdraw(uint256 assets, address receiver, address owner) external returns (uint256 shares);
+
+  function maxRedeem(address owner) external view returns (uint256 maxShares);
+  function previewRedeem(uint256 shares) external view returns (uint256 assets);
+  function redeem(uint256 shares, address receiver, address owner) external returns (uint256 assets);
+
+  event Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares);
+  event Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares);
+
+tldr: "ERC-4626 is one of the best examples of a good ERC: it standardizes the adapter layer without pretending to standardize vault strategy. Integrators get a predictable way to quote shares/assets, deposit, mint, withdraw, redeem, and read total managed assets. But the vault remains a black box. Rounding, donation/inflation attacks, fee policy, withdrawal queues, oracle assumptions, and strategy risk are outside the interface. LSPs do not replace ERC-4626; they complement it with better account permissions, metadata, receiver hooks, and gasless execution around vault interactions."
+
+stats:
+  - k: "Standard"
+    v: "ERC-4626 / EIP-4626"
+  - k: "Created"
+    v: "22 December 2021"
+    href: "https://eips.ethereum.org/EIPS/eip-4626"
+  - k: "Requires"
+    v: "ERC-20 + ERC-2612"
+  - k: "Core abstraction"
+    v: "shares over one underlying asset"
+  - k: "Primary users"
+    v: "vaults · lending markets · aggregators · yield tokens"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-4626"
+    href: "https://eips.ethereum.org/EIPS/eip-4626"
+  - k: "Implementation docs"
+    v: "OpenZeppelin ERC-4626"
+    href: "https://docs.openzeppelin.com/contracts/5.x/erc4626"
+
+interfaceDiagram:
+  - group: "asset"
+    items: ["asset", "totalAssets"]
+  - group: "quote"
+    items: ["convertToShares", "convertToAssets"]
+  - group: "preview"
+    items: ["previewDeposit", "previewMint", "previewWithdraw", "previewRedeem"]
+  - group: "limits"
+    items: ["maxDeposit", "maxMint", "maxWithdraw", "maxRedeem"]
+  - group: "mutate"
+    items: ["deposit", "mint", "withdraw", "redeem"]
+
+limits:
+  - title: "The vault is still a black box."
+    summary: "ERC-4626 standardizes the interface, not the strategy. It does not tell integrators where assets are deployed, how risk is priced, whether the strategy can be paused, what oracle it uses, or whether withdrawals depend on an async queue. The spec explicitly leaves accounting and allocation details to vault implementations."
+    workarounds: ["vault due diligence", "strategy adapters", "risk registries", "off-chain monitoring"]
+    from:
+      chip: "ERC-4626"
+      code: "totalAssets() + previews"
+      tags: ["interface only", "strategy opaque", "off-chain review"]
+    to:
+      chip: "LSP4 + ERC-725Y"
+      code: "typed metadata + risk disclosures"
+      tags: ["discoverable", "structured", "attached to asset/account"]
+
+  - title: "Rounding and donation attacks are implementation risks."
+    summary: "The standard defines share/asset conversion behavior, but an empty or low-liquidity vault can be vulnerable if the implementation lets an attacker donate assets and skew the exchange rate before a user's deposit. OpenZeppelin documents virtual shares/assets and precision offsets as defenses, but the ERC itself is not the defense."
+    workarounds: ["virtual offset", "dead shares", "seeded initial liquidity", "minimum deposit checks", "first-deposit guards"]
+    from:
+      chip: "ERC-4626"
+      code: "convertToShares(assets)"
+      tags: ["rounding", "donation risk", "empty vault hazard"]
+    to:
+      chip: "implementation"
+      code: "virtual shares/assets + slippage checks"
+      tags: ["must be designed", "not solved by LSP", "audit required"]
+
+  - title: "Preview functions are not price oracles."
+    summary: "previewDeposit and friends should approximate same-transaction outcomes, but the spec warns that preview values can be manipulated by on-chain conditions. convert functions are allowed to be inexact and can be implemented more robustly, but integrators still need to know which view function they are using and why."
+    workarounds: ["TWAP-style convert functions", "slippage parameters", "same-block simulation", "vault-specific quote adapters"]
+    from:
+      chip: "ERC-4626"
+      code: "previewDeposit / previewRedeem"
+      tags: ["manipulable", "not oracle", "context-sensitive"]
+    to:
+      chip: "LSP20"
+      code: "inline call verification"
+      tags: ["policy checks", "preconditions", "account-side guards"]
+
+  - title: "Approve/deposit keeps the ERC-20 allowance UX."
+    summary: "Depositing the underlying asset usually means approving the vault, then calling deposit or mint. ERC-4626 can use ERC-2612 permit when supported, but it inherits the underlying token's approval model and the share token's allowance model."
+    workarounds: ["EIP-2612 permit", "Permit2", "multicall routers", "smart account batching", "allowance revocation"]
+    href: "/erc-20-allowance/"
+    from:
+      chip: "ERC-4626"
+      code: "asset.approve(vault) + deposit"
+      tags: ["two-step UX", "allowance risk", "token-dependent"]
+    to:
+      chip: "LSP6 + LSP25"
+      code: "scoped controller + relayed call"
+      tags: ["account permissions", "gasless", "batched intent"]
+
+  - title: "Fees and withdrawal constraints are not uniform."
+    summary: "The interface has max functions and preview functions, but fee policy, withdrawal queues, cooldowns, locks, and emergency states remain implementation-specific. Two ERC-4626 vaults can both be compliant while presenting very different liquidity guarantees."
+    workarounds: ["max* checks", "fee-aware previews", "strategy disclosures", "vault-specific UI warnings"]
+    from:
+      chip: "ERC-4626"
+      code: "maxWithdraw(owner)"
+      tags: ["underestimates limits", "policy-specific", "not a guarantee"]
+    to:
+      chip: "ERC-725Y"
+      code: "standardized disclosure keys"
+      tags: ["metadata layer", "indexable", "wallet-readable"]
+
+luksoRoutes:
+  - chip: "LSP6"
+    label: "Key Manager"
+    summary: "Use account-level permissions to scope vault interactions instead of handing a dapp blanket authority over the user's whole account."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP25"
+    label: "Execute Relay Call"
+    summary: "Relayed vault deposits or withdrawals without requiring the user to hold native gas."
+    href: "/standards/lsp25-execute-relay-call/"
+  - chip: "LSP7"
+    label: "Digital Asset"
+    summary: "A receiver-aware fungible asset layer if the underlying asset or share representation is issued inside the LSP ecosystem."
+    href: "/standards/lsp7-digital-asset/"
+  - chip: "LSP4"
+    label: "Digital Asset Metadata"
+    summary: "Attach structured metadata, strategy descriptions, risk links, and verification data to vault-like assets."
+    href: "/standards/lsp4-digital-asset-metadata/"
+  - chip: "LSP1"
+    label: "Universal Receiver"
+    summary: "Let accounts react to incoming share tokens or strategy receipts through one receiver hook."
+    href: "/standards/lsp1-universal-receiver/"
+
+compareRows:
+  - row: "core job"
+    left: "standardize vault share accounting"
+    right: "standardize account, metadata, permissions, and receiving"
+  - row: "asset movement"
+    left: "ERC-20 approve + deposit/mint"
+    right: "controller-permitted calls + LSP25 relay"
+  - row: "strategy risk"
+    left: "implementation-specific black box"
+    right: "can be disclosed in ERC-725Y/LSP4 metadata"
+  - row: "receiver awareness"
+    left: "inherits ERC-20 transfer behavior"
+    right: "LSP1 notifications for LSP assets"
+  - row: "best framing"
+    left: "keep ERC-4626 for vault math"
+    right: "wrap the UX and account layer with LSPs"
+compareRight:
+  chip: "LSP stack"
+  kind: "topic"
+  label: "LSP account + asset layer"
+
+useErc: "When you are building or integrating a yield-bearing vault, lending wrapper, strategy share, or aggregator adapter. ERC-4626 is the right interface for shares over one ERC-20 underlying asset, and replacing it would reduce composability."
+useLsp: "When the pain is not vault accounting but user authority, metadata, discoverability, receiving, or gasless execution. Keep ERC-4626 for the vault interface; use LSP6, LSP25, LSP4, LSP1, and LSP7 around the account and asset experience."
+
+aliases:
+  - "ERC4626"
+  - "EIP-4626"
+  - "tokenized vault standard"
+  - "ERC-4626 vault"
+  - "vault shares"
+  - "yield vault standard"
+
+faqs:
+  - q: "What is ERC-4626?"
+    a: "ERC-4626 is Ethereum's tokenized vault standard. It extends ERC-20 share tokens with a common API for deposits, mints, withdrawals, redemptions, share/asset conversion, limits, previews, and vault events."
+  - q: "Is ERC-4626 an ERC-20 token?"
+    a: "Yes. ERC-4626 vault shares are ERC-20 tokens. The standard adds vault-specific functions on top of the ERC-20 share interface."
+  - q: "Does ERC-4626 support more than one underlying asset?"
+    a: "No. The standard is for a vault with a single underlying ERC-20 asset returned by asset(). Multi-asset vaults need another interface or adapters."
+  - q: "What is the ERC-4626 inflation attack?"
+    a: "It is a first-deposit or low-liquidity attack where an attacker manipulates the share/asset exchange rate, often by donating assets to the vault, so a victim's deposit mints too few shares. Defenses are implementation-level, such as virtual offsets, seeded liquidity, and minimum output checks."
+  - q: "Do LSPs replace ERC-4626?"
+    a: "No. ERC-4626 is the right vault accounting interface. LSPs complement it by improving account permissions, token metadata, receiver hooks, and relayed execution around vault interactions."
+
+related:
+  - "erc/ethereum-token-standards"
+  - "erc/erc-20-allowance"
+  - "erc/erc-20"
+  - "erc/erc-2612"
+  - "erc/permit2"
+  - "problems/erc20-approval-risks"
+  - "standards/lsp6-key-manager"
+  - "standards/lsp25-execute-relay-call"
+
+docs:
+  - label: "eips.ethereum.org / EIP-4626"
+    href: "https://eips.ethereum.org/EIPS/eip-4626"
+  - label: "OpenZeppelin / ERC-4626"
+    href: "https://docs.openzeppelin.com/contracts/5.x/erc4626"
+  - label: "docs.lukso.tech / LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+
+primarySources:
+  - label: "EIP-4626: Tokenized Vaults"
+    href: "https://eips.ethereum.org/EIPS/eip-4626"
+  - label: "OpenZeppelin ERC-4626 guide"
+    href: "https://docs.openzeppelin.com/contracts/5.x/erc4626"
+  - label: "LUKSO LSP6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+
+timeline:
+  - year: "Dec 2021"
+    text: "ERC-4626 is created to standardize tokenized vault integration across DeFi."
+    href: "https://eips.ethereum.org/EIPS/eip-4626"
+  - year: "2022"
+    text: "Vault adapters and libraries converge around the standard as DeFi protocols seek one interface for yield-bearing shares."
+  - year: "2023+"
+    text: "Implementation-level issues like empty-vault inflation attacks become part of standard ERC-4626 audit checklists."
+
+glossary:
+  - term: "asset"
+    def: "The underlying ERC-20 token managed by the vault."
+  - term: "share"
+    def: "The ERC-20 token representing a claim on a fraction of the vault's managed assets."
+  - term: "preview"
+    def: "A view function that estimates the output of the corresponding mutable function in current conditions."
+  - term: "inflation attack"
+    def: "A manipulation of the vault exchange rate, often through donation to a low-liquidity vault, that causes a victim deposit to mint too few shares."
+
+lede: |
+  ERC-4626 is boring in the best way. Before it, every yield vault looked familiar but integrated differently. Deposits, shares, withdrawals, previews, fees, and total assets were all named and modeled differently enough that aggregators wrote adapters for every protocol. ERC-4626 standardized the adapter layer.
+
+  It did not standardize yield strategy. That is the right boundary. It is also why integrators still have work to do.
+
+origin: |
+  ERC-4626 was created on **22 December 2021** by Joey Santoro, t11s, Jet Jadeja, Alberto Cuesta Canada, and Senor Doggo. The context was DeFi maturity: vaults, lending wrappers, aggregators, and interest-bearing tokens had become core infrastructure, but each one exposed slightly different deposit and withdrawal semantics.
+
+  The standard made vault shares ERC-20 tokens and added the missing vault verbs: quote, preview, limit, deposit, mint, withdraw, redeem. That gave integrators one shape to code against while preserving each vault's right to implement its own strategy.
+
+spec: |
+  The mental model is a vault with one underlying asset and one ERC-20 share token. `asset()` names the underlying token. `totalAssets()` reports managed assets. `convertToShares` and `convertToAssets` provide average conversion estimates. `preview*` functions estimate specific operations. `max*` functions expose current limits. The mutable functions move assets and shares: `deposit`, `mint`, `withdraw`, and `redeem`.
+
+  The canonical specification is at [eips.ethereum.org/EIPS/eip-4626](https://eips.ethereum.org/EIPS/eip-4626). OpenZeppelin's implementation docs are especially useful for the inflation-attack and virtual-offset discussion.
+
+whatsBroken: |
+  ERC-4626 is not broken in the same way ERC-20 approvals or ERC-721 metadata are broken. Its boundary is mostly correct. The remaining risks come from what the interface intentionally does not specify: strategy, fees, liquidity, implementation math, oracle policy, and user authority around the vault call.
+
+vogelsteller: |
+  The honest LUKSO framing is complement, not replacement. A vault still needs ERC-4626-style accounting if it wants to compose with DeFi. What LSPs add is the surrounding account and asset system: scoped controllers through LSP6, relayed execution through LSP25, metadata through LSP4, and receiver hooks through LSP1.
+
+  Put differently: ERC-4626 solves "how does an integrator talk to a vault?" LSPs solve "how does a user account safely authorize, understand, receive, and automate vault interactions?"
+---
