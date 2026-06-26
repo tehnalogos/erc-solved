@@ -1,54 +1,80 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 
-const staticUrls = [
-  '/',
-  '/problems/',
-  '/standards/',
-  '/standards/matrix/',
-  '/build/',
-  '/erc/',
-  '/about/',
+// Static page → priority + changefreq tiering.
+// Tiers (highest → lowest crawl + SEO weight):
+//   1.0  — homepage and the top-level explainers listed on /erc/ (head-term targets)
+//   0.9  — technical deep-dive content (LSP / ERC standard pages, ERC↔LSP comparisons,
+//          the /standards/matrix/ landing)
+//   0.7  — long-tail content (problem pages, migration guides, build verticals)
+//   0.5  — hub indexes and utility pages (the section landings themselves)
+const staticPages: Array<{ url: string; priority: string; changefreq: string }> = [
+  { url: '/',                  priority: '1.0', changefreq: 'weekly'  },
+  { url: '/standards/matrix/', priority: '0.9', changefreq: 'weekly'  },
+  { url: '/erc/',              priority: '0.5', changefreq: 'monthly' },
+  { url: '/problems/',         priority: '0.5', changefreq: 'monthly' },
+  { url: '/standards/',        priority: '0.5', changefreq: 'monthly' },
+  { url: '/build/',            priority: '0.5', changefreq: 'monthly' },
+  { url: '/about/',            priority: '0.5', changefreq: 'monthly' },
 ];
+
+// Collection → URL prefix, sitemap priority, changefreq.
+// `erc` is the highest priority because it holds the top-level explainers
+// (/erc-20/, /erc-721/, /erc-4337/, /gasless-transactions/) — the pages the
+// user wants ranking highest. Standards + compare are next; problems / migrate
+// / build verticals are long-tail.
+const collectionConfig: Record<
+  string,
+  { prefix: string; priority: string; changefreq: string }
+> = {
+  erc:       { prefix: '/',                  priority: '1.0', changefreq: 'weekly'  },
+  standards: { prefix: '/standards/',        priority: '0.9', changefreq: 'weekly'  },
+  compare:   { prefix: '/standards/compare/', priority: '0.9', changefreq: 'weekly'  },
+  problems:  { prefix: '/problems/',         priority: '0.7', changefreq: 'monthly' },
+  migrate:   { prefix: '/build/migrate/',    priority: '0.7', changefreq: 'monthly' },
+  build:     { prefix: '/build/',            priority: '0.7', changefreq: 'monthly' },
+};
 
 export const GET: APIRoute = async ({ site }) => {
   const origin = (site?.origin || 'https://www.ercsolved.dev').replace(/\/$/, '');
   const today = new Date().toISOString().slice(0, 10);
 
-  const collections = ['problems', 'standards', 'compare', 'migrate', 'build', 'erc'] as const;
-  const collectionUrls: { url: string; updated: string }[] = [];
+  const collections = Object.keys(collectionConfig) as Array<keyof typeof collectionConfig>;
+  const collectionUrls: Array<{
+    url: string;
+    updated: string;
+    priority: string;
+    changefreq: string;
+  }> = [];
 
   for (const collection of collections) {
-    const entries = await getCollection(collection);
-    const prefix = {
-      problems: '/problems/',
-      standards: '/standards/',
-      compare: '/standards/compare/',
-      migrate: '/build/migrate/',
-      build: '/build/',
-      erc: '/',
-    }[collection];
-
+    const entries = await getCollection(collection as any);
+    const { prefix, priority, changefreq } = collectionConfig[collection];
     for (const entry of entries) {
       const updated = (entry as any).data.updated
         ? new Date((entry as any).data.updated).toISOString().slice(0, 10)
         : today;
-      collectionUrls.push({ url: `${prefix}${entry.slug}/`, updated });
+      collectionUrls.push({
+        url: `${prefix}${entry.slug}/`,
+        updated,
+        priority,
+        changefreq,
+      });
     }
   }
 
   const urls = [
-    ...staticUrls.map(u => ({ url: u, updated: today })),
+    ...staticPages.map((p) => ({ ...p, updated: today })),
     ...collectionUrls,
   ];
 
   const items = urls
     .map(
-      ({ url, updated }) => `  <url>
+      ({ url, updated, priority, changefreq }) => `  <url>
     <loc>${origin}${url}</loc>
     <lastmod>${updated}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>${url === '/' || url === '/erc-20/' ? '1.0' : '0.8'}</priority>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
   </url>`,
     )
     .join('\n');
