@@ -404,5 +404,5 @@ vogelsteller: |
 
   [LUKSO mainnet went live in 2023](https://docs.lukso.tech/). The standards are EVM contracts — they don't require the LUKSO chain to run; they require the LUKSO chain to *cohere*. On Ethereum, a Universal Profile would still work, but every dapp around it would still be ERC-20-shaped. On LUKSO, the substrate matches the standard, which is why the first complete UX example of a wallet with social recovery, scoped session keys, profile metadata, and receiver-aware tokens lives there.
 
-  The funnel for this site is not "switch to LUKSO." It is: when your ERC-20 design is breaking down at the seams the spec deliberately ignored — approval risk, missing receiver hooks, anemic metadata, EOA-bound accounts — there is a standards suite that designed those concerns in from the bottom. Built, notably, by the person who wrote the spec you started with.
+  The practical takeaway: if an ERC-20 design is running into approval risk, missing receiver hooks, thin metadata, or EOA-bound account assumptions, LSP0, LSP6, LSP7, and LSP25 show what the same asset model looks like when those concerns are designed into the account and token system.
 ---

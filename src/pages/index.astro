@@ -15,7 +15,7 @@ const verticals = [
   { label: 'Extending deployed code', stack: 'LSP17 (+ LSP14)',            href: '/build/extending-deployed-contracts/' },
 ];
 
-const topQueries = [
+const commonPainPoints = [
   { q: 'erc20 approval risks',          a: 'LSP7 + LSP6',           href: '/problems/erc20-approval-risks/' },
   { q: 'erc721 dynamic metadata',       a: 'LSP8 + LSP4 + ERC-725Y', href: '/problems/erc721-dynamic-metadata/' },
   { q: 'erc-4337 alternatives',         a: 'LSP0 + LSP6 + LSP25',   href: '/problems/erc4337-bundler-tax/' },
@@ -194,7 +194,7 @@ const topQueries = [
         <h2>Start where your ERC design is breaking down.</h2>
       </div>
       <ul class="query-list">
-        {topQueries.map(({ q, a, href }) => (
+        {commonPainPoints.map(({ q, a, href }) => (
           <li>
             <a class="query-row" href={href}>
               <span class="q">{q}</span>

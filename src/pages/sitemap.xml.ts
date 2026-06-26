@@ -2,12 +2,11 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 
 // Static page → priority + changefreq tiering.
-// Tiers (highest → lowest crawl + SEO weight):
-//   1.0  — homepage and the top-level explainers listed on /erc/ (head-term targets)
-//   0.9  — technical deep-dive content (LSP / ERC standard pages, ERC↔LSP comparisons,
-//          the /standards/matrix/ landing)
-//   0.7  — long-tail content (problem pages, migration guides, build verticals)
-//   0.5  — hub indexes and utility pages (the section landings themselves)
+// Tiers:
+//   1.0  — homepage and top-level explainers
+//   0.9  — technical deep-dive content and the /standards/matrix/ landing
+//   0.7  — problem pages, migration guides, build verticals
+//   0.5  — hub indexes and utility pages
 const staticPages: Array<{ url: string; priority: string; changefreq: string }> = [
   { url: '/',                  priority: '1.0', changefreq: 'weekly'  },
   { url: '/standards/matrix/', priority: '0.9', changefreq: 'weekly'  },
@@ -20,9 +19,8 @@ const staticPages: Array<{ url: string; priority: string; changefreq: string }> 
 
 // Collection → URL prefix, sitemap priority, changefreq.
 // `erc` is the highest priority because it holds the top-level explainers
-// (/erc-20/, /erc-721/, /erc-4337/, /gasless-transactions/) — the pages the
-// user wants ranking highest. Standards + compare are next; problems / migrate
-// / build verticals are long-tail.
+// (/erc-20/, /erc-721/, /erc-4337/, /gasless-transactions/). Standards +
+// compare are next; problems / migrate / build verticals are supporting pages.
 const collectionConfig: Record<
   string,
   { prefix: string; priority: string; changefreq: string }

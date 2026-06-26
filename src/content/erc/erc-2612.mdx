@@ -33,7 +33,7 @@ abi: |
   function nonces(address owner) external view returns (uint256);
   function DOMAIN_SEPARATOR() external view returns (bytes32);
 
-tldr: "ERC-2612 fixes one ERC-20 UX problem: users no longer need ETH just to submit approve. It does not remove the allowance model. After permit executes, the spender still has ERC-20 allowance and can still call transferFrom up to the signed value. The high-yield LUKSO comparison is LSP25 for relayed execution and LSP6 for account-level permission scoping."
+tldr: "ERC-2612 fixes one ERC-20 UX problem: users no longer need ETH just to submit approve. It does not remove the allowance model. After permit executes, the spender still has ERC-20 allowance and can still call transferFrom up to the signed value. The closest LUKSO comparison is LSP25 for relayed execution and LSP6 for account-level permission scoping."
 
 stats:
   - k: "Standard"
@@ -121,7 +121,7 @@ compareRows:
     left: "still present"
     right: "bounded by LSP6 permission"
 compareRight:
-  chip: "LSP25+6"
+  chip: "LSP25+LSP6"
   kind: "topic"
   label: "LSP relay and permission stack"
 

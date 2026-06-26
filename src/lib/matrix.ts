@@ -27,7 +27,7 @@ export const matrixRows: MatrixRow[] = [
   {
     ercChip: 'ERC-1155',
     ercLabel: 'multi-asset contract',
-    lspChip: 'LSP7+8',
+    lspChip: 'LSP7+LSP8',
     lspLabel: 'split by semantics',
     verdict: 'semantic boundary in the standard, not in token-id bits',
     href: '/standards/compare/erc1155-lsp7-lsp8/',
@@ -51,7 +51,7 @@ export const matrixRows: MatrixRow[] = [
   {
     ercChip: 'ERC-777',
     ercLabel: 'token hooks',
-    lspChip: 'LSP7+1',
+    lspChip: 'LSP7+LSP1',
     lspLabel: 'safer receiver model',
     verdict: 'LSP1 universal receiver, no reentrancy-prone tokensReceived',
     href: '/erc-777/',
@@ -67,7 +67,7 @@ export const matrixRows: MatrixRow[] = [
   {
     ercChip: 'ERC-1363',
     ercLabel: 'transferAndCall',
-    lspChip: 'LSP7+1',
+    lspChip: 'LSP7+LSP1',
     lspLabel: 'native, not opt-in',
     verdict: 'transfer + receiver hook is the default, not a wrapper',
     href: '/erc-1363/',
@@ -83,7 +83,7 @@ export const matrixRows: MatrixRow[] = [
   {
     ercChip: 'ERC-2612',
     ercLabel: 'permit (gasless approve)',
-    lspChip: 'LSP6+25',
+    lspChip: 'LSP6+LSP25',
     lspLabel: 'account-level relay',
     verdict: 'authorization at the account, not per-token signatures',
     href: '/erc-2612/',
@@ -99,7 +99,7 @@ export const matrixRows: MatrixRow[] = [
   {
     ercChip: 'ERC-4337',
     ercLabel: 'account abstraction',
-    lspChip: 'LSP0+6+20+25',
+    lspChip: 'LSP0+LSP6+LSP20+LSP25',
     lspLabel: 'native smart account',
     verdict: 'no bundler, no EntryPoint — the account is the entry point',
     href: '/standards/compare/erc4337-lsp-stack/',
@@ -107,7 +107,7 @@ export const matrixRows: MatrixRow[] = [
   {
     ercChip: 'ERC-4906',
     ercLabel: 'metadata update event',
-    lspChip: 'LSP4+725Y',
+    lspChip: 'LSP4+ERC-725Y',
     lspLabel: 'native dynamic keys',
     verdict: 'metadata is typed key-value, not an event saying "go refetch"',
     href: '/erc-4906/',
@@ -131,7 +131,7 @@ export const matrixRows: MatrixRow[] = [
   {
     ercChip: 'EOA',
     ercLabel: 'externally owned account',
-    lspChip: 'LSP0+3+6',
+    lspChip: 'LSP0+LSP3+LSP6',
     lspLabel: 'Universal Profile',
     verdict: 'account + metadata + controllers as one user-owned object',
     href: '/standards/compare/eoa-universal-profile/',

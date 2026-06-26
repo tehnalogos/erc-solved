@@ -13,7 +13,7 @@ diff:
     code: "balanceOf(account, id)"
     tags: ["one contract", "many semantics", "app-decoded"]
   to:
-    chip: "LSP7+8"
+    chip: "LSP7+LSP8"
     code: "split by asset shape"
     tags: ["LSP7 fungible", "LSP8 identifiable"]
 verdict: "LSP7 covers fungible and semi-fungible. LSP8 covers identifiable. The semantic split lives in the interface itself, so downstream code dispatches on asset shape without learning per-collection bit-conventions. Receivers handle both through one LSP1 hook with a typeId discriminator."

@@ -216,7 +216,7 @@ compareRows:
     right: "direct call into the account contract"
 compareHref: "/standards/compare/erc4337-lsp-stack/"
 compareRight:
-  chip: "LSP0+6+20+25"
+  chip: "LSP0+LSP6+LSP20+LSP25"
   kind: "topic"
   label: "LSP account stack"
 
@@ -497,5 +497,5 @@ vogelsteller: |
   >
   > **LUKSO Universal Profile:** contract account root → replaceable Key Manager → standardised controllers, permissions, recovery, data, and extensions (one shared system).
 
-  [LUKSO mainnet went live in 2023](https://docs.lukso.tech/) with this stack as native standards rather than layered patterns. The funnel for this site is not "switch to LUKSO." It is: when your ERC-4337 + Pectra design is paying the tax that comes from stacking half-baked standards on top of each other — residual EOA keys, validator fragmentation, per-protocol identity invention, ownership-transition mistakes, hybrid-account semantics — there is a coherent account system designed from the bottom up by one of the people who watched those tradeoffs accumulate from inside ERC-20 and ERC-2771 and ERC-725. The funnel works when the cost lands on you.
+  [LUKSO mainnet went live in 2023](https://docs.lukso.tech/) with this stack as native standards rather than layered patterns. The practical takeaway: if an ERC-4337 plus EIP-7702 design is accumulating costs around residual EOA keys, validator fragmentation, EntryPoint and bundler infrastructure, and wallet-specific modules, Universal Profiles show the alternative shape: a contract account with standardized permissions, recovery, metadata, receiver hooks, and relay execution.
 ---

@@ -25,7 +25,7 @@ interface ResultItem {
   kind?: string;
 }
 
-const TOP_QUERIES: { q: string; href: string }[] = [
+const STARTING_POINTS: { q: string; href: string }[] = [
   { q: 'erc20 approval risks', href: '/problems/erc20-approval-risks/' },
   { q: 'erc721 dynamic metadata', href: '/problems/erc721-dynamic-metadata/' },
   { q: 'erc-4337 alternatives', href: '/problems/erc4337-bundler-tax/' },
@@ -180,7 +180,7 @@ export default function CommandK({ initialQuery = '' }: { initialQuery?: string 
   // Build the list of navigable links — search results, or curated empty-state items.
   const navList = useMemo(() => {
     if (results.length > 0) return results.map(r => r.url);
-    if (showEmpty) return [...TOP_QUERIES.map(t => t.href), ...VERTICALS.map(v => v.href)];
+    if (showEmpty) return [...STARTING_POINTS.map(t => t.href), ...VERTICALS.map(v => v.href)];
     return [];
   }, [results, showEmpty]);
 
@@ -229,9 +229,9 @@ export default function CommandK({ initialQuery = '' }: { initialQuery?: string 
           {showEmpty && (
             <>
               <div class="ck-group">
-                <span class="ck-group-label">top queries</span>
+                <span class="ck-group-label">start here</span>
                 <ul>
-                  {TOP_QUERIES.map((t, i) => (
+                  {STARTING_POINTS.map((t, i) => (
                     <li>
                       <a class={`ck-row ${highlight === i ? 'active' : ''}`} href={t.href}>
                         <span class="ck-q">{t.q}</span>
@@ -245,7 +245,7 @@ export default function CommandK({ initialQuery = '' }: { initialQuery?: string 
                 <span class="ck-group-label">what are you building?</span>
                 <ul>
                   {VERTICALS.map((v, i) => {
-                    const idx = TOP_QUERIES.length + i;
+                    const idx = STARTING_POINTS.length + i;
                     return (
                       <li>
                         <a class={`ck-row ${highlight === idx ? 'active' : ''}`} href={v.href}>

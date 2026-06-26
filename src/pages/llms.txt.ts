@@ -78,8 +78,8 @@ This site is not official LUKSO documentation. Use docs.lukso.tech as the canoni
 
 ## Core Pages
 
-${line('/', 'Ethereum ERC Problems and LUKSO LSP Solutions', 'Home page and positioning for the ERC problem -> LUKSO Standards thesis.')}
-${line('/problems/', 'Ethereum ERC Problem Index', 'Search-intent index of ERC and EVM pain points mapped to LUKSO LSP patterns.')}
+${line('/', 'Ethereum ERC Problems and LUKSO LSP Solutions', 'Home page for ERC pain points mapped to LUKSO Standards patterns.')}
+${line('/problems/', 'Ethereum ERC Problem Index', 'Index of ERC and EVM pain points mapped to LUKSO LSP patterns.')}
 ${line('/standards/', 'LUKSO Standards Index', 'Index of LSP and ERC substrate explainers used across the site.')}
 ${line('/standards/matrix/', 'Ethereum ERC -> LSP Matrix', 'One-row mapping from common ERC standards to LUKSO Standard equivalents or companions.')}
 ${line('/build/', 'Build Verticals', 'Curated reading paths by builder use case.')}

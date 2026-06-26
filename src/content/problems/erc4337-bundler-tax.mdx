@@ -13,7 +13,7 @@ diff:
     code: "handleOps(UserOperation[], beneficiary)"
     tags: ["separate mempool", "bundler stack", "paymaster"]
   to:
-    chip: "LSP0+6+25"
+    chip: "LSP0+LSP6+LSP25"
     code: "executeRelayCall(sig, nonce, validity, payload)"
     tags: ["account is the entrypoint", "no bundler"]
 verdict: "A Universal Profile is a contract account composed from LSP0 + LSP6 + LSP25 + LSP20. A controller signs, a relayer submits, the profile validates via LSP6 and executes — no EntryPoint hop, no UserOperation envelope, no bundler. msg.sender at downstream targets is the account itself, and permissions live in a single standard vocabulary instead of per-account validator modules."
