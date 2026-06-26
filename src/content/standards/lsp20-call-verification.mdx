@@ -21,7 +21,7 @@ abi: |
   ) external returns (bytes4 magicValue);
 solves:
   - pain: "Key Manager indirection — controllers calling LSP6 calling LSP0"
-companions: ["LSP·0", "LSP·6", "LSP·25"]
+companions: ["LSP0", "LSP6", "LSP25"]
 doesNotSolve:
   - "LSP20 doesn't replace LSP6's permission model. It changes how that model is *invoked*."
   - "If the verifier is itself a contract, you still need to think about its trust assumptions."

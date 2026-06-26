@@ -13,7 +13,7 @@ diff:
     code: "upgradeTo(newImplementation) onlyOwner"
     tags: ["upgrade key forever", "trust assumption"]
   to:
-    chip: "LSP·17"
+    chip: "LSP17"
     code: "fallback → extension[selector]"
     tags: ["base immutable", "selector-routed"]
 verdict: "LSP17 defines a fallback router: unknown selector → registered extension contract. The base contract stays immutable. New behavior is added by registering extensions in ERC-725Y. No upgrade authority. No diamond storage layout problem."

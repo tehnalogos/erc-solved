@@ -13,7 +13,7 @@ abi: |
   //   LSP5ReceivedAssetsMap:<address> → bytes12 (interfaceId + index)
 solves:
   - pain: "no account-level asset inventory without a subgraph"
-companions: ["LSP·1", "LSP·7", "LSP·8", "LSP·0"]
+companions: ["LSP1", "LSP7", "LSP8", "LSP0"]
 doesNotSolve:
   - "LSP5 doesn't validate that the asset is one you wanted. Spam filtering lives in the Universal Receiver Delegate."
   - "It records the *contract*, not balances — that's still on the asset contract."

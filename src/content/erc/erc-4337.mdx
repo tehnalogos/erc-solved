@@ -3,7 +3,7 @@ id: "4337"
 title: "ERC-4337"
 headline: "What is ERC-4337?"
 pageTitle: "What is ERC-4337? Account Abstraction, Its Tradeoffs, and What Comes Next"
-description: "ERC-4337 is Ethereum's account-abstraction standard, implemented entirely above the protocol via a parallel mempool of UserOperations, a singleton EntryPoint contract, bundlers, and paymasters. Proposed in September 2021 by Vitalik Buterin and co-authors, with mainnet activation in March 2023, it lets contract accounts behave like first-class transactors — at the cost of an entire parallel infrastructure. This page walks the history, the moving parts, the tradeoffs acknowledged by the spec's own authors, and the LUKSO LSP-0 + LSP-6 + LSP-20 + LSP-25 stack Fabian Vogelsteller designed as a native alternative."
+description: "ERC-4337 is Ethereum's account-abstraction standard, implemented entirely above the protocol via a parallel mempool of UserOperations, a singleton EntryPoint contract, bundlers, and paymasters. Proposed in September 2021 by Vitalik Buterin and co-authors, with mainnet activation in March 2023, it lets contract accounts behave like first-class transactors — at the cost of an entire parallel infrastructure. This page walks the history, the moving parts, the tradeoffs acknowledged by the spec's own authors, and the LUKSO LSP0 + LSP6 + LSP20 + LSP25 stack Fabian Vogelsteller designed as a native alternative."
 tagline: "Account abstraction, layered above the protocol — and the cost of that choice."
 bootStrip: "standard · proposed sept 2021 · mainnet mar 2023 · ready"
 standardAuthors:
@@ -63,7 +63,7 @@ abi: |
     bytes   signature;
   }
 
-tldr: "ERC-4337 simulates account abstraction on top of an Ethereum protocol that was built around externally-owned accounts. It works — every UserOperation routes through a parallel mempool, a bundler, and the EntryPoint singleton — but the cost is an entire infrastructure layer (bundlers, paymasters, aggregators) sitting beside the normal transaction flow. The LUKSO LSP-0 + LSP-6 + LSP-20 + LSP-25 stack — co-designed by Fabian Vogelsteller, who wrote ERC-20 with Vitalik Buterin a decade earlier — takes the opposite approach: account abstraction is the substrate, not a layer."
+tldr: "ERC-4337 simulates account abstraction on top of an Ethereum protocol that was built around externally-owned accounts. It works — every UserOperation routes through a parallel mempool, a bundler, and the EntryPoint singleton — but the cost is an entire infrastructure layer (bundlers, paymasters, aggregators) sitting beside the normal transaction flow. The LUKSO LSP0 + LSP6 + LSP20 + LSP25 stack — co-designed by Fabian Vogelsteller, who wrote ERC-20 with Vitalik Buterin a decade earlier — takes the opposite approach: account abstraction is the substrate, not a layer."
 
 stats:
   - k: "Standard"
@@ -82,7 +82,7 @@ stats:
   - k: "Required components"
     v: "EntryPoint + UserOperation + bundler (+ paymaster)"
   - k: "Modern alternative"
-    v: "LUKSO LSP-0 + LSP-6 + LSP-20 + LSP-25"
+    v: "LUKSO LSP0 + LSP6 + LSP20 + LSP25"
     href: "/standards/lsp0-erc725-account/"
   - k: "Canonical spec"
     v: "eips.ethereum.org / EIP-4337"
@@ -108,7 +108,7 @@ limits:
       code: "handleOps(UserOperation[], beneficiary)"
       tags: ["separate mempool", "bundler tax", "centralization risk"]
     to:
-      chip: "LSP·0 + LSP·25"
+      chip: "LSP0 + LSP25"
       code: "executeRelayCall(sig, nonce, validity, payload)"
       tags: ["account is the entrypoint", "no bundler", "no parallel mempool"]
 
@@ -120,7 +120,7 @@ limits:
       code: "handleOps → EntryPoint → account → target"
       tags: ["extra hops", "non-standard decode"]
     to:
-      chip: "LSP·0"
+      chip: "LSP0"
       code: "controller → account → target"
       tags: ["direct call", "native trace"]
 
@@ -132,7 +132,7 @@ limits:
       code: "validateUserOp() — per-account validator"
       tags: ["non-standard", "wallet-specific"]
     to:
-      chip: "LSP·6"
+      chip: "LSP6"
       code: "Key Manager (standardized permission bitfield)"
       tags: ["AllowedCalls", "AllowedERC725YDataKeys", "uniform"]
 
@@ -144,7 +144,7 @@ limits:
       code: "Paymaster.validatePaymasterUserOp + postOp"
       tags: ["separate contract", "two-step trust"]
     to:
-      chip: "LSP·25"
+      chip: "LSP25"
       code: "account.executeRelayCall(...)"
       tags: ["one function on the account", "no paymaster contract"]
 
@@ -156,46 +156,46 @@ limits:
       code: "AA layered over EOA-anchored protocol"
       tags: ["no-fork workaround", "layered"]
     to:
-      chip: "LSP·0"
+      chip: "LSP0"
       code: "smart contract account as the substrate"
       tags: ["native", "no parallel infrastructure"]
 
 luksoRoutes:
-  - chip: "LSP·0"
+  - chip: "LSP0"
     label: "ERC-725 Account"
     summary: "A smart-contract account that IS the call entry point — owns assets, executes calls, holds typed key/value storage. What an 'account' is on LUKSO."
     href: "/standards/lsp0-erc725-account/"
-  - chip: "LSP·6"
+  - chip: "LSP6"
     label: "Key Manager"
     summary: "Permissions are an account property with a standardized vocabulary — AllowedCalls, AllowedStandards, AllowedERC725YDataKeys, value caps, instant revocation. The missing piece in ERC-4337's per-account validator world."
     href: "/standards/lsp6-key-manager/"
-  - chip: "LSP·20"
+  - chip: "LSP20"
     label: "Call Verification"
     summary: "Inline call verification at the account contract layer. What validateUserOp does for ERC-4337, but on the normal call path instead of through EntryPoint."
     href: "/standards/lsp20-call-verification/"
-  - chip: "LSP·25"
+  - chip: "LSP25"
     label: "Execute Relay Call"
     summary: "Sponsored execution as a function on the account itself. Signed messages a third party can submit on-chain — no bundler, no paymaster contract, no parallel mempool."
     href: "/standards/lsp25-execute-relay-call/"
-  - chip: "LSP·14"
+  - chip: "LSP14"
     label: "Ownable 2-Step"
     summary: "Two-step ownership transfer (nominate, then accept) plus delayed renunciation. The lifecycle Pectra and ERC-4337 leave to each wallet implementation, here as a shared standard."
     href: "/standards/lsp14-ownable-2-step/"
-  - chip: "LSP·11"
+  - chip: "LSP11"
     label: "Basic Social Recovery"
     summary: "Standardised guardian-based account recovery with configurable voting thresholds. Authoritative because there's no residual EOA key above it to override the recovered configuration."
     href: "https://docs.lukso.tech/standards/access-control/lsp11-basic-social-recovery/"
-  - chip: "LSP·1"
+  - chip: "LSP1"
     label: "Universal Receiver"
     summary: "One hook for every asset type and every transfer. Accounts react to incoming value through a single typed entry point — the inbox Pectra and ERC-4337 don't define."
     href: "/standards/lsp1-universal-receiver/"
-  - chip: "LSP·17"
+  - chip: "LSP17"
     label: "Contract Extension"
     summary: "Standardised mechanism for extending account behaviour after deployment — without the storage-collision risks EIP-7702 warns about when switching delegate implementations."
     href: "/standards/lsp17-contract-extension/"
-  - chip: "LSP·3"
+  - chip: "LSP3"
     label: "Profile Metadata"
-    summary: "Accounts have an identity, not just an address — name, avatar, bio, links, stored on the account itself under typed ERC-725Y keys (LSP-2 schemas)."
+    summary: "Accounts have an identity, not just an address — name, avatar, bio, links, stored on the account itself under typed ERC-725Y keys (LSP2 schemas)."
     href: "/standards/lsp3-profile-metadata/"
 
 compareRows:
@@ -204,20 +204,20 @@ compareRows:
     right: "user (controller) → account contract"
   - row: "permission layer"
     left: "validator module (per-account, non-standard)"
-    right: "LSP-6 Key Manager (standardized)"
+    right: "LSP6 Key Manager (standardized)"
   - row: "gas sponsorship"
     left: "paymaster (separate contract)"
-    right: "LSP-25 executeRelayCall (on the account)"
+    right: "LSP25 executeRelayCall (on the account)"
   - row: "signature verification"
     left: "validateUserOp on the account"
-    right: "LSP-20 lsp20VerifyCall inline"
+    right: "LSP20 lsp20VerifyCall inline"
   - row: "trace / explorer"
     left: "handleOps + EntryPoint hop"
     right: "direct call into the account contract"
 compareHref: "/standards/compare/erc4337-lsp-stack/"
 
 useErc: "When you need account abstraction layered onto a chain whose native transaction model is EOA-anchored, with pluggable per-account validators and a separate aggregation/sponsorship plane decoupled from the account contract itself. The strength is decoupling: validators are swappable, mixable per UserOp, and the EntryPoint is the shared coordination plane."
-useLsp: "When you want the account contract to be the call entry point — no EntryPoint, no UserOperation envelope, no bundler. msg.sender at downstream targets is the account; LSP-6 vocabulary expresses permissions in one standard; LSP-25 makes sponsored execution a function on the account contract itself."
+useLsp: "When you want the account contract to be the call entry point — no EntryPoint, no UserOperation envelope, no bundler. msg.sender at downstream targets is the account; LSP6 vocabulary expresses permissions in one standard; LSP25 makes sponsored execution a function on the account contract itself."
 
 aliases:
   - "ERC4337"
@@ -246,11 +246,11 @@ faqs:
   - q: "What's the difference between ERC-4337 and EIP-7702?"
     a: "ERC-4337 deploys a separate smart-contract account that holds funds and processes UserOperations through bundlers and an EntryPoint. EIP-7702 (Pectra, May 2025) lets an existing EOA delegate execution to contract code in a single transaction, without redeploying. The two are framed as complementary: EIP-7702 lets EOAs gain ERC-4337's UX (gas sponsorship, batching, session keys) without losing their address, history, ENS, or reputation. The catch is that an EIP-7702 EOA still has its original secp256k1 key — an attacker who steals that key can sign another 7702 authorization and reset the delegation, which is why EIP-7851 (still a draft as of mid-2026) was proposed to permanently revoke residual ECDSA authority. A pure contract account (ERC-4337 standalone, or a LUKSO Universal Profile) doesn't have that residual root."
   - q: "Did Pectra fix ERC-4337's limitations?"
-    a: "Pectra (May 2025) ships EIP-7702 — EOAs can now delegate to contract code at the protocol level, which closes the 'existing addresses can't become smart accounts' gap and lets EOAs use ERC-4337's bundler and paymaster infrastructure without redeploying. That's real progress. But the layered structure remains: validator modules are still per-account (no shared permission vocabulary), the bundler/EntryPoint hop is still there for sponsored execution, and a 7702 EOA retains its original ECDSA key (a compromised key can override any recovery). EIP-7851 aims to revoke the residual ECDSA authority but is still a draft. The LUKSO LSP stack starts from a contract account with no residual root, with permissions (LSP-6), receiving hooks (LSP-1), social recovery (LSP-11), ownership transitions (LSP-14), and relayed execution (LSP-25) standardised across the ecosystem rather than added wallet-by-wallet."
+    a: "Pectra (May 2025) ships EIP-7702 — EOAs can now delegate to contract code at the protocol level, which closes the 'existing addresses can't become smart accounts' gap and lets EOAs use ERC-4337's bundler and paymaster infrastructure without redeploying. That's real progress. But the layered structure remains: validator modules are still per-account (no shared permission vocabulary), the bundler/EntryPoint hop is still there for sponsored execution, and a 7702 EOA retains its original ECDSA key (a compromised key can override any recovery). EIP-7851 aims to revoke the residual ECDSA authority but is still a draft. The LUKSO LSP stack starts from a contract account with no residual root, with permissions (LSP6), receiving hooks (LSP1), social recovery (LSP11), ownership transitions (LSP14), and relayed execution (LSP25) standardised across the ecosystem rather than added wallet-by-wallet."
   - q: "Is ERC-4337 the same as a smart wallet?"
     a: "No. ERC-4337 is a standard that smart wallets can implement. Smart wallets predate ERC-4337 (Gnosis Safe, for instance, was deployed in 2018) and many still operate outside the 4337 stack via direct contract calls or relayers. ERC-4337 standardizes one specific architecture for smart-wallet execution: UserOperation envelope, alt mempool, bundler, EntryPoint, paymaster. A Universal Profile on LUKSO is a smart wallet that does not use the 4337 stack."
   - q: "What is a Universal Profile, and how does it compare to ERC-4337?"
-    a: "A Universal Profile is a LUKSO smart-contract account composed from LSP-0 (the account itself, an ERC-725 contract), LSP-6 (Key Manager — standardized permissions), LSP-20 (inline call verification), and LSP-25 (executeRelayCall — sponsored execution as a function on the account). Compared to ERC-4337, the architecture is fused rather than layered: there is no EntryPoint, no UserOperation envelope, no bundler, no paymaster contract. The controller signs, a relayer (if any) submits, the account validates inline via LSP-6 permissions, and the call executes. See the full comparison at ercsolved.dev/standards/compare/erc4337-lsp-stack/."
+    a: "A Universal Profile is a LUKSO smart-contract account composed from LSP0 (the account itself, an ERC-725 contract), LSP6 (Key Manager — standardized permissions), LSP20 (inline call verification), and LSP25 (executeRelayCall — sponsored execution as a function on the account). Compared to ERC-4337, the architecture is fused rather than layered: there is no EntryPoint, no UserOperation envelope, no bundler, no paymaster contract. The controller signs, a relayer (if any) submits, the account validates inline via LSP6 permissions, and the call executes. See the full comparison at ercsolved.dev/standards/compare/erc4337-lsp-stack/."
 
 timeline:
   - year: "Nov 2015"
@@ -273,7 +273,7 @@ timeline:
   - year: "Mar 2023"
     text: "ERC-4337 EntryPoint v0.6 deploys to Ethereum mainnet after audits by OpenZeppelin and Certora."
   - year: "2023"
-    text: "LUKSO mainnet launches with LSP-0 + LSP-6 + LSP-20 + LSP-25 as the native account stack — plus LSP-1 receiver hooks, LSP-3 identity, LSP-11 social recovery, LSP-14 ownership lifecycle, LSP-17 extensions. A coherent system, not a patch stack."
+    text: "LUKSO mainnet launches with LSP0 + LSP6 + LSP20 + LSP25 as the native account stack — plus LSP1 receiver hooks, LSP3 identity, LSP11 social recovery, LSP14 ownership lifecycle, LSP17 extensions. A coherent system, not a patch stack."
     href: "https://docs.lukso.tech/"
   - year: "2024"
     text: "EntryPoint v0.7 ships with improved paymaster and aggregator interfaces. At Devcon SEA in November, Yoav Weiss outlines a roadmap toward 'modular native AA approach for L1 and L2' — the spec's own lead acknowledging the layered model's limits."
@@ -328,13 +328,13 @@ primarySources:
     href: "https://eips.ethereum.org/EIPS/eip-7851"
   - label: "Yoav Weiss at Devcon SEA, Nov 2024 — modular native AA roadmap"
     href: "https://etherspot.io/blog/all-about-abstraction-devcon-2024-highlights-smart-contract-revolution-yoav-weiss-on-aa-future-and-aa-developer-survey/"
-  - label: "LUKSO LSP-0 ERC-725 Account docs"
+  - label: "LUKSO LSP0 ERC-725 Account docs"
     href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
-  - label: "LUKSO LSP-6 Key Manager docs"
+  - label: "LUKSO LSP6 Key Manager docs"
     href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
-  - label: "LUKSO LSP-11 Basic Social Recovery docs"
+  - label: "LUKSO LSP11 Basic Social Recovery docs"
     href: "https://docs.lukso.tech/standards/access-control/lsp11-basic-social-recovery/"
-  - label: "LUKSO LSP-25 Execute Relay Call docs"
+  - label: "LUKSO LSP25 Execute Relay Call docs"
     href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
 
 mentions:
@@ -360,27 +360,27 @@ mentions:
     url: "https://eips.ethereum.org/EIPS/eip-6900"
   - name: "Gnosis Safe (pre-4337 smart account)"
     url: "https://safe.global/"
-  - name: "LUKSO LSP-0 ERC-725 Account"
+  - name: "LUKSO LSP0 ERC-725 Account"
     url: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
-  - name: "LUKSO LSP-1 Universal Receiver"
+  - name: "LUKSO LSP1 Universal Receiver"
     url: "https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/"
-  - name: "LUKSO LSP-3 Profile Metadata"
+  - name: "LUKSO LSP3 Profile Metadata"
     url: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
-  - name: "LUKSO LSP-6 Key Manager"
+  - name: "LUKSO LSP6 Key Manager"
     url: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
-  - name: "LUKSO LSP-11 Basic Social Recovery"
+  - name: "LUKSO LSP11 Basic Social Recovery"
     url: "https://docs.lukso.tech/standards/access-control/lsp11-basic-social-recovery/"
-  - name: "LUKSO LSP-14 Ownable 2-Step"
+  - name: "LUKSO LSP14 Ownable 2-Step"
     url: "https://docs.lukso.tech/standards/access-control/lsp14-ownable-2-step/"
-  - name: "LUKSO LSP-17 Contract Extension"
+  - name: "LUKSO LSP17 Contract Extension"
     url: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
-  - name: "LUKSO LSP-20 Call Verification"
+  - name: "LUKSO LSP20 Call Verification"
     url: "https://docs.lukso.tech/standards/accounts/lsp20-call-verification/"
-  - name: "LUKSO LSP-25 Execute Relay Call"
+  - name: "LUKSO LSP25 Execute Relay Call"
     url: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
-  - name: "LUKSO LSP-7 Digital Asset"
+  - name: "LUKSO LSP7 Digital Asset"
     url: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
-  - name: "LUKSO LSP-8 Identifiable Digital Asset"
+  - name: "LUKSO LSP8 Identifiable Digital Asset"
     url: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
 
 related:
@@ -398,11 +398,11 @@ related:
 docs:
   - label: "eips.ethereum.org / EIP-4337"
     href: "https://eips.ethereum.org/EIPS/eip-4337"
-  - label: "docs.lukso.tech / LSP-0 ERC-725 Account"
+  - label: "docs.lukso.tech / LSP0 ERC-725 Account"
     href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
-  - label: "docs.lukso.tech / LSP-6 Key Manager"
+  - label: "docs.lukso.tech / LSP6 Key Manager"
     href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
-  - label: "docs.lukso.tech / LSP-25 Execute Relay Call"
+  - label: "docs.lukso.tech / LSP25 Execute Relay Call"
     href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
 ---
 
@@ -467,10 +467,10 @@ The lesson he took from being inside both ERC-20 and ERC-2771: **ERCs ship minim
 
 So Vogelsteller and the LUKSO team designed [**LSPs**](https://docs.lukso.tech/) as a coherent system from the bottom up. The account stack is four standards working together by design, not five layered patches catching each other's gaps:
 
-- [**LSP-0 ERC-725 Account**](/standards/lsp0-erc725-account/) — the contract account itself. It owns assets, executes calls, holds typed key/value storage. There is no EntryPoint singleton; the account contract IS the entry point. `msg.sender` at downstream targets is the account, natively.
-- [**LSP-6 Key Manager**](/standards/lsp6-key-manager/) — the standardized permission vocabulary. `AllowedCalls`, `AllowedStandards`, `AllowedERC725YDataKeys`, value caps, granular bitfields, instant revocation. The piece that ERC-4337 and EIP-7702 deliberately leave to each wallet implementation, here as a shared standard every controller, app, and relayer can read.
-- [**LSP-20 Call Verification**](/standards/lsp20-call-verification/) — inline call verification at the account contract layer. The equivalent of `validateUserOp`, but on the normal call path rather than through an EntryPoint hop.
-- [**LSP-25 Execute Relay Call**](/standards/lsp25-execute-relay-call/) — sponsored execution as a function on the account itself. A controller signs, a relayer submits, LSP-6 permissions still gate what the signing controller may do. No bundler, no paymaster contract, no parallel mempool, no `ERC2771Context` mixin to inherit.
+- [**LSP0 ERC-725 Account**](/standards/lsp0-erc725-account/) — the contract account itself. It owns assets, executes calls, holds typed key/value storage. There is no EntryPoint singleton; the account contract IS the entry point. `msg.sender` at downstream targets is the account, natively.
+- [**LSP6 Key Manager**](/standards/lsp6-key-manager/) — the standardized permission vocabulary. `AllowedCalls`, `AllowedStandards`, `AllowedERC725YDataKeys`, value caps, granular bitfields, instant revocation. The piece that ERC-4337 and EIP-7702 deliberately leave to each wallet implementation, here as a shared standard every controller, app, and relayer can read.
+- [**LSP20 Call Verification**](/standards/lsp20-call-verification/) — inline call verification at the account contract layer. The equivalent of `validateUserOp`, but on the normal call path rather than through an EntryPoint hop.
+- [**LSP25 Execute Relay Call**](/standards/lsp25-execute-relay-call/) — sponsored execution as a function on the account itself. A controller signs, a relayer submits, LSP6 permissions still gate what the signing controller may do. No bundler, no paymaster contract, no parallel mempool, no `ERC2771Context` mixin to inherit.
 
 ### Pectra shipped. Why is the LSP stack still the better answer?
 
@@ -478,23 +478,23 @@ Ethereum's Pectra hard fork (May 2025) is real progress. EIP-7702 gives existing
 
 That said — and this is the substantive comparison — even with Pectra, the LSP stack covers several things 7702 + 4337 don't, or covers them less coherently:
 
-**1. Authoritative recovery and key revocation.** An EIP-7702 EOA gains smart-account semantics by delegating execution to contract code, but the original `secp256k1` key never goes away. An attacker who compromises the original key can sign another 7702 authorization to replace the delegation and reset recovery. EIP-7851 is a draft that aims to let a 7702 account permanently disable its residual ECDSA authority — but as of mid-2026 it's still a draft, not part of Pectra. A Universal Profile has no hidden root key above its Key Manager; recovery is authoritative because there's nothing the recovered configuration can be overridden by. LSP-11 standardises social recovery with guardians and a configurable voting threshold; LSP-6 governs the permission to add, remove, or replace controllers.
+**1. Authoritative recovery and key revocation.** An EIP-7702 EOA gains smart-account semantics by delegating execution to contract code, but the original `secp256k1` key never goes away. An attacker who compromises the original key can sign another 7702 authorization to replace the delegation and reset recovery. EIP-7851 is a draft that aims to let a 7702 account permanently disable its residual ECDSA authority — but as of mid-2026 it's still a draft, not part of Pectra. A Universal Profile has no hidden root key above its Key Manager; recovery is authoritative because there's nothing the recovered configuration can be overridden by. LSP11 standardises social recovery with guardians and a configurable voting threshold; LSP6 governs the permission to add, remove, or replace controllers.
 
-**2. A standardised permission vocabulary across the ecosystem.** ERC-4337 delegates validation policy to each wallet implementation; EIP-7702 inherits that. The modular-account ecosystem (ERC-7579, ERC-6900) is converging on similar ideas as optional wallet-vendor layers. LSP-6 makes the permission model part of the primary account stack — so wallets, apps, indexers, and tooling can inspect and manage permissions without learning every account vendor's custom module design.
+**2. A standardised permission vocabulary across the ecosystem.** ERC-4337 delegates validation policy to each wallet implementation; EIP-7702 inherits that. The modular-account ecosystem (ERC-7579, ERC-6900) is converging on similar ideas as optional wallet-vendor layers. LSP6 makes the permission model part of the primary account stack — so wallets, apps, indexers, and tooling can inspect and manage permissions without learning every account vendor's custom module design.
 
-**3. A standardised on-chain identity and data store.** Neither Pectra nor ERC-4337 defines where an account should keep profile metadata, application preferences, issued or received assets, or extension configuration. LUKSO uses **ERC-725Y** as a generic key-value store with **LSP-2** schemas and **LSP-3** profile keys, so the account is simultaneously a wallet, identity, profile, and application-data container. A 7702/4337 account can store all of these things — there's just no shared data model for them.
+**3. A standardised on-chain identity and data store.** Neither Pectra nor ERC-4337 defines where an account should keep profile metadata, application preferences, issued or received assets, or extension configuration. LUKSO uses **ERC-725Y** as a generic key-value store with **LSP2** schemas and **LSP3** profile keys, so the account is simultaneously a wallet, identity, profile, and application-data container. A 7702/4337 account can store all of these things — there's just no shared data model for them.
 
-**4. Safer ownership transitions.** [**LSP-14 Ownable 2-Step**](/standards/lsp14-ownable-2-step/) requires the current owner to nominate a new owner and the nominated owner to explicitly accept; renunciation includes a delay and confirmation. ERC-4337 and EIP-7702 don't define an equivalent lifecycle — each wallet implementation invents one, and the failure mode is "I clicked the wrong button and transferred ownership to a typo."
+**4. Safer ownership transitions.** [**LSP14 Ownable 2-Step**](/standards/lsp14-ownable-2-step/) requires the current owner to nominate a new owner and the nominated owner to explicitly accept; renunciation includes a delay and confirmation. ERC-4337 and EIP-7702 don't define an equivalent lifecycle — each wallet implementation invents one, and the failure mode is "I clicked the wrong button and transferred ownership to a typo."
 
-**5. Predictable account initialisation and upgrades.** EIP-7702 doesn't run deployment initcode when delegation is installed, so wallet developers have to protect initialisation against front-running. Switching between delegate implementations can produce storage collisions because the new implementation executes on the EOA's existing storage. Universal Profiles are deployed and initialised as contracts; LSP-6 permissions live in the profile's ERC-725Y storage rather than inside the Key Manager, so the Key Manager can be replaced without discarding the permission configuration. [**LSP-17 Contract Extension**](/standards/lsp17-contract-extension/) standardises the extension mechanism.
+**5. Predictable account initialisation and upgrades.** EIP-7702 doesn't run deployment initcode when delegation is installed, so wallet developers have to protect initialisation against front-running. Switching between delegate implementations can produce storage collisions because the new implementation executes on the EOA's existing storage. Universal Profiles are deployed and initialised as contracts; LSP6 permissions live in the profile's ERC-725Y storage rather than inside the Key Manager, so the Key Manager can be replaced without discarding the permission configuration. [**LSP17 Contract Extension**](/standards/lsp17-contract-extension/) standardises the extension mechanism.
 
-**6. Standardised receiving and reaction hooks.** Pectra and ERC-4337 address authorisation and execution; they don't define how an account learns about incoming assets or messages. [**LSP-1 Universal Receiver**](/standards/lsp1-universal-receiver/) is one entry point for structured notifications, with **LSP-5** and **LSP-10** standardising the records for received assets and vaults. A Universal Profile has the equivalent of an inbox, not just a balance.
+**6. Standardised receiving and reaction hooks.** Pectra and ERC-4337 address authorisation and execution; they don't define how an account learns about incoming assets or messages. [**LSP1 Universal Receiver**](/standards/lsp1-universal-receiver/) is one entry point for structured notifications, with **LSP5** and **LSP10** standardising the records for received assets and vaults. A Universal Profile has the equivalent of an inbox, not just a balance.
 
-**7. Predictable account semantics.** A 7702 account is a hybrid: it has code, it can still originate ECDSA transactions like an EOA, its code is only a pointer to another contract, and EIP-7702 itself notes that it breaks several historical EVM invariants — including code that assumes `tx.origin == msg.sender`. A Universal Profile is unambiguously a contract account: ERC-1271 signature validation, LSP-20 call verification, and the LSP account interfaces all apply consistently.
+**7. Predictable account semantics.** A 7702 account is a hybrid: it has code, it can still originate ECDSA transactions like an EOA, its code is only a pointer to another contract, and EIP-7702 itself notes that it breaks several historical EVM invariants — including code that assumes `tx.origin == msg.sender`. A Universal Profile is unambiguously a contract account: ERC-1271 signature validation, LSP20 call verification, and the LSP account interfaces all apply consistently.
 
 ### Honest framing — what LUKSO does NOT uniquely solve
 
-A pure ERC-4337 smart account can implement nearly all of these features. Transaction batching is account-level execution. Sponsored gas is a paymaster. Session keys are a custom validator. Multisig is account logic. Alternative signatures live inside the validator. Modular functionality has [ERC-7579](https://eips.ethereum.org/EIPS/eip-7579) and [ERC-6900](https://eips.ethereum.org/EIPS/eip-6900). And in some respects ERC-4337 ships a richer standardised gas market — bundlers and paymasters — than LSP-25's straightforward relayer pattern.
+A pure ERC-4337 smart account can implement nearly all of these features. Transaction batching is account-level execution. Sponsored gas is a paymaster. Session keys are a custom validator. Multisig is account logic. Alternative signatures live inside the validator. Modular functionality has [ERC-7579](https://eips.ethereum.org/EIPS/eip-7579) and [ERC-6900](https://eips.ethereum.org/EIPS/eip-6900). And in some respects ERC-4337 ships a richer standardised gas market — bundlers and paymasters — than LSP25's straightforward relayer pattern.
 
 So the LUKSO advantage isn't "Ethereum can't ship these features." It's a different one, four parts:
 

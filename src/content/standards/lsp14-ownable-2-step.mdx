@@ -13,7 +13,7 @@ abi: |
   function pendingOwner() external view returns (address);
 solves:
   - pain: "OZ Ownable's one-step transfer (typo = catastrophe)"
-companions: ["LSP·0", "LSP·6"]
+companions: ["LSP0", "LSP6"]
 doesNotSolve:
   - "LSP14 isn't a multisig. It's a safer single-owner pattern."
   - "If your account uses LSP6 controllers, ownership rotation is a separate, more powerful tool."

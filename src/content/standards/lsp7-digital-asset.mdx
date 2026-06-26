@@ -34,7 +34,7 @@ solves:
     href: "/problems/erc20-approval-risks/"
   - pain: "ERC-1155 complexity (split by asset shape)"
     href: "/problems/erc1155-complexity/"
-companions: ["LSP·1", "LSP·4", "LSP·6", "LSP·8"]
+companions: ["LSP1", "LSP4", "LSP6", "LSP8"]
 doesNotSolve:
   - "LSP7 operators are still amount-scoped — that's honest, it's not magic. Real scope discipline comes from pairing with LSP6 on the controller side."
   - "Publishes distinct function selectors from ERC-20. Contracts that ABI-check for ERC-20 won't dispatch to LSP7 — by design, not as a workaround."

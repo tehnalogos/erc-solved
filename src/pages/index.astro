@@ -7,21 +7,21 @@ const description =
   'A spec-grade field guide for Ethereum and EVM builders. Ethereum Request for Comments (ERC) pain points mapped to the LUKSO LSP standards that were designed instead of layered.';
 
 const verticals = [
-  { label: 'Token economics',         stack: 'LSP·7 + LSP·4',                href: '/build/token-economics/' },
-  { label: 'Dynamic NFTs',            stack: 'LSP·8 + LSP·4 + ERC-725Y',     href: '/build/dynamic-nfts/' },
-  { label: 'Smart wallet UX',         stack: 'LSP·0 + LSP·6',                href: '/build/smart-wallet-ux/' },
-  { label: 'Gasless onboarding',      stack: 'LSP·25 + LSP·6',               href: '/build/gasless-onboarding/' },
-  { label: 'Profile-native apps',     stack: 'LSP·0 + LSP·3 + LSP·26',       href: '/build/profile-native-apps/' },
-  { label: 'Extending deployed code', stack: 'LSP·17 (+ LSP·14)',            href: '/build/extending-deployed-contracts/' },
+  { label: 'Token economics',         stack: 'LSP7 + LSP4',                href: '/build/token-economics/' },
+  { label: 'Dynamic NFTs',            stack: 'LSP8 + LSP4 + ERC-725Y',     href: '/build/dynamic-nfts/' },
+  { label: 'Smart wallet UX',         stack: 'LSP0 + LSP6',                href: '/build/smart-wallet-ux/' },
+  { label: 'Gasless onboarding',      stack: 'LSP25 + LSP6',               href: '/build/gasless-onboarding/' },
+  { label: 'Profile-native apps',     stack: 'LSP0 + LSP3 + LSP26',       href: '/build/profile-native-apps/' },
+  { label: 'Extending deployed code', stack: 'LSP17 (+ LSP14)',            href: '/build/extending-deployed-contracts/' },
 ];
 
 const topQueries = [
-  { q: 'erc20 approval risks',          a: 'LSP·7 + LSP·6',           href: '/problems/erc20-approval-risks/' },
-  { q: 'erc721 dynamic metadata',       a: 'LSP·8 + LSP·4 + ERC-725Y', href: '/problems/erc721-dynamic-metadata/' },
-  { q: 'erc-4337 alternatives',         a: 'LSP·0 + LSP·6 + LSP·25',   href: '/problems/erc4337-bundler-tax/' },
-  { q: 'erc20 transfer hooks',          a: 'LSP·7 + LSP·1',            href: '/problems/erc20-transfer-hooks/' },
-  { q: 'social recovery smart wallets', a: 'LSP·6 controllers',        href: '/problems/social-recovery/' },
-  { q: 'safetransferfrom problems',     a: 'LSP·1 universal receiver', href: '/problems/erc721-safe-transfer/' },
+  { q: 'erc20 approval risks',          a: 'LSP7 + LSP6',           href: '/problems/erc20-approval-risks/' },
+  { q: 'erc721 dynamic metadata',       a: 'LSP8 + LSP4 + ERC-725Y', href: '/problems/erc721-dynamic-metadata/' },
+  { q: 'erc-4337 alternatives',         a: 'LSP0 + LSP6 + LSP25',   href: '/problems/erc4337-bundler-tax/' },
+  { q: 'erc20 transfer hooks',          a: 'LSP7 + LSP1',            href: '/problems/erc20-transfer-hooks/' },
+  { q: 'social recovery smart wallets', a: 'LSP6 controllers',        href: '/problems/social-recovery/' },
+  { q: 'safetransferfrom problems',     a: 'LSP1 universal receiver', href: '/problems/erc721-safe-transfer/' },
 ];
 ---
 
@@ -154,7 +154,7 @@ const topQueries = [
             tags: ['unbounded', 'phishable', 'split-intent'],
           }}
           to={{
-            chip: 'LSP·7',
+            chip: 'LSP7',
             code: 'authorizeOperator(op, amount, data)',
             tags: ['scoped', 'revocable', 'LSP6 account permissions'],
           }}

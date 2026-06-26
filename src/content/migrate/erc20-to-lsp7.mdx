@@ -1,7 +1,7 @@
 ---
 title: "Migrate ERC-20 token logic to LSP7"
 from: "ERC-20"
-to: "LSP·7"
+to: "LSP7"
 description: "A step-by-step migration from an ERC-20 token contract to LSP7. Map balances, transfers, approvals, metadata, and receiver behavior."
 estimate: "~2 days for a typical contract"
 verdict: "Don't migrate just because LSP7 exists. Migrate when the token needs receiver awareness, structured ERC-725Y metadata, transfer-time context via the data payload, or operator authorization that composes with LSP6 account permissions. Keep ERC-20 when its minimum-interface property is the design goal — including when downstream contracts hardcode the ERC-20 ABI."

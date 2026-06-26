@@ -13,7 +13,7 @@ diff:
     code: "address = keccak(pubkey)[12:]"
     tags: ["one key", "no recovery", "no scope"]
   to:
-    chip: "LSP·0"
+    chip: "LSP0"
     code: "contract Account is ERC-725 + LSP6 + LSP1"
     tags: ["many controllers", "scoped", "recoverable"]
 verdict: "A Universal Profile is an account contract. Controllers (LSP6) sign for it; profile metadata (LSP3) describes it; LSP1 hooks let it react. The address survives controller rotation."

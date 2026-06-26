@@ -13,7 +13,7 @@ diff:
     code: "tokenURI(tokenId) returns (string)"
     tags: ["one URI", "server-cached", "no integrity"]
   to:
-    chip: "LSP·8"
+    chip: "LSP8"
     code: "getDataForTokenId(tokenId, key)"
     tags: ["typed keys", "VerifiableURI", "per-token"]
 verdict: "LSP8 stores per-token metadata through ERC-725Y data keys, not one tokenURI string. Apps read getDataForTokenId(tokenId, key) and get a typed value back. Dynamic updates are setData calls, gated by whatever account permissions you want."

@@ -13,7 +13,7 @@ diff:
     code: "transfer(to, amount)"
     tags: ["no recipient call", "no data payload"]
   to:
-    chip: "LSP·7"
+    chip: "LSP7"
     code: "transfer(from, to, amount, force, data)"
     tags: ["LSP1 hook on recipient", "force + data"]
 verdict: "LSP7 makes the hook native. Every transfer can carry bytes data and triggers the recipient through LSP1 Universal Receiver — and LSP1 is one interface across LSP7, LSP8, and value transfers, so contracts stop implementing four receiver shapes."

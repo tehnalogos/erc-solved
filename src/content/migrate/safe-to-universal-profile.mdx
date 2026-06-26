@@ -1,7 +1,7 @@
 ---
 title: "Migrate from Safe (Gnosis Safe) to Universal Profile"
 from: "Safe"
-to: "LSP·0"
+to: "LSP0"
 description: "Move custody and ownership from a Safe multisig to a Universal Profile with LSP6 controllers. The permission model maps cleanly; the recovery model needs to be designed."
 estimate: "~1 day for a small Safe; longer if the Safe owns many assets"
 verdict: "Migrate when you want per-controller permission scoping in a standard vocabulary (LSP6 bitfield + AllowedCalls + AllowedERC725YDataKeys), profile-native metadata storage, or LSP25 relay execution on the account itself. Stay on Safe when the m-of-n multisig threshold is the primitive your product encodes — that pattern doesn't map 1:1 to LSP6 and needs a recovery contract layer to express."

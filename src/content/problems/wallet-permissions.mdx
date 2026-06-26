@@ -13,7 +13,7 @@ diff:
     code: "wallet_signTransaction(tx)"
     tags: ["full account every time"]
   to:
-    chip: "LSP·6"
+    chip: "LSP6"
     code: "permissions[controller] + allowedCalls[controller]"
     tags: ["per-controller", "per-call", "revocable"]
 verdict: "LSP6 assigns each controller a permission bitfield plus optional allowed calls (target + standard + selector) and allowed data keys. Granting a session controller is one tx. Revoking it is one tx. Scope is enforced on-chain."

@@ -41,7 +41,7 @@ const keywords = [
   `what is ${data.title}`,
   `${data.title} standard`,
   `${data.title} explained`,
-  `${data.title} vs LSP-7`,
+  `${data.title} vs LSP7`,
   ...data.standardAuthors,
 ];
 
@@ -136,9 +136,12 @@ const toc = [
     text: l.title.replace(/^The\s+/, '').replace(/\.$/, ''),
     slug: slugify(l.title),
   }))),
+  ...(data.authorCriticism
+    ? [{ depth: 2, text: 'Criticism from the source', slug: 'author-criticism' }]
+    : []),
   { depth: 2, text: pivot.tocLabel,             slug: 'vogelsteller-pivot' },
   ...(data.compareRows?.length
-    ? [{ depth: 2, text: `${data.title} vs LSP-7`, slug: 'compare' }]
+    ? [{ depth: 2, text: `${data.title} vs LSP7`, slug: 'compare' }]
     : []),
   { depth: 2, text: 'When to use which',        slug: 'when-to-use-which' },
   ...(data.faqs?.length
@@ -223,7 +226,7 @@ const toc = [
           </a>
           {data.compareHref && (
             <span class="cta-meta">
-              or read <a href={data.compareHref}>{data.title} vs LSP·7</a>
+              or read <a href={data.compareHref}>{data.title} vs LSP7</a>
             </span>
           )}
         </div>
@@ -363,15 +366,14 @@ const toc = [
                   <p>{lim.summary}</p>
                   <DiffArrow size="md" framed from={lim.from} to={lim.to} />
                   {lim.workarounds.length > 0 && (
-                    <p class="workarounds">
-                      <span class="wk-label">workarounds tried:</span>{' '}
-                      {lim.workarounds.map((w: string, idx: number) => (
-                        <>
-                          {idx > 0 && <span class="wk-sep"> · </span>}
-                          <span class="wk-item">{w}</span>
-                        </>
-                      ))}
-                    </p>
+                    <div class="workarounds">
+                      <span class="wk-label">workarounds tried</span>
+                      <ul class="wk-list">
+                        {lim.workarounds.map((w: string) => (
+                          <li>{w}</li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                   {lim.href && (
                     <p class="deeper"><Crossref href={lim.href}>read the deep-dive</Crossref></p>
@@ -383,6 +385,51 @@ const toc = [
         </ol>
       </div>
     </section>
+
+    {data.authorCriticism && (
+      <section class="band author-criticism-band" id="author-criticism">
+        <div class="band-inner">
+          <span class="eyebrow">criticism from the source</span>
+          <h2>What an {data.title} co-author said about the standard.<a class="anchor" href="#author-criticism" aria-label="Link to this section">#</a></h2>
+          <p class="ac-intro">{data.authorCriticism.intro}</p>
+
+          <ol class="ac-list">
+            {data.authorCriticism.items.map((item: any, i: number) => (
+              <li class="ac-item" data-reveal>
+                <div class="ac-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</div>
+                <div class="ac-body">
+                  <span class="ac-theme">{item.theme}</span>
+                  <blockquote class="ac-quote">
+                    <p>{item.quote}</p>
+                    <footer class="ac-attribution">
+                      — {data.authorCriticism.authorName}, <a href={data.authorCriticism.sourceUrl} rel="noopener noreferrer" target="_blank">{data.authorCriticism.sourceLabel}</a>
+                    </footer>
+                  </blockquote>
+                  <div class="ac-solution">
+                    <div class="ac-solution-head">
+                      <span class="ac-solution-label">LUKSO answer</span>
+                      <span class="ac-lsps">
+                        {item.lsps.map((lsp: string, idx: number) => (
+                          <>
+                            {idx > 0 && <span class="ac-lsp-sep">+</span>}
+                            <span class="ac-lsp-chip">{lsp}</span>
+                          </>
+                        ))}
+                      </span>
+                    </div>
+                    <p class="ac-solution-text">{item.solution}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          {data.authorCriticism.outro && (
+            <p class="ac-outro">{data.authorCriticism.outro}</p>
+          )}
+        </div>
+      </section>
+    )}
 
     <section class="band" id="vogelsteller-pivot">
       <div class="band-inner">
@@ -415,7 +462,7 @@ const toc = [
       <section class="band" id="compare">
         <div class="band-inner">
           <span class="eyebrow">spec to spec, at a glance</span>
-          <h2>{data.title} vs LSP·7 in one table.<a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
+          <h2>{data.title} vs LSP7 in one table.<a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
           <div class="compare-wrap" data-reveal>
             <table class="compare">
               <thead>
@@ -821,15 +868,156 @@ const toc = [
     font-family: var(--font-mono);
     font-size: var(--t-mono-sm);
     color: var(--ink-fog);
+    display: grid;
+    gap: var(--s-2);
+  }
+  .wk-label {
+    color: var(--erc-sand);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    font-size: var(--t-mono-xs);
+  }
+  .wk-list {
+    margin: 0;
+    padding-left: var(--s-3);
+    display: grid;
+    gap: var(--s-1);
+    list-style: '— ';
+  }
+  .wk-list li {
+    color: var(--ink-bone-dim);
+    line-height: 1.55;
+    padding-left: var(--s-1);
+  }
+  .deeper { margin-top: var(--s-1); }
+
+  /* ── author-criticism band ─────────────────────────────────────────── */
+  .author-criticism-band {
+    background: color-mix(in srgb, var(--signal-pink) 3%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--signal-pink) 25%, var(--ink-line));
+    border-bottom: 1px solid color-mix(in srgb, var(--signal-pink) 25%, var(--ink-line));
+  }
+  .ac-intro {
+    max-width: var(--reading);
+    color: var(--ink-bone-dim);
+    line-height: 1.65;
+    margin-top: calc(-1 * var(--s-2));
+  }
+  .ac-list {
+    display: grid;
+    gap: var(--s-6);
+    margin-top: var(--s-3);
+  }
+  .ac-item {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--s-4);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--ink-line);
+  }
+  .ac-num {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    color: var(--signal-pink);
+    letter-spacing: 0;
+    padding-top: 4px;
+  }
+  .ac-body {
+    display: grid;
+    gap: var(--s-4);
+    min-width: 0;
+  }
+  .ac-theme {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    color: var(--erc-sand);
+  }
+  .ac-quote {
+    margin: 0;
+    padding: var(--s-4) var(--s-5);
+    border-left: 2px solid var(--erc-sand);
+    background: var(--ink-paper);
+    display: grid;
+    gap: var(--s-3);
+  }
+  .ac-quote p {
+    margin: 0;
+    color: var(--ink-bone);
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.45;
+  }
+  .ac-attribution {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    margin: 0;
+  }
+  .ac-attribution a {
+    color: var(--ink-bone-dim);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .ac-attribution a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+  .ac-solution {
+    padding: var(--s-4) var(--s-5);
+    border-left: 2px solid var(--signal-pink);
+    background: var(--ink-paper);
+    display: grid;
+    gap: var(--s-3);
+  }
+  .ac-solution-head {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 var(--s-2);
-    align-items: baseline;
+    gap: var(--s-3);
+    align-items: center;
   }
-  .wk-label { color: var(--erc-sand); margin-right: var(--s-2); }
-  .wk-sep { color: var(--ink-line); }
-  .wk-item { color: var(--ink-bone-dim); }
-  .deeper { margin-top: var(--s-1); }
+  .ac-solution-label {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    color: var(--signal-pink);
+  }
+  .ac-lsps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    align-items: center;
+  }
+  .ac-lsp-chip {
+    padding: 1px var(--s-2);
+    border: 1px solid var(--signal-pink);
+    color: var(--signal-pink);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .ac-lsp-sep { color: var(--ink-line); font-family: var(--font-mono); font-size: var(--t-mono-sm); }
+  .ac-solution-text {
+    margin: 0;
+    color: var(--ink-bone);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    line-height: 1.65;
+  }
+  .ac-outro {
+    max-width: var(--reading);
+    color: var(--ink-fog);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    line-height: 1.6;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--ink-line);
+  }
+
+  @media (max-width: 640px) {
+    .ac-item { grid-template-columns: 32px minmax(0, 1fr); gap: var(--s-3); }
+    .ac-quote, .ac-solution { padding: var(--s-3) var(--s-4); }
+  }
 
   /* ── routes grid ──────────────────────────────────────────────────── */
   .routes {

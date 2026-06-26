@@ -13,7 +13,7 @@ diff:
     code: "onERC721Received(...) returns (bytes4)"
     tags: ["one asset type", "narrow hook"]
   to:
-    chip: "LSP·1"
+    chip: "LSP1"
     code: "universalReceiver(typeId, data)"
     tags: ["one hook for everything", "typeId-routed"]
 verdict: "LSP1 is a single universalReceiver hook with a typeId discriminator. LSP7, LSP8, and value transfers all call it. Multi-asset contracts stop implementing four receiver interfaces; account contracts react through a Universal Receiver Delegate."

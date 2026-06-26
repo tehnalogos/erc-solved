@@ -3,7 +3,7 @@ id: "20"
 title: "ERC-20"
 headline: "What is ERC-20?"
 pageTitle: "What is ERC-20? Limits, Fixes, and What Comes Next"
-description: "ERC-20 is Ethereum's fungible token standard, proposed in November 2015 by Fabian Vogelsteller and co-authored with Vitalik Buterin. This is the origin, the ABI, the well-known limitations — and the LUKSO LSP-7 standard Vogelsteller designed to replace it."
+description: "ERC-20 is Ethereum's fungible token standard, proposed in November 2015 by Fabian Vogelsteller and co-authored with Vitalik Buterin. This is the origin, the ABI, the well-known limitations — and the LUKSO LSP7 standard Vogelsteller designed to replace it."
 tagline: "The token standard that ate Ethereum — and what its author built next."
 bootStrip: "standard · proposed nov 2015 · still load-bearing · ready"
 standardAuthors:
@@ -55,7 +55,7 @@ limits:
       code: "approve(spender, amount)"
       tags: ["unbounded", "phishable", "split-intent"]
     to:
-      chip: "LSP·7 + LSP·6"
+      chip: "LSP7 + LSP6"
       code: "authorizeOperator(op, amount, data)"
       tags: ["scoped", "revocable", "account-gated"]
 
@@ -68,7 +68,7 @@ limits:
       code: "transfer(to, amount)"
       tags: ["no receiver call", "silent on contract recipients"]
     to:
-      chip: "LSP·7 + LSP·1"
+      chip: "LSP7 + LSP1"
       code: "transfer(from, to, amount, force, data)"
       tags: ["universalReceiver fires", "force flag is your call"]
 
@@ -80,7 +80,7 @@ limits:
       code: "name() / symbol() / decimals()"
       tags: ["three strings", "no schema", "off-chain by convention"]
     to:
-      chip: "LSP·4 + ERC-725Y"
+      chip: "LSP4 + ERC-725Y"
       code: "getData(bytes32 key)"
       tags: ["typed JSON", "VerifiableURI", "extensible at runtime"]
 
@@ -93,7 +93,7 @@ limits:
       code: "EOA — one keypair, all-or-nothing"
       tags: ["no recovery", "no session keys", "no scoped permissions"]
     to:
-      chip: "LSP·0 + LSP·3 + LSP·6"
+      chip: "LSP0 + LSP3 + LSP6"
       code: "Universal Profile"
       tags: ["accounts as contracts", "named controllers", "social recovery"]
 
@@ -110,35 +110,35 @@ limits:
       tags: ["one stack", "shared substrate", "no patch layer"]
 
 luksoRoutes:
-  - chip: "LSP·0"
+  - chip: "LSP0"
     label: "ERC-725 Account"
     summary: "A smart-contract account that is the user — not a wrapper around one. Owns assets, executes calls, holds typed key/value storage."
     href: "/standards/lsp0-erc725-account/"
-  - chip: "LSP·3"
+  - chip: "LSP3"
     label: "Profile Metadata"
     summary: "Name, avatar, bio, links — stored on the account itself under typed ERC-725Y keys. Profiles are first-class, not third-party."
     href: "/standards/lsp3-profile-metadata/"
-  - chip: "LSP·6"
+  - chip: "LSP6"
     label: "Key Manager"
     summary: "Permissions are an account property, not a token allowance. Granular controllers with allowed calls, standards, value caps, and instant revocation."
     href: "/standards/lsp6-key-manager/"
-  - chip: "LSP·1"
+  - chip: "LSP1"
     label: "Universal Receiver"
     summary: "Every transfer notifies sender and receiver through one entry point. The on-transfer hook ERC-20 left out, generalised across asset types."
     href: "/standards/lsp1-universal-receiver/"
-  - chip: "LSP·4"
+  - chip: "LSP4"
     label: "Digital Asset Metadata"
     summary: "Typed token metadata under ERC-725Y. Icons, descriptions, links, attributes — schema'd, not stringly-typed."
     href: "/standards/lsp4-digital-asset-metadata/"
-  - chip: "LSP·7"
+  - chip: "LSP7"
     label: "Digital Asset"
-    summary: "Fungible tokens with native receiver hooks, transfer data payload, and operator authorization that pairs with LSP·6 account permissions."
+    summary: "Fungible tokens with native receiver hooks, transfer data payload, and operator authorization that pairs with LSP6 account permissions."
     href: "/standards/lsp7-digital-asset/"
-  - chip: "LSP·8"
+  - chip: "LSP8"
     label: "Identifiable Digital Asset"
     summary: "Non-fungible tokens with bytes32 token IDs, on-chain typed metadata, and the same receiver-aware transfer model."
     href: "/standards/lsp8-identifiable-digital-asset/"
-  - chip: "LSP·25"
+  - chip: "LSP25"
     label: "Execute Relay Call"
     summary: "Signed messages that a third party can submit on-chain. Gasless onboarding without bundlers, paymasters, or a bolted-on mempool."
     href: "/standards/lsp25-execute-relay-call/"
@@ -176,19 +176,19 @@ faqs:
   - q: "What does ERC-20 stand for?"
     a: "ERC stands for Ethereum Request for Comments. ERC-20 is the twentieth proposal in that series, and it specifies a minimum interface for fungible tokens on Ethereum. The proposal was later formalized as EIP-20 (Ethereum Improvement Proposal 20), which is the canonical specification at eips.ethereum.org/EIPS/eip-20."
   - q: "Who created ERC-20?"
-    a: "Fabian Vogelsteller proposed ERC-20 as GitHub issue #20 on the Ethereum repository in November 2015, while working at the Ethereum Foundation. Vitalik Buterin is credited as co-author on the formalized EIP-20 specification. Vogelsteller has since co-founded LUKSO, where he designed the LSP-7 Digital Asset standard as a more complete replacement."
+    a: "Fabian Vogelsteller proposed ERC-20 as GitHub issue #20 on the Ethereum repository in November 2015, while working at the Ethereum Foundation. Vitalik Buterin is credited as co-author on the formalized EIP-20 specification. Vogelsteller has since co-founded LUKSO, where he designed the LSP7 Digital Asset standard as a more complete replacement."
   - q: "Is ERC-20 the same as EIP-20?"
     a: "Yes — they refer to the same standard. ERC-20 is the original community proposal name (the proposal number assigned to the GitHub issue); EIP-20 is the formalized specification once it moved into the EIP repository. Most developers say ERC-20 in casual use; eips.ethereum.org/EIPS/eip-20 is the authoritative spec."
   - q: "What is wrong with ERC-20?"
     a: "Five well-known limits. (1) approve and transferFrom split user intent across two transactions the wallet cannot connect, which makes max-uint approvals the de-facto pattern and creates standing phishing risk. (2) transfer never calls the recipient, so tokens sent to contracts that do not handle them are stranded. (3) Metadata is limited to name, symbol, and decimals — no icon, no description, no schema. (4) The standard assumes accounts are EOAs or bare contracts, with no built-in recovery, scoped permissions, or session keys. (5) Every gap has produced a layered standard (Permit, Permit2, 1363, 777, 4337) instead of fixing the substrate."
-  - q: "What is LSP-7?"
-    a: "LSP-7 is the LUKSO Digital Asset standard, designed by Fabian Vogelsteller — the original author of ERC-20 — as a fungible token spec for Universal Profiles. It keeps ERC-20's balance model and adds a force flag, a data payload on every transfer, LSP-1 universal-receiver notifications on both sides, and amount-scoped operators with typed events. Paired with LSP-6 on the account side, the authorization model stops being a forever-promise to a token contract."
+  - q: "What is LSP7?"
+    a: "LSP7 is the LUKSO Digital Asset standard, designed by Fabian Vogelsteller — the original author of ERC-20 — as a fungible token spec for Universal Profiles. It keeps ERC-20's balance model and adds a force flag, a data payload on every transfer, LSP1 universal-receiver notifications on both sides, and amount-scoped operators with typed events. Paired with LSP6 on the account side, the authorization model stops being a forever-promise to a token contract."
   - q: "Why is ETH not an ERC-20 token?"
     a: "Ether (ETH) predates the ERC-20 standard — it is the native asset of Ethereum, handled directly by the protocol rather than by a contract. ERC-20 was proposed in 2015 to give a uniform interface for tokens that live inside contracts. To make ETH usable in dapps that expect the ERC-20 interface, the ecosystem wraps it in a contract called WETH (Wrapped Ether), which is itself an ERC-20 token redeemable 1:1 for ETH."
   - q: "Is LUKSO a competitor to Ethereum?"
     a: "No. LUKSO is its own EVM-compatible Layer 1 blockchain, but its LSP standards are written as EVM contracts that can run on Ethereum and other EVM chains. The intent is not to replace Ethereum but to ship a connected account, token, metadata, receiver, permission, and relay system that the rest of the ecosystem can adopt selectively. ERC-20 is still the right answer for many use cases."
-  - q: "Can I migrate an ERC-20 token to LSP-7?"
-    a: "Yes. The balance model is the same, so the migration path is contract-level rather than user-level. The LUKSO docs publish an end-to-end guide for deploying an LSP-7 equivalent and bridging holders. The site's own walkthrough is at ercsolved.dev/build/migrate/erc20-to-lsp7/."
+  - q: "Can I migrate an ERC-20 token to LSP7?"
+    a: "Yes. The balance model is the same, so the migration path is contract-level rather than user-level. The LUKSO docs publish an end-to-end guide for deploying an LSP7 equivalent and bridging holders. The site's own walkthrough is at ercsolved.dev/build/migrate/erc20-to-lsp7/."
   - q: "What chains support ERC-20?"
     a: "Every EVM-compatible chain supports ERC-20 — the standard is a contract interface, not a protocol-level feature. ERC-20 tokens exist on Ethereum mainnet, every Layer 2, every sidechain, every fork. The same contract code can deploy unchanged across chains, which is what made ERC-20 a network-effect standard rather than a vendor specification."
 
@@ -227,7 +227,7 @@ stats:
   - k: "Optional methods"
     v: "3 (name · symbol · decimals)"
   - k: "Modern alternative"
-    v: "LUKSO LSP-7"
+    v: "LUKSO LSP7"
     href: "/standards/lsp7-digital-asset/"
   - k: "Canonical spec"
     v: "eips.ethereum.org / EIP-20"
@@ -261,7 +261,7 @@ timeline:
   - year: "2020"
     text: "DeFi summer; Compound, Uniswap, and Aave embed the ERC-20 ABI as a load-bearing assumption."
   - year: "2023"
-    text: "LUKSO mainnet launches with LSP-0, LSP-6, LSP-7, LSP-8, and the rest of the LSP suite as native standards."
+    text: "LUKSO mainnet launches with LSP0, LSP6, LSP7, LSP8, and the rest of the LSP suite as native standards."
     href: "https://docs.lukso.tech/"
   - year: "2026"
     text: "Trillions of dollars in supply continue to move through the original six-function interface every week."
@@ -280,7 +280,7 @@ glossary:
   - term: "LSP"
     def: "LUKSO Standards Proposal. The LUKSO equivalent of an ERC, with a focus on accounts, profiles, permissions, and receiver-aware tokens."
   - term: "UP"
-    def: "Universal Profile. A smart-contract account on LUKSO that combines LSP-0 (account), LSP-3 (profile metadata), and LSP-6 (permissions)."
+    def: "Universal Profile. A smart-contract account on LUKSO that combines LSP0 (account), LSP3 (profile metadata), and LSP6 (permissions)."
   - term: "WETH"
     def: "Wrapped Ether. An ERC-20 contract that holds ETH and issues a 1:1 ERC-20 balance — so ETH can be used where ERC-20 is expected."
   - term: "ICO"
@@ -303,7 +303,7 @@ primarySources:
     href: "https://lukso.network"
   - label: "LUKSO developer documentation"
     href: "https://docs.lukso.tech/"
-  - label: "ERC-20 to LSP-7 migration guide"
+  - label: "ERC-20 to LSP7 migration guide"
     href: "https://docs.lukso.tech/learn/migrate/migrate-erc20-to-lsp7/"
 
 mentions:
@@ -327,13 +327,13 @@ mentions:
     url: "https://eips.ethereum.org/EIPS/eip-725"
   - name: "web3.js"
     url: "https://github.com/web3/web3.js"
-  - name: "LUKSO LSP-0 ERC725 Account"
+  - name: "LUKSO LSP0 ERC725 Account"
     url: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
-  - name: "LUKSO LSP-1 Universal Receiver"
+  - name: "LUKSO LSP1 Universal Receiver"
     url: "https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/"
-  - name: "LUKSO LSP-6 Key Manager"
+  - name: "LUKSO LSP6 Key Manager"
     url: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
-  - name: "LUKSO LSP-7 Digital Asset"
+  - name: "LUKSO LSP7 Digital Asset"
     url: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
 
 personSchema:
@@ -357,16 +357,16 @@ personSchema:
     - "web3.js"
 
 howToMigration:
-  name: "How to migrate an ERC-20 token to LUKSO LSP-7"
-  description: "Three-step path from an existing ERC-20 contract to LSP-7 on LUKSO. The balance model is the same, so the work is contract-level rather than user-level."
+  name: "How to migrate an ERC-20 token to LUKSO LSP7"
+  description: "Three-step path from an existing ERC-20 contract to LSP7 on LUKSO. The balance model is the same, so the work is contract-level rather than user-level."
   toolHref: "https://docs.lukso.tech/learn/migrate/migrate-erc20-to-lsp7/"
   steps:
-    - name: "Deploy an LSP-7 Digital Asset contract on LUKSO"
-      text: "Use the LSP-7 reference implementation from the @lukso/lsp-smart-contracts package. Configure name, symbol, and decimals to match the source ERC-20, and decide on the initial force-transfer policy."
+    - name: "Deploy an LSP7 Digital Asset contract on LUKSO"
+      text: "Use the LSP7 reference implementation from the @lukso/lsp-smart-contracts package. Configure name, symbol, and decimals to match the source ERC-20, and decide on the initial force-transfer policy."
     - name: "Snapshot existing ERC-20 holders"
       text: "Read balances from the source ERC-20 contract at a published block height. Publish the snapshot so holders can verify their allocation before migration."
     - name: "Bridge or mint the new supply on LUKSO"
-      text: "Either run a bridge that locks the source ERC-20 and mints LSP-7 on LUKSO, or do a one-time mint to the snapshot addresses and freeze further issuance on the ERC-20 side."
+      text: "Either run a bridge that locks the source ERC-20 and mints LSP7 on LUKSO, or do a one-time mint to the snapshot addresses and freeze further issuance on the ERC-20 side."
 ---
 
 {/* ─── slot: lede (renders in the hero) ─────────────────────────────────── */}
@@ -410,7 +410,7 @@ Five gaps, in order of how often they cost users money. Each one has produced it
 
 Vogelsteller did not disown ERC-20 — the spec did exactly what a minimum interface is supposed to do. But over the years after he proposed it, he kept writing the things ERC-20 deliberately wasn't. He authored [**web3.js**](https://github.com/web3/web3.js) (the original Ethereum JavaScript client), built the **Mist Browser**, and proposed [**ERC-725**](https://eips.ethereum.org/EIPS/eip-725) — a standard for smart-contract-based identity that quietly contains the seed of every later "account abstraction" idea.
 
-In 2017 he co-founded [**LUKSO**](https://lukso.network) with Marjorie Hernandez. The thesis is direct: ship the *surrounding system* that ERC-20's minimum interface was never going to specify. Accounts are not addresses, they are smart contracts ([**LSP-0**](https://docs.lukso.tech/standards/accounts/lsp0-erc725account/) / ERC-725 Account). Permissions are not allowances on a token, they are a property of the account itself ([**LSP-6 Key Manager**](https://docs.lukso.tech/standards/access-control/lsp6-key-manager/)). Tokens notify their recipients ([**LSP-1 Universal Receiver**](https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/)). Metadata is typed and lives on the asset (**LSP-4** under **ERC-725Y**). Fungibles ([**LSP-7**](https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/)) and NFTs (**LSP-8**) inherit all of that for free. Gasless onboarding is a primitive (**LSP-25**), not a bolted-on bundler stack.
+In 2017 he co-founded [**LUKSO**](https://lukso.network) with Marjorie Hernandez. The thesis is direct: ship the *surrounding system* that ERC-20's minimum interface was never going to specify. Accounts are not addresses, they are smart contracts ([**LSP0**](https://docs.lukso.tech/standards/accounts/lsp0-erc725account/) / ERC-725 Account). Permissions are not allowances on a token, they are a property of the account itself ([**LSP6 Key Manager**](https://docs.lukso.tech/standards/access-control/lsp6-key-manager/)). Tokens notify their recipients ([**LSP1 Universal Receiver**](https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/)). Metadata is typed and lives on the asset (**LSP4** under **ERC-725Y**). Fungibles ([**LSP7**](https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/)) and NFTs (**LSP8**) inherit all of that for free. Gasless onboarding is a primitive (**LSP25**), not a bolted-on bundler stack.
 
 [LUKSO mainnet went live in 2023](https://docs.lukso.tech/). The standards are EVM contracts — they don't require the LUKSO chain to run; they require the LUKSO chain to *cohere*. On Ethereum, a Universal Profile would still work, but every dapp around it would still be ERC-20-shaped. On LUKSO, the substrate matches the standard, which is why the first complete UX example of a wallet with social recovery, scoped session keys, profile metadata, and receiver-aware tokens lives there.
 

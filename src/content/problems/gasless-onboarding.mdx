@@ -13,7 +13,7 @@ diff:
     code: "UserOp + paymaster + bundler"
     tags: ["parallel infra", "external EntryPoint"]
   to:
-    chip: "LSP·25"
+    chip: "LSP25"
     code: "executeRelayCall(sig, nonce, validity, payload)"
     tags: ["on the account itself"]
 verdict: "LSP25 puts relay execution on the Universal Profile. A controller signs, a relayer submits and pays. No bundler, no EntryPoint, no separate mempool. LSP6 permissions still apply to the relayed call."

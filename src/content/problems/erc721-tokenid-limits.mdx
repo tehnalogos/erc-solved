@@ -13,7 +13,7 @@ diff:
     code: "uint256 tokenId"
     tags: ["one number", "needs extra mappings"]
   to:
-    chip: "LSP·8"
+    chip: "LSP8"
     code: "bytes32 tokenId"
     tags: ["hash · serial · ref · number"]
 verdict: "LSP8 uses bytes32 token IDs. The integer case still works (cast a uint256). When you need a hash, a serial, or a structured reference, you encode it directly into the ID instead of maintaining a side mapping."

@@ -18,7 +18,7 @@ abi: |
 solves:
   - pain: "contract extension after deployment"
     href: "/problems/contract-extension/"
-companions: ["LSP·0", "ERC-725"]
+companions: ["LSP0", "ERC-725"]
 doesNotSolve:
   - "LSP17 isn't an upgrade primitive for the base bytecode. It adds *new* functions; it doesn't change existing ones."
   - "DELEGATECALL extensions share storage — you still need storage-layout discipline if you use that flavor."

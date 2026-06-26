@@ -15,13 +15,13 @@ const standardPath = `/standards/${slug}/`;
 const standardLabel = formatStandardLabel(data.kind, data.id);
 
 // Build a chip → slug map from the standards collection so companion links resolve
-// (chip values like "LSP·1" or "ERC-725" must map to actual built slugs like
+// (chip values like "LSP1" or "ERC-725" must map to actual built slugs like
 // "lsp1-universal-receiver" or "erc725", which we cannot derive from the chip alone).
 const allStandards = await getCollection('standards');
 const chipToSlug = new Map<string, string>();
 for (const s of allStandards) {
   const id = s.data.id;
-  const key = s.data.kind === 'LSP' ? `LSP·${id}` : `ERC-${id}`;
+  const key = s.data.kind === 'LSP' ? `LSP${id}` : `ERC-${id}`;
   chipToSlug.set(key, s.slug);
 }
 function companionHref(chip: string): string {
@@ -61,7 +61,7 @@ function companionHref(chip: string): string {
     <p class="one-line">{data.oneLine}</p>
   </div>
 
-  <SpecBlock chip={`${data.kind}·${data.id}`} chipKind={chipKind} caption="interface" lang="solidity">{data.abi}</SpecBlock>
+  <SpecBlock chip={`${data.kind}${data.id}`} chipKind={chipKind} caption="interface" lang="solidity">{data.abi}</SpecBlock>
 
   <section class="prose">
     <slot />

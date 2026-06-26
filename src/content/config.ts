@@ -222,6 +222,28 @@ const erc = defineCollection({
         tocLabel: z.string().optional(),
       })
       .optional(),
+
+    // When one of the spec's own authors has publicly criticised it, surface
+    // the verbatim quotes here, each paired with the LSP that addresses it.
+    // Renders as a dedicated band between What's-broken and the Second-act.
+    authorCriticism: z
+      .object({
+        authorName: z.string(),
+        authorRole: z.string(),
+        sourceLabel: z.string(),
+        sourceUrl: z.string().url(),
+        intro: z.string(),
+        items: z.array(
+          z.object({
+            quote: z.string(),
+            theme: z.string(),
+            lsps: z.array(z.string()),
+            solution: z.string(),
+          }),
+        ),
+        outro: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 

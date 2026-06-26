@@ -3,7 +3,7 @@ id: "721"
 title: "ERC-721"
 headline: "What is ERC-721?"
 pageTitle: "What is ERC-721? The NFT Standard, Its Limits, and What Comes Next"
-description: "ERC-721 is Ethereum's non-fungible token standard. Proposed in September 2017 by Dieter Shirley and finalized in January 2018 with William Entriken as lead author, it became the substrate for the entire NFT economy — and exposed every gap a minimum interface leaves behind. This page walks the history, the ABI, the well-known limitations, and the LUKSO LSP-8 standard Fabian Vogelsteller designed to address them."
+description: "ERC-721 is Ethereum's non-fungible token standard. Proposed in September 2017 by Dieter Shirley and finalized in January 2018 with William Entriken as lead author, it became the substrate for the entire NFT economy — and exposed every gap a minimum interface leaves behind. This page walks the history, the ABI, the well-known limitations, and the LUKSO LSP8 standard Fabian Vogelsteller designed to address them."
 tagline: "Ethereum's non-fungible token standard — and the gaps a minimum interface left to integrators."
 bootStrip: "standard · drafted sept 2017 · final jan 2018 · nft substrate · ready"
 standardAuthors:
@@ -46,7 +46,7 @@ abi: |
   function onERC721Received(address operator, address from, uint256 tokenId, bytes data)
     external returns (bytes4);
 
-tldr: "ERC-721 standardized NFT ownership by deliberately leaving everything else open: metadata is one off-chain URL, transfer safety is opt-in, approvals are blanket-or-nothing, and the spec itself acknowledges 'caller control over their risk' as the design choice. Each gap has produced its own EIP, its own marketplace policy fight, and its own stranded-asset headline. LSP-8 — the LUKSO NFT standard built by Fabian Vogelsteller, who wrote ERC-20 — addresses these as substrate, not as layers."
+tldr: "ERC-721 standardized NFT ownership by deliberately leaving everything else open: metadata is one off-chain URL, transfer safety is opt-in, approvals are blanket-or-nothing, and the spec itself acknowledges 'caller control over their risk' as the design choice. Each gap has produced its own EIP, its own marketplace policy fight, and its own stranded-asset headline. LSP8 — the LUKSO NFT standard built by Fabian Vogelsteller, who wrote ERC-20 — addresses these as substrate, not as layers."
 
 stats:
   - k: "Standard"
@@ -64,7 +64,7 @@ stats:
   - k: "ID type"
     v: "uint256"
   - k: "Modern alternative"
-    v: "LUKSO LSP-8"
+    v: "LUKSO LSP8"
     href: "/standards/lsp8-identifiable-digital-asset/"
   - k: "Canonical spec"
     v: "eips.ethereum.org / EIP-721"
@@ -90,7 +90,7 @@ limits:
       code: "tokenURI(tokenId) returns (string)"
       tags: ["one URI per token", "off-chain JSON", "no schema", "no integrity check", "no contract-readable typing"]
     to:
-      chip: "LSP·8 + LSP·4"
+      chip: "LSP8 + LSP4"
       code: "getDataForTokenId(tokenId, key) returns (bytes)"
       tags: ["typed per-key storage", "VerifiableURI hash-anchored", "contract-readable", "account-permissioned updates"]
 
@@ -102,7 +102,7 @@ limits:
       code: "setApprovalForAll(operator, true)"
       tags: ["collection-wide", "phishable", "lasts forever"]
     to:
-      chip: "LSP·8 + LSP·6"
+      chip: "LSP8 + LSP6"
       code: "authorizeOperator(op, tokenId, data)"
       tags: ["per-token", "account-gated", "instant revoke"]
 
@@ -115,7 +115,7 @@ limits:
       code: "onERC721Received(...) returns (bytes4)"
       tags: ["one asset type", "opt-in only"]
     to:
-      chip: "LSP·1"
+      chip: "LSP1"
       code: "universalReceiver(typeId, data)"
       tags: ["every transfer", "every asset type"]
 
@@ -128,7 +128,7 @@ limits:
       code: "uint256 tokenId"
       tags: ["one number", "needs side mappings"]
     to:
-      chip: "LSP·8"
+      chip: "LSP8"
       code: "bytes32 tokenId"
       tags: ["hash · serial · ref · number"]
 
@@ -140,40 +140,40 @@ limits:
       code: "safeTransferFrom(from, to, id) × N"
       tags: ["one tx per token", "no batching"]
     to:
-      chip: "LSP·8 + LSP·25"
+      chip: "LSP8 + LSP25"
       code: "batch ops + relay execution"
       tags: ["bundled", "gas-aware", "gasless-onboardable"]
 
 luksoRoutes:
-  - chip: "LSP·8"
+  - chip: "LSP8"
     label: "Identifiable Digital Asset"
-    summary: "NFTs with bytes32 tokenIds, per-token typed metadata, and the same receiver-aware transfer model as LSP-7. The LUKSO direct answer to ERC-721."
+    summary: "NFTs with bytes32 tokenIds, per-token typed metadata, and the same receiver-aware transfer model as LSP7. The LUKSO direct answer to ERC-721."
     href: "/standards/lsp8-identifiable-digital-asset/"
-  - chip: "LSP·4"
+  - chip: "LSP4"
     label: "Digital Asset Metadata"
     summary: "Typed metadata under ERC-725Y keys: name, symbol, description, icon, images, attributes, traits, royalty config — every field is a typed value at a typed key, readable from other contracts (not just from web3 clients) and updatable via account-permissioned setData calls. The VerifiableURI primitive lets a key point to off-chain media with an on-chain hash, so the chain enforces what the off-chain blob must be — no silent swap of the JPEG after sale. Per-token metadata uses the same model via getDataForTokenId(tokenId, key). Replaces the tokenURI string-dance with structured, typed, per-key storage downstream contracts can actually read and reason about."
     href: "/standards/lsp4-digital-asset-metadata/"
-  - chip: "LSP·1"
+  - chip: "LSP1"
     label: "Universal Receiver"
     summary: "One hook for every asset type and every transfer. The receiver problem ERC-721's safeTransferFrom only half-solved, generalised."
     href: "/standards/lsp1-universal-receiver/"
-  - chip: "LSP·6"
+  - chip: "LSP6"
     label: "Key Manager"
     summary: "Operator permissions are account-level, not collection-level. The fix for setApprovalForAll: scoped, named, revocable session keys instead of blanket grants."
     href: "/standards/lsp6-key-manager/"
-  - chip: "LSP·0"
+  - chip: "LSP0"
     label: "ERC-725 Account"
-    summary: "A smart-contract account that owns and operates NFTs natively — receives via LSP-1, holds typed metadata, authorizes through LSP-6, recovers through controllers."
+    summary: "A smart-contract account that owns and operates NFTs natively — receives via LSP1, holds typed metadata, authorizes through LSP6, recovers through controllers."
     href: "/standards/lsp0-erc725-account/"
-  - chip: "LSP·3"
+  - chip: "LSP3"
     label: "Profile Metadata"
     summary: "Profiles are first-class on the account: name, avatar, bio, links. NFTs gain a holder identity to display alongside, not just a hex address."
     href: "/standards/lsp3-profile-metadata/"
-  - chip: "LSP·7"
+  - chip: "LSP7"
     label: "Digital Asset"
-    summary: "The fungible companion to LSP-8 — same receiver model, same operator authorization shape. Multi-asset apps stop implementing four receiver interfaces."
+    summary: "The fungible companion to LSP8 — same receiver model, same operator authorization shape. Multi-asset apps stop implementing four receiver interfaces."
     href: "/standards/lsp7-digital-asset/"
-  - chip: "LSP·25"
+  - chip: "LSP25"
     label: "Execute Relay Call"
     summary: "Signed messages a third party can submit on-chain. Gasless mint, gasless transfer, gasless onboarding — without bundlers, paymasters, or a bolted-on mempool."
     href: "/standards/lsp25-execute-relay-call/"
@@ -199,11 +199,11 @@ compareRows:
     right: "bytes data on every transfer + force flag"
   - row: "interface ABI"
     left: "ERC-721 selectors — consumed by code that hardcodes them"
-    right: "distinct LSP-8 selectors — won't accidentally dispatch as ERC-721"
+    right: "distinct LSP8 selectors — won't accidentally dispatch as ERC-721"
 compareHref: "/standards/compare/erc721-lsp8/"
 
 useErc: "When the tokenId is a counter, the metadata is immutable (or already pinned with broad redundancy), and the contract is built to be consumed by code that hardcodes the ERC-721 ABI. The smaller surface is the feature — fewer bytes, simpler reasoning, no force flag or per-token data store to decide on."
-useLsp: "When the tokenId itself needs to carry meaning (hash, serial, encoded reference), per-token state mutates after mint, recipient logic needs to fire on every transfer through LSP-1 — not only on safeTransferFrom — or you want approval scoping at the account layer instead of collection-wide blanket grants."
+useLsp: "When the tokenId itself needs to carry meaning (hash, serial, encoded reference), per-token state mutates after mint, recipient logic needs to fire on every transfer through LSP1 — not only on safeTransferFrom — or you want approval scoping at the account layer instead of collection-wide blanket grants."
 
 aliases:
   - "ERC721"
@@ -228,18 +228,20 @@ faqs:
     a: "A non-fungible token is a unique, individually-owned, on-chain identifier — most commonly an ERC-721 tokenId on Ethereum or an EVM-compatible chain. The token itself carries little data: it's a uint256 with an ownerOf(...) mapping. Everything visual or semantic about the NFT (image, attributes, description) is typically referenced through tokenURI as off-chain JSON. This is why pinning, hosting, and metadata standards matter so much in practice."
   - q: "What's wrong with ERC-721?"
     a: "Five gaps. (1) tokenURI returns one string per token with no on-chain typing or integrity check — pinning failures kill rendering. (2) setApprovalForAll grants blanket collection-wide authority to operators, the primitive behind nearly every NFT phishing drain. (3) safeTransferFrom only checks IERC721Receiver, is opt-in, and is shipped alongside a non-safe transferFrom that strands tokens silently. (4) uint256 tokenIds are awkward for hashes or structured IDs. (5) One transfer = one transaction, which is what CryptoKitties exposed at launch and every airdrop has paid for since."
-  - q: "What is LSP-8?"
-    a: "LSP-8 is the LUKSO Identifiable Digital Asset standard — the LUKSO equivalent of ERC-721, designed by Fabian Vogelsteller (the author of ERC-20). It keeps ERC-721's ownership model and widens tokenId to bytes32, replaces tokenURI with a typed per-token ERC-725Y key/value store, and routes every transfer through the LSP-1 Universal Receiver. Paired with LSP-6 on the account side, operator authorization stops being a forever-promise to a marketplace."
+  - q: "What is LSP8?"
+    a: "LSP8 is the LUKSO Identifiable Digital Asset standard — the LUKSO equivalent of ERC-721, designed by Fabian Vogelsteller (the author of ERC-20). It keeps ERC-721's ownership model and widens tokenId to bytes32, replaces tokenURI with a typed per-token ERC-725Y key/value store, and routes every transfer through the LSP1 Universal Receiver. Paired with LSP6 on the account side, operator authorization stops being a forever-promise to a marketplace."
   - q: "What is ERC-721A, and does it fix anything?"
     a: "ERC-721A is Azuki's gas-optimized implementation of the ERC-721 standard — same external ABI, same selectors, batch-mint optimizations on the internal storage. It materially reduces gas for sequential mints of large collections (the original use case was Azuki's 10,000-piece drop). It does not change tokenURI, doesn't add transfer hooks, doesn't fix the approval model, and doesn't replace the standard. It's an implementation, not a new specification."
   - q: "What about NFT royalties?"
-    a: "ERC-721 itself does not define royalties — that was a deliberate scope-out. ERC-2981 added a royaltyInfo recommendation in 2020, but enforcement is marketplace-side and inconsistent. On the LUKSO side, LSP-8 likewise doesn't define royalties in its base contract; instead, the LSP-6 Key Manager and transfer-layer permissions give finer-grained policy control — royalty enforcement becomes a controller decision on the account, not a marketplace policy negotiation."
-  - q: "Can I migrate an ERC-721 collection to LSP-8?"
-    a: "Yes. The ownership model is the same, so migration is contract-level rather than user-level. The LUKSO docs publish an end-to-end guide for deploying an LSP-8 equivalent and bridging holders; the site's own walkthrough is at ercsolved.dev/build/migrate/erc721-to-lsp8/."
+    a: "ERC-721 itself does not define royalties — that was a deliberate scope-out. ERC-2981 added a royaltyInfo recommendation in 2020, but enforcement is marketplace-side and inconsistent. On the LUKSO side, LSP8 likewise doesn't define royalties in its base contract; instead, the LSP6 Key Manager and transfer-layer permissions give finer-grained policy control — royalty enforcement becomes a controller decision on the account, not a marketplace policy negotiation."
+  - q: "Can I migrate an ERC-721 collection to LSP8?"
+    a: "Yes. The ownership model is the same, so migration is contract-level rather than user-level. The LUKSO docs publish an end-to-end guide for deploying an LSP8 equivalent and bridging holders; the site's own walkthrough is at ercsolved.dev/build/migrate/erc721-to-lsp8/."
   - q: "What is tokenURI and how does it work in ERC-721?"
     a: "tokenURI(tokenId) is the optional ERC-721 function that returns a single string per token — typically an HTTPS URL or an ipfs:// CID — pointing to off-chain JSON describing the NFT. Marketplaces and wallets resolve it by fetching the URI, downloading the JSON, parsing it according to the de-facto OpenSea metadata schema (name, description, image, attributes, animation_url), then fetching the referenced image from yet another host. Nothing about this is enforced on-chain: the contract has no opinion on what the URI points to, what schema the JSON should follow, or whether the host is still up. ERC-721 mandates ERC-165 for interface detection but doesn't mandate the metadata extension at all — it's optional. The result is that 'an NFT' depends on infrastructure outside the contract for everything visual or semantic, which is the source of most NFT metadata problems."
   - q: "Why do NFT images disappear or show as broken?"
-    a: "Because the actual image isn't on-chain — the contract just stores a tokenURI string pointing to off-chain JSON, which in turn points to the image at another off-chain location. When any link in that chain fails, the NFT renders blank. Common causes: IPFS pinning subscriptions expire and no peer is keeping the CID alive; the backend server hosting the metadata API goes down or is decommissioned; the image hosting (Cloudflare, S3, the project's own server) returns 404 or is taken down; or the project shuts down and metadata stops being maintained. ERC-4906 added a MetadataUpdate event in 2022 so contracts can tell marketplaces 'refresh this token' — but it doesn't fix any of the underlying availability issues. The LSP-4 + VerifiableURI model on LUKSO addresses this by putting typed metadata on-chain under ERC-725Y storage and (for off-chain media) anchoring the hash on-chain so the chain enforces what the off-chain blob must be — a swap of the underlying file becomes detectable on-chain."
+    a: "Because the actual image isn't on-chain — the contract just stores a tokenURI string pointing to off-chain JSON, which in turn points to the image at another off-chain location. When any link in that chain fails, the NFT renders blank. Common causes: IPFS pinning subscriptions expire and no peer is keeping the CID alive; the backend server hosting the metadata API goes down or is decommissioned; the image hosting (Cloudflare, S3, the project's own server) returns 404 or is taken down; or the project shuts down and metadata stops being maintained. ERC-4906 added a MetadataUpdate event in 2022 so contracts can tell marketplaces 'refresh this token' — but it doesn't fix any of the underlying availability issues. The LSP4 + VerifiableURI model on LUKSO addresses this by putting typed metadata on-chain under ERC-725Y storage and (for off-chain media) anchoring the hash on-chain so the chain enforces what the off-chain blob must be — a swap of the underlying file becomes detectable on-chain."
+  - q: "Has any ERC-721 co-author publicly criticised the standard?"
+    a: "Yes. In a March 2020 Medium essay, Dieter Shirley — co-author of ERC-721 and then-CTO of Dapper Labs (the team that built CryptoKitties) — named three specific shortcomings of the standard he helped design: ERC-721 assumes only Ethereum addresses can own an NFT (asset-owning-asset composability needed the more complicated ERC-998 extension); features can't be added retroactively because deployed Ethereum contracts are immutable; and the central-ledger storage model makes per-asset rent accounting unfair (citing the live CryptoKitties contract: ~2M Kitties, 111MB of on-chain data, all in one mapping). The full verbatim quotes paired with their LUKSO LSP answers are in the 'Criticism from the source' section above (ercsolved.dev/erc-721/#author-criticism). The other three co-authors (William Entriken, Jacob Evans, Nastassia Sachs) don't have equivalent retrospective criticism on the record."
 
 timeline:
   - year: "Sept 2017"
@@ -259,10 +261,10 @@ timeline:
     text: "ERC-4906 adds the MetadataUpdate event so contracts can signal that off-chain tokenURI JSON has changed."
     href: "https://eips.ethereum.org/EIPS/eip-4906"
   - year: "2023"
-    text: "LUKSO mainnet launches with LSP-8 as the native NFT primitive — bytes32 IDs, per-token ERC-725Y metadata, LSP-1 receiver hooks, and LSP-6 operator scoping."
+    text: "LUKSO mainnet launches with LSP8 as the native NFT primitive — bytes32 IDs, per-token ERC-725Y metadata, LSP1 receiver hooks, and LSP6 operator scoping."
     href: "https://docs.lukso.tech/"
   - year: "2024–26"
-    text: "Marketplace royalty enforcement debates continue. Transfer-validator patterns and creator-token standards emerge as opt-in policy layers on top of ERC-721, while LSP-8 carries the same policy as substrate-level account permissions."
+    text: "Marketplace royalty enforcement debates continue. Transfer-validator patterns and creator-token standards emerge as opt-in policy layers on top of ERC-721, while LSP8 carries the same policy as substrate-level account permissions."
 
 glossary:
   - term: "NFT"
@@ -274,9 +276,9 @@ glossary:
   - term: "ERC-4906"
     def: "April 2022 EIP that added the MetadataUpdate(tokenId) event so contracts can signal to marketplaces that a token's metadata changed. Signal-only — doesn't carry the new state or specify which field changed."
   - term: "ERC-725Y"
-    def: "The typed key-value storage substrate underneath every LUKSO account and asset. bytes32 keys map to bytes values, with LSP-2 schemas defining how to interpret them. The 'on-chain database' LSP-4 metadata lives in."
+    def: "The typed key-value storage substrate underneath every LUKSO account and asset. bytes32 keys map to bytes values, with LSP2 schemas defining how to interpret them. The 'on-chain database' LSP4 metadata lives in."
   - term: "VerifiableURI"
-    def: "An LSP-4 metadata primitive that lets an ERC-725Y key point to off-chain media WITH an on-chain hash, so the chain enforces what the off-chain blob must be. A silent swap of the underlying file becomes detectable on-chain."
+    def: "An LSP4 metadata primitive that lets an ERC-725Y key point to off-chain media WITH an on-chain hash, so the chain enforces what the off-chain blob must be. A silent swap of the underlying file becomes detectable on-chain."
   - term: "data URI"
     def: "A URI scheme (data:image/svg+xml;base64,...) that encodes content directly in the URL. Used by on-chain NFT projects to ship the entire image inside tokenURI itself — eliminates the off-chain dependency at the cost of gas."
   - term: "IPFS"
@@ -305,17 +307,17 @@ primarySources:
     href: "https://github.com/fulldecent"
   - label: "CoinGecko Spotlight #3 — interview with William Entriken"
     href: "https://www.coingecko.com/learn/spotlight-3-william-entriken"
-  - label: "Dieter Shirley (ERC-721 co-author, Dapper Labs CTO) — 2020 Medium retrospective on ERC-721 ownership architecture; quoted inline above (TODO: replace href with verified Medium URL)"
-    href: "https://github.com/dete"
+  - label: "Dieter Shirley (ERC-721 co-author, Dapper Labs CTO) — \"Resource-Oriented Programming: A Better Model for Digital Ownership\" (Medium, 23 March 2020)"
+    href: "https://medium.com/dapperlabs/resource-oriented-programming-bee4d69c8f8e"
   - label: "ERC-998 Composable Non-Fungible Token Standard (the extension Shirley cited as the workaround for ERC-721's address-owner assumption)"
     href: "https://github.com/ethereum/EIPs/issues/998"
   - label: "ERC-2981 NFT Royalty Standard"
     href: "https://eips.ethereum.org/EIPS/eip-2981"
   - label: "ERC-4906 MetadataUpdate event"
     href: "https://eips.ethereum.org/EIPS/eip-4906"
-  - label: "LUKSO LSP-8 Identifiable Digital Asset docs"
+  - label: "LUKSO LSP8 Identifiable Digital Asset docs"
     href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
-  - label: "LUKSO ERC-721 → LSP-8 migration guide"
+  - label: "LUKSO ERC-721 → LSP8 migration guide"
     href: "https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/"
 
 mentions:
@@ -335,34 +337,34 @@ mentions:
     url: "https://eips.ethereum.org/EIPS/eip-165"
   - name: "ERC-721A (Azuki implementation)"
     url: "https://github.com/chiru-labs/ERC721A"
-  - name: "LUKSO LSP-8 Identifiable Digital Asset"
+  - name: "LUKSO LSP8 Identifiable Digital Asset"
     url: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
-  - name: "LUKSO LSP-4 Digital Asset Metadata"
+  - name: "LUKSO LSP4 Digital Asset Metadata"
     url: "https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/"
-  - name: "LUKSO LSP-5 Received Assets"
+  - name: "LUKSO LSP5 Received Assets"
     url: "https://docs.lukso.tech/standards/metadata/lsp5-received-assets/"
-  - name: "LUKSO LSP-1 Universal Receiver"
+  - name: "LUKSO LSP1 Universal Receiver"
     url: "https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/"
-  - name: "LUKSO LSP-6 Key Manager"
+  - name: "LUKSO LSP6 Key Manager"
     url: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
-  - name: "LUKSO LSP-14 Ownable 2-Step"
+  - name: "LUKSO LSP14 Ownable 2-Step"
     url: "https://docs.lukso.tech/standards/access-control/lsp14-ownable-2-step/"
-  - name: "LUKSO LSP-17 Contract Extension"
+  - name: "LUKSO LSP17 Contract Extension"
     url: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
-  - name: "LUKSO LSP-0 ERC725 Account"
+  - name: "LUKSO LSP0 ERC725 Account"
     url: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
 
 howToMigration:
-  name: "How to migrate an ERC-721 collection to LUKSO LSP-8"
-  description: "Three-step path from an existing ERC-721 contract to LSP-8 on LUKSO. The ownership model is the same; the work is contract-level rather than user-level."
+  name: "How to migrate an ERC-721 collection to LUKSO LSP8"
+  description: "Three-step path from an existing ERC-721 contract to LSP8 on LUKSO. The ownership model is the same; the work is contract-level rather than user-level."
   toolHref: "https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/"
   steps:
-    - name: "Deploy an LSP-8 contract on LUKSO"
-      text: "Use the LSP-8 reference implementation from the @lukso/lsp-smart-contracts package. Choose a tokenId encoding (cast uint256 from the source, content hash, structured serial), configure name and symbol via LSP-4 metadata keys, and decide the initial force-transfer policy."
+    - name: "Deploy an LSP8 contract on LUKSO"
+      text: "Use the LSP8 reference implementation from the @lukso/lsp-smart-contracts package. Choose a tokenId encoding (cast uint256 from the source, content hash, structured serial), configure name and symbol via LSP4 metadata keys, and decide the initial force-transfer policy."
     - name: "Snapshot existing ERC-721 holders and per-token state"
-      text: "Read ownerOf and tokenURI for every minted ID at a published block height. Publish the snapshot so holders can verify their allocation. Capture any per-token attributes you want preserved as LSP-4 token-id data on the new contract."
+      text: "Read ownerOf and tokenURI for every minted ID at a published block height. Publish the snapshot so holders can verify their allocation. Capture any per-token attributes you want preserved as LSP4 token-id data on the new contract."
     - name: "Bridge or mint the new collection on LUKSO"
-      text: "Either run a bridge that locks the source ERC-721 and mints LSP-8 on LUKSO, or do a one-time mint to the snapshot addresses and freeze further issuance on the ERC-721 side."
+      text: "Either run a bridge that locks the source ERC-721 and mints LSP8 on LUKSO, or do a one-time mint to the snapshot addresses and freeze further issuance on the ERC-721 side."
 
 related:
   - "problems/erc721-dynamic-metadata"
@@ -379,16 +381,36 @@ docs:
     href: "https://eips.ethereum.org/EIPS/eip-721"
   - label: "ethereum.org / ERC-721 docs"
     href: "https://ethereum.org/developers/docs/standards/tokens/erc-721/"
-  - label: "docs.lukso.tech / LSP-8 Identifiable Digital Asset"
+  - label: "docs.lukso.tech / LSP8 Identifiable Digital Asset"
     href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
-  - label: "docs.lukso.tech / migrate ERC-721 to LSP-8"
+  - label: "docs.lukso.tech / migrate ERC-721 to LSP8"
     href: "https://docs.lukso.tech/learn/migrate/migrate-erc721-to-lsp8/"
+
+authorCriticism:
+  authorName: "Dieter Shirley"
+  authorRole: "ERC-721 co-author; CTO, Dapper Labs (the team that built CryptoKitties)"
+  sourceLabel: "Medium, 23 March 2020"
+  sourceUrl: "https://medium.com/dapperlabs/resource-oriented-programming-bee4d69c8f8e"
+  intro: "Two years after EIP-721 was finalized, Dieter Shirley — one of the four co-authors and CTO of Dapper Labs, the team whose CryptoKitties contract was the standard's launch use case — published a retrospective naming three specific shortcomings of the ERC-721 architecture. The quotes below are verbatim from that essay. The LUKSO answers were designed into the LSP suite from the bottom up by Fabian Vogelsteller."
+  items:
+    - theme: "The ownership-model assumption"
+      quote: "ERC-721 defines an ownership model for NFTs that assumes that only Ethereum addresses can own an NFT. However, the idea of an asset itself owning other assets (like a CryptoKitty owning a nifty pair of sunglasses) is very interesting in some use cases, and required a new specification (ERC-998) to be created. ERC-998 is very powerful, but it's also much more complicated than ERC-721."
+      lsps: ["LSP0", "LSP8"]
+      solution: "On LUKSO, accounts ARE contracts. A Universal Profile (LSP0) can own LSP8 NFTs, other Universal Profiles, fungible LSP7 tokens, or any combination — and any of those owned assets can in turn own further assets, because the same account primitive composes recursively. The 'asset owning another asset' arrangement that required a separate, more complicated ERC-998 extension on Ethereum is the substrate's default behaviour on LUKSO, not an opt-in layer."
+    - theme: "The retroactive-upgrade impossibility"
+      quote: "Implementing it [ERC-998] properly is very difficult, and retroactively applying its features to existing ERC-721 assets is effectively impossible due to the immutable nature of Ethereum smart contracts."
+      lsps: ["LSP17", "LSP6", "LSP14"]
+      solution: "LSP17 Contract Extension is a first-class standard for adding behaviour to a contract account after deployment. LSP6 Key Manager is replaceable on a deployed Universal Profile, so the permission and authorisation layer can be upgraded without redeploying the assets it controls. LSP14 Ownable 2-Step gives ownership transitions and renunciation a defined lifecycle. The 'we deployed it, now it's frozen' problem becomes a designed-for upgrade path instead of an irreversible accident."
+    - theme: "The central-ledger storage model"
+      quote: "With the ledger model, it's hard to know who should pay this rent. For example, the CryptoKitties contract represents tens of thousands of players with almost two million Kitties and over 111MB of on-chain data. Ethereum provides no way of fairly charging rent to all those Kitty owners."
+      lsps: ["ERC-725Y", "LSP4", "LSP5"]
+      solution: "ERC-725Y is the typed key-value storage substrate every LUKSO account and asset is built on. LSP4 defines per-asset metadata under ERC-725Y on the asset itself; per-token data lives there too via getDataForTokenId. LSP5 keeps standardised records of received assets on the owner's account. Storage sits with whichever entity actually reads and pays for it — the asset, the per-token slot, or the owner — instead of all of it accumulating in one central per-contract mapping that nobody can fairly charge for."
 ---
 
 {/* ─── slot: lede (renders in the hero) ─────────────────────────────────── */}
 <Fragment slot="lede">
 
-ERC-721 is the standard that made Ethereum the home of the NFT — every CryptoPunk, every Bored Ape, every art drop, every PFP collection speaks the same nine-function interface that Dieter Shirley first drafted in September 2017 and that William Entriken led to final specification on 24 January 2018. That minimalism is exactly why so much built on top of it, and exactly why every team since has paid an integration tax for metadata that goes offline, approvals that drain entire collections, and safe-transfer hooks that the spec itself describes as a deliberate "caller-control" tradeoff. This page walks the history, the ABI, the limits people keep working around, and the LSP-8 standard the author of ERC-20 designed instead.
+ERC-721 is the standard that made Ethereum the home of the NFT — every CryptoPunk, every Bored Ape, every art drop, every PFP collection speaks the same nine-function interface that Dieter Shirley first drafted in September 2017 and that William Entriken led to final specification on 24 January 2018. That minimalism is exactly why so much built on top of it, and exactly why every team since has paid an integration tax for metadata that goes offline, approvals that drain entire collections, and safe-transfer hooks that the spec itself describes as a deliberate "caller-control" tradeoff. This page walks the history, the ABI, the limits people keep working around, and the LSP8 standard the author of ERC-20 designed instead.
 
 </Fragment>
 
@@ -411,17 +433,21 @@ That is the authors saying, in plain text, that the safety hook is opt-in by des
 
 ### What one of the authors said in retrospect
 
-Two years after EIP-721 was finalized, **Dieter Shirley** — one of the four co-authors and CTO of Dapper Labs (the team that built CryptoKitties, the standard's launch use case) — revisited the design in a 2020 Medium essay. Shirley's retrospective is the most concrete on-the-record author criticism of the standard's architecture. He named three specific limits:
+Two years after EIP-721 was finalized, **Dieter Shirley** — one of the four co-authors and CTO of Dapper Labs (the team that built CryptoKitties, the standard's launch use case) — revisited the design in [a March 2020 Medium essay titled "Resource-Oriented Programming: A Better Model for Digital Ownership"](https://medium.com/dapperlabs/resource-oriented-programming-bee4d69c8f8e). Shirley's retrospective is the most concrete on-the-record author criticism of the standard's architecture. Three direct quotes:
 
-> ERC-721 assumes an NFT can be owned only by an Ethereum address. More composable arrangements — such as one NFT owning another — therefore required the substantially more complicated [ERC-998](https://github.com/ethereum/EIPs/issues/998) extension.
+On the ownership-model assumption:
 
-> Those capabilities were extremely difficult to add retroactively to existing ERC-721 contracts because deployed Ethereum contracts are immutable.
+> ERC-721 defines an ownership model for NFTs that assumes that only Ethereum addresses can own an NFT. However, the idea of an asset itself owning other assets (like a CryptoKitty owning a nifty pair of sunglasses) is very interesting in some use cases, and required a new specification (ERC-998) to be created. ERC-998 is very powerful, but it's also much more complicated than ERC-721.
 
-> ERC-721's central-ledger model made matters such as assigning storage costs to individual asset owners awkward, compared with a model in which assets are stored directly in owners' accounts.
+On the retroactive-immutability problem:
 
-The three are paraphrases of the same underlying complaint: the ownership architecture assumes a flat address space, the contract is immutable so the model can't be revisited later, and the central per-contract ownership ledger is the wrong place to assign per-asset storage cost. EIP-721 itself characterises what it ships as "basic functionality" for tracking and transferring NFTs — Shirley's retrospective is closer to "the basic functionality succeeded; the surrounding architecture choices proved restrictive for composability, safety, storage accounting, and later extensibility."
+> Implementing it [ERC-998] properly is very difficult, and retroactively applying its features to existing ERC-721 assets is effectively impossible due to the immutable nature of Ethereum smart contracts.
 
-The other three co-authors (Entriken, Evans, Sachs) don't have an equivalent retrospective criticism on the record — so for them, the strongest "what the authors said" material remains the EIP-721 Rationale section itself, quoted above.
+On the central-ledger storage model (CryptoKitties as the concrete example):
+
+> With the ledger model, it's hard to know who should pay this rent. For example, the CryptoKitties contract represents tens of thousands of players with almost two million Kitties and over 111MB of on-chain data. Ethereum provides no way of fairly charging rent to all those Kitty owners.
+
+Three different framings of the same underlying complaint: the ownership architecture assumes a flat address space, the contract is immutable so the model can't be revisited later, and the central per-contract ownership ledger is the wrong place to assign per-asset storage cost. The other three co-authors (Entriken, Evans, Sachs) don't have an equivalent retrospective criticism on the record — so for them, the strongest "what the authors said" material remains the EIP-721 Rationale section itself, quoted above.
 
 </Fragment>
 
@@ -446,27 +472,27 @@ ERC-721's authors did exactly what a minimum-interface standard is supposed to d
 
 [**Fabian Vogelsteller**](https://github.com/frozeman) had already lived this once. He wrote [ERC-20](/erc-20/) in November 2015 and watched the same dynamic play out on the fungible side: a minimum interface that won the network effect, plus six years of layered EIPs trying to patch what the substrate didn't say. When he co-founded **LUKSO** with Marjorie Hernandez in 2017 — the same year Shirley drafted ERC-721 — the thesis was direct: design the *surrounding system* that a minimum interface deliberately can't specify.
 
-For non-fungible tokens, that surrounding system is **LSP-8**. The structural moves are small and deliberate:
+For non-fungible tokens, that surrounding system is **LSP8**. The structural moves are small and deliberate:
 
 - **`bytes32` tokenIds.** The integer case still works — cast a `uint256` and proceed. The new cases (content hashes, encoded serials, structured references) become first-class instead of side mappings. The ID becomes a typed value, not a counter pretending to be a name.
-- **Per-token ERC-725Y data**, via `getDataForTokenId(tokenId, key)`. The metadata stops being a URL behind a server you don't control. It's a typed key-value graph on-chain, dynamic updates are `setData` calls gated by [**LSP-6**](/standards/lsp6-key-manager/) account permissions, and off-chain media still works — with `VerifiableURI` when you want hash-anchored integrity.
-- **Receiver hooks via [LSP-1](/standards/lsp1-universal-receiver/) on every transfer**, not only on the opt-in `safeTransferFrom` variant. One hook, every asset type, declared policy.
-- **Operator authorization scoped per token** and gated through [LSP-6](/standards/lsp6-key-manager/) on the account side. The collection-wide `setApprovalForAll` pattern simply doesn't exist; an operator can be authorized for a specific tokenId, with the controller doing the authorization itself bound by named, revocable permissions.
+- **Per-token ERC-725Y data**, via `getDataForTokenId(tokenId, key)`. The metadata stops being a URL behind a server you don't control. It's a typed key-value graph on-chain, dynamic updates are `setData` calls gated by [**LSP6**](/standards/lsp6-key-manager/) account permissions, and off-chain media still works — with `VerifiableURI` when you want hash-anchored integrity.
+- **Receiver hooks via [LSP1](/standards/lsp1-universal-receiver/) on every transfer**, not only on the opt-in `safeTransferFrom` variant. One hook, every asset type, declared policy.
+- **Operator authorization scoped per token** and gated through [LSP6](/standards/lsp6-key-manager/) on the account side. The collection-wide `setApprovalForAll` pattern simply doesn't exist; an operator can be authorized for a specific tokenId, with the controller doing the authorization itself bound by named, revocable permissions.
 
-[LUKSO mainnet went live in 2023](https://docs.lukso.tech/). LSP-8 is an EVM contract — it doesn't require the LUKSO chain to run; it requires the LUKSO chain to *cohere*. On Ethereum, an LSP-8 contract works, but every marketplace and indexer around it still expects ERC-721's ABI. On LUKSO, the substrate matches the standard: [Universal Profiles](/standards/lsp0-erc725-account/) hold the assets, [LSP-6](/standards/lsp6-key-manager/) authorizes the operators, [LSP-1](/standards/lsp1-universal-receiver/) routes the transfer hooks, [LSP-4](/standards/lsp4-digital-asset-metadata/) holds the metadata, and a non-fungible token finally gets to live in a system designed for it instead of one bolted on.
+[LUKSO mainnet went live in 2023](https://docs.lukso.tech/). LSP8 is an EVM contract — it doesn't require the LUKSO chain to run; it requires the LUKSO chain to *cohere*. On Ethereum, an LSP8 contract works, but every marketplace and indexer around it still expects ERC-721's ABI. On LUKSO, the substrate matches the standard: [Universal Profiles](/standards/lsp0-erc725-account/) hold the assets, [LSP6](/standards/lsp6-key-manager/) authorizes the operators, [LSP1](/standards/lsp1-universal-receiver/) routes the transfer hooks, [LSP4](/standards/lsp4-digital-asset-metadata/) holds the metadata, and a non-fungible token finally gets to live in a system designed for it instead of one bolted on.
 
 ### What Shirley diagnosed in 2020, and the LSP that addresses it
 
-The three specific shortcomings Shirley named in his 2020 retrospective map directly onto the LUKSO account stack:
+The three specific shortcomings Shirley named in [his March 2020 retrospective](https://medium.com/dapperlabs/resource-oriented-programming-bee4d69c8f8e) map directly onto the LUKSO account stack:
 
-- **"ERC-721 assumes an NFT can be owned only by an Ethereum address" — composable arrangements required the ERC-998 extension.**
-  &nbsp;&nbsp;→ [**LSP-0 Universal Profile**](/standards/lsp0-erc725-account/) + [**LSP-8**](/standards/lsp8-identifiable-digital-asset/). On LUKSO, accounts *are* contracts. An NFT can be owned by a Universal Profile that itself owns other Universal Profiles or assets, and ownership relationships compose without a separate "composable" extension on top. The thing ERC-998 had to bolt on is the substrate's default.
+- **"ERC-721 defines an ownership model for NFTs that assumes that only Ethereum addresses can own an NFT" — composable arrangements required the ERC-998 extension, which is "much more complicated than ERC-721."**
+  &nbsp;&nbsp;→ [**LSP0 Universal Profile**](/standards/lsp0-erc725-account/) + [**LSP8**](/standards/lsp8-identifiable-digital-asset/). On LUKSO, accounts *are* contracts. An NFT can be owned by a Universal Profile that itself owns other Universal Profiles or assets, and ownership relationships compose without a separate "composable" extension on top. The thing ERC-998 had to bolt on is the substrate's default.
 
-- **"Capabilities were extremely difficult to add retroactively to existing ERC-721 contracts because deployed Ethereum contracts are immutable."**
-  &nbsp;&nbsp;→ [**LSP-17 Contract Extension**](/standards/lsp17-contract-extension/) + [**LSP-6 Key Manager**](/standards/lsp6-key-manager/) + [**LSP-14 Ownable 2-Step**](/standards/lsp14-ownable-2-step/). Extension is a first-class standard at the account layer; the Key Manager is replaceable; ownership transitions and renunciation have a defined lifecycle. The "we deployed it, now it's frozen" problem is treated as substrate, not as an irreversible accident.
+- **"Retroactively applying its features to existing ERC-721 assets is effectively impossible due to the immutable nature of Ethereum smart contracts."**
+  &nbsp;&nbsp;→ [**LSP17 Contract Extension**](/standards/lsp17-contract-extension/) + [**LSP6 Key Manager**](/standards/lsp6-key-manager/) + [**LSP14 Ownable 2-Step**](/standards/lsp14-ownable-2-step/). Extension is a first-class standard at the account layer; the Key Manager is replaceable; ownership transitions and renunciation have a defined lifecycle. The "we deployed it, now it's frozen" problem is treated as substrate, not as an irreversible accident.
 
-- **"ERC-721's central-ledger model made assigning storage costs to individual asset owners awkward."**
-  &nbsp;&nbsp;→ **ERC-725Y** (the typed key-value substrate) + [**LSP-4 Digital Asset Metadata**](/standards/lsp4-digital-asset-metadata/) + [**LSP-5 Received Assets**](/standards/lsp5-received-assets/). Per-token data lives under ERC-725Y on the asset itself; the owner side keeps standardised records of what it holds through LSP-5. Storage cost sits with whichever entity actually reads and pays for that storage, instead of all of it accumulating in one central per-contract mapping.
+- **"With the ledger model, it's hard to know who should pay this rent ... Ethereum provides no way of fairly charging rent to all those Kitty owners." (Shirley cites the live CryptoKitties contract: ~2M Kitties, 111MB of on-chain data, all in one central per-contract mapping.)**
+  &nbsp;&nbsp;→ **ERC-725Y** (the typed key-value substrate) + [**LSP4 Digital Asset Metadata**](/standards/lsp4-digital-asset-metadata/) + [**LSP5 Received Assets**](/standards/lsp5-received-assets/). Per-token data lives under ERC-725Y on the asset itself; the owner side keeps standardised records of what it holds through LSP5. Storage cost sits with whichever entity actually reads and pays for that storage, instead of all of it accumulating in one central per-contract mapping.
 
 The funnel for this site is not "switch to LUKSO." It is: when your ERC-721 design is breaking down at the seams the spec deliberately ignored — dead tokenURIs, drained collections from `setApprovalForAll` phishing, stranded NFTs in non-receiver-aware contracts, gas tax on every per-token transfer, the three Shirley named in retrospect — there is a standards suite that designed those concerns in from the bottom. Built, notably, by the same person who wrote the original ERC-20.
 

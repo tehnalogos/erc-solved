@@ -13,7 +13,7 @@ diff:
     code: "approve(spender, amount)"
     tags: ["unbounded", "phishable", "split-intent"]
   to:
-    chip: "LSP·7"
+    chip: "LSP7"
     code: "authorizeOperator(op, amount, data)"
     tags: ["scoped", "revocable", "LSP6 gated"]
 verdict: "LSP7 operators are still amount-scoped — that's honest, not magic. The shift is that on a Universal Profile, the controller calling authorizeOperator is itself bound by LSP6 permissions. Allowances stop being a forever-promise to a token contract and become a revocable, narrow grant on the account."
