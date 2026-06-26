@@ -111,6 +111,20 @@ const updatedStr = data.updated
   ? new Date(data.updated).toISOString().slice(0, 10)
   : null;
 
+// Pivot framing — the "what LUKSO built instead" section. Defaults are
+// honest for any ERC; entries can override (e.g. /erc-20/, where Vogelsteller
+// IS the author of the ERC, gets a more personal "the author's second act"
+// framing).
+const pivot = {
+  eyebrow: data.pivot?.eyebrow ?? 'the LUKSO alternative',
+  headline: data.pivot?.headline ?? 'LUKSO designed it differently.',
+  highlight: data.pivot?.highlight ?? 'LUKSO',
+  tocLabel: data.pivot?.tocLabel ?? 'LUKSO alternative',
+};
+const pivotParts = pivot.headline.split(
+  new RegExp(`(${pivot.highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`),
+);
+
 const toc = [
   { depth: 2, text: `What is ${data.title}?`,   slug: 'what-is-erc-20' },
   { depth: 2, text: 'At a glance',              slug: 'at-a-glance' },
@@ -122,7 +136,7 @@ const toc = [
     text: l.title.replace(/^The\s+/, '').replace(/\.$/, ''),
     slug: slugify(l.title),
   }))),
-  { depth: 2, text: 'The second act',           slug: 'vogelsteller-pivot' },
+  { depth: 2, text: pivot.tocLabel,             slug: 'vogelsteller-pivot' },
   ...(data.compareRows?.length
     ? [{ depth: 2, text: `${data.title} vs LSP-7`, slug: 'compare' }]
     : []),
@@ -141,6 +155,7 @@ const toc = [
   title={data.pageTitle}
   description={data.description}
   ogType="article"
+  ogImage={data.ogImage}
   jsonLd={jsonLd}
 >
   <article
@@ -371,8 +386,12 @@ const toc = [
 
     <section class="band" id="vogelsteller-pivot">
       <div class="band-inner">
-        <span class="eyebrow">the author's second act</span>
-        <h2>So {data.standardAuthors[0]} built <span class="pink">LUKSO</span>.<a class="anchor" href="#vogelsteller-pivot" aria-label="Link to this section">#</a></h2>
+        <span class="eyebrow">{pivot.eyebrow}</span>
+        <h2>{pivotParts.map((part: string) => (
+          part === pivot.highlight
+            ? <span class="pink">{part}</span>
+            : part
+        ))}<a class="anchor" href="#vogelsteller-pivot" aria-label="Link to this section">#</a></h2>
         <div class="prose">
           <slot name="vogelsteller" />
         </div>

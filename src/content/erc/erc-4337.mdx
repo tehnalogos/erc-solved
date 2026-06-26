@@ -1,0 +1,514 @@
+---
+id: "4337"
+title: "ERC-4337"
+headline: "What is ERC-4337?"
+pageTitle: "What is ERC-4337? Account Abstraction, Its Tradeoffs, and What Comes Next"
+description: "ERC-4337 is Ethereum's account-abstraction standard, implemented entirely above the protocol via a parallel mempool of UserOperations, a singleton EntryPoint contract, bundlers, and paymasters. Proposed in September 2021 by Vitalik Buterin and co-authors, with mainnet activation in March 2023, it lets contract accounts behave like first-class transactors — at the cost of an entire parallel infrastructure. This page walks the history, the moving parts, the tradeoffs acknowledged by the spec's own authors, and the LUKSO LSP-0 + LSP-6 + LSP-20 + LSP-25 stack Fabian Vogelsteller designed as a native alternative."
+tagline: "Account abstraction, layered above the protocol — and the cost of that choice."
+bootStrip: "standard · proposed sept 2021 · mainnet mar 2023 · ready"
+standardAuthors:
+  - "Vitalik Buterin"
+  - "Yoav Weiss"
+  - "Dror Tirosh"
+  - "Shahaf Nacson"
+  - "Alex Forshtat"
+  - "Kristof Gazso"
+  - "Tjaden Hess"
+proposed: "September 2021"
+eipNumber: "EIP-4337"
+termCode: "EIP-4337"
+updated: 2026-06-25
+
+definition: "ERC-4337 is the Ethereum standard for account abstraction implemented entirely above the protocol — without consensus-layer changes. Proposed on 29 September 2021 by Vitalik Buterin alongside Yoav Weiss, Dror Tirosh, Shahaf Nacson, Alex Forshtat, Kristof Gazso, and Tjaden Hess, it defines a UserOperation envelope, a singleton EntryPoint contract, a separate mempool, and a bundler-mediated execution path that lets contract accounts behave like first-class transactors. The reference EntryPoint v0.6 deployed to Ethereum mainnet on 1 March 2023; subsequent versions (v0.7 in 2024, v0.8 in May 2025 with native EIP-7702 support) refined the model."
+
+abi: |
+  // ─── EntryPoint (singleton) ──────────────────────────────────────────
+  function handleOps(PackedUserOperation[] calldata ops, address payable beneficiary) external;
+  function simulateHandleOp(PackedUserOperation calldata op, address target, bytes calldata targetCallData)
+    external returns (uint256 preOpGas, uint256 paid, uint256 validationData, uint256 targetSuccess, bytes memory targetResult);
+  function depositTo(address account)  external payable;
+  function withdrawTo(address payable withdrawAddress, uint256 amount) external;
+
+  // ─── IAccount (each smart account implements) ────────────────────────
+  function validateUserOp(
+    PackedUserOperation calldata userOp,
+    bytes32 userOpHash,
+    uint256 missingAccountFunds
+  ) external returns (uint256 validationData);
+
+  // ─── IPaymaster (optional, sponsors gas) ─────────────────────────────
+  function validatePaymasterUserOp(
+    PackedUserOperation calldata userOp,
+    bytes32 userOpHash,
+    uint256 maxCost
+  ) external returns (bytes memory context, uint256 validationData);
+
+  function postOp(
+    PostOpMode mode,
+    bytes calldata context,
+    uint256 actualGasCost,
+    uint256 actualUserOpFeePerGas
+  ) external;
+
+  // ─── PackedUserOperation (the envelope) ──────────────────────────────
+  struct PackedUserOperation {
+    address sender;
+    uint256 nonce;
+    bytes   initCode;
+    bytes   callData;
+    bytes32 accountGasLimits;     // verificationGasLimit + callGasLimit
+    uint256 preVerificationGas;
+    bytes32 gasFees;              // maxPriorityFeePerGas + maxFeePerGas
+    bytes   paymasterAndData;
+    bytes   signature;
+  }
+
+tldr: "ERC-4337 simulates account abstraction on top of an Ethereum protocol that was built around externally-owned accounts. It works — every UserOperation routes through a parallel mempool, a bundler, and the EntryPoint singleton — but the cost is an entire infrastructure layer (bundlers, paymasters, aggregators) sitting beside the normal transaction flow. The LUKSO LSP-0 + LSP-6 + LSP-20 + LSP-25 stack — co-designed by Fabian Vogelsteller, who wrote ERC-20 with Vitalik Buterin a decade earlier — takes the opposite approach: account abstraction is the substrate, not a layer."
+
+stats:
+  - k: "Standard"
+    v: "ERC-4337 / EIP-4337"
+  - k: "Proposed"
+    v: "29 September 2021"
+    href: "https://github.com/ethereum/EIPs/issues/4337"
+  - k: "Authors"
+    v: "Buterin · Weiss · Tirosh · Nacson · Forshtat · Gazso · Hess"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - k: "Mainnet activation"
+    v: "1 March 2023 (EntryPoint v0.6)"
+  - k: "Current EntryPoint"
+    v: "v0.8 (May 2025, native EIP-7702 support)"
+    href: "https://erc4337.substack.com/p/entrypoint-v08-released"
+  - k: "Required components"
+    v: "EntryPoint + UserOperation + bundler (+ paymaster)"
+  - k: "Modern alternative"
+    v: "LUKSO LSP-0 + LSP-6 + LSP-20 + LSP-25"
+    href: "/standards/lsp0-erc725-account/"
+  - k: "Canonical spec"
+    v: "eips.ethereum.org / EIP-4337"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+
+interfaceDiagram:
+  - group: "entry"
+    items: ["handleOps", "simulateHandleOp", "depositTo", "withdrawTo"]
+  - group: "account"
+    items: ["validateUserOp", "executeUserOp"]
+  - group: "paymaster"
+    items: ["validatePaymasterUserOp", "postOp"]
+  - group: "userop"
+    items: ["sender", "nonce", "initCode", "callData", "accountGasLimits", "signature"]
+
+limits:
+  - title: "The parallel mempool."
+    summary: "UserOperations are not transactions. They live in a separate alt-mempool, get packed by bundlers, and route through the singleton EntryPoint before reaching the account. Most product teams don't want to operate or rent any of that, and the bundler position carries censorship, reordering, and MEV-extraction risk that the L1 mempool's broader participant set doesn't share. The bundler tax is real: every UserOp pays for the bundler's submission cost on top of the gas it consumes."
+    workarounds: ["Safe + relayer", "custodial backends", "EIP-2771 forwarders", "EIP-7702 delegation (Pectra 2025)"]
+    href: "/problems/erc4337-bundler-tax/"
+    from:
+      chip: "ERC-4337"
+      code: "handleOps(UserOperation[], beneficiary)"
+      tags: ["separate mempool", "bundler tax", "centralization risk"]
+    to:
+      chip: "LSP·0 + LSP·25"
+      code: "executeRelayCall(sig, nonce, validity, payload)"
+      tags: ["account is the entrypoint", "no bundler", "no parallel mempool"]
+
+  - title: "Worse trace and explorer surface."
+    summary: "Block explorers show handleOps, not the user's actual function call. Tracing routes through EntryPoint before reaching the account, and decoding the UserOperation envelope requires explorer support that every chain has to bolt on. Debugging happens on a separate plane from the normal transaction flow — the gas accounting, the validation errors, and the call trace all sit one indirection level removed from the work the user wanted done."
+    workarounds: ["userop.org explorers", "Tenderly UserOp decoders", "per-bundler dashboards"]
+    from:
+      chip: "ERC-4337"
+      code: "handleOps → EntryPoint → account → target"
+      tags: ["extra hops", "non-standard decode"]
+    to:
+      chip: "LSP·0"
+      code: "controller → account → target"
+      tags: ["direct call", "native trace"]
+
+  - title: "Per-account validator modules, no shared permission vocabulary."
+    summary: "ERC-4337 deliberately keeps the spec small: validateUserOp is one function each account implements however it wants. The cost is that 'smart accounts' don't share a permission vocabulary — each implementation (Safe, Kernel, Biconomy, Alchemy LightAccount, Soul Wallet, etc.) invents its own validator shape. Migration between account implementations is non-trivial; permission audits are per-account, not per-standard; and tooling has to special-case each wallet."
+    workarounds: ["ERC-7579 modular accounts (under development)", "wallet-specific SDKs"]
+    from:
+      chip: "ERC-4337"
+      code: "validateUserOp() — per-account validator"
+      tags: ["non-standard", "wallet-specific"]
+    to:
+      chip: "LSP·6"
+      code: "Key Manager (standardized permission bitfield)"
+      tags: ["AllowedCalls", "AllowedERC725YDataKeys", "uniform"]
+
+  - title: "Paymaster trust as a separate failure surface."
+    summary: "Gas sponsorship requires a paymaster contract that the user and the bundler must both trust. Paymasters have their own ETH deposit at the EntryPoint, their own validation function (validatePaymasterUserOp), their own postOp accounting, and their own DoS attack surface. Wallets ship per-paymaster integrations, and a single bad paymaster can poison a bundler's queue. The two-step (validate + postOp) shape adds a second failure point on every sponsored UserOp."
+    workarounds: ["allowlisted paymaster relationships", "paymaster reputation services", "bundler-side filtering"]
+    from:
+      chip: "ERC-4337"
+      code: "Paymaster.validatePaymasterUserOp + postOp"
+      tags: ["separate contract", "two-step trust"]
+    to:
+      chip: "LSP·25"
+      code: "account.executeRelayCall(...)"
+      tags: ["one function on the account", "no paymaster contract"]
+
+  - title: "Account abstraction sits above EVM, not in it."
+    summary: "The whole architecture exists because Ethereum's protocol couldn't change. Vitalik's own 2021 Medium post on Infinitism framed ERC-4337 as 'account abstraction *without* Ethereum protocol changes' — the title itself is a candid acknowledgement of the design constraint. EIP-7702 (Pectra, May 2025), co-authored by Vitalik, is the eventual patch: its Motivation section cites that existing EOAs can't migrate to ERC-4337 smart accounts without losing address history, ENS, reputation, and airdrop eligibility. The two standards are now framed as complementary — but the existence of EIP-7702 is the spec's own authors acknowledging that account-abstraction primitives belong closer to the substrate than a 2021 alt-mempool design could put them."
+    workarounds: ["EIP-7702 EOA delegation (Pectra, May 2025)", "EntryPoint v0.8 with 7702 integration"]
+    from:
+      chip: "ERC-4337"
+      code: "AA layered over EOA-anchored protocol"
+      tags: ["no-fork workaround", "layered"]
+    to:
+      chip: "LSP·0"
+      code: "smart contract account as the substrate"
+      tags: ["native", "no parallel infrastructure"]
+
+luksoRoutes:
+  - chip: "LSP·0"
+    label: "ERC-725 Account"
+    summary: "A smart-contract account that IS the call entry point — owns assets, executes calls, holds typed key/value storage. What an 'account' is on LUKSO."
+    href: "/standards/lsp0-erc725-account/"
+  - chip: "LSP·6"
+    label: "Key Manager"
+    summary: "Permissions are an account property with a standardized vocabulary — AllowedCalls, AllowedStandards, AllowedERC725YDataKeys, value caps, instant revocation. The missing piece in ERC-4337's per-account validator world."
+    href: "/standards/lsp6-key-manager/"
+  - chip: "LSP·20"
+    label: "Call Verification"
+    summary: "Inline call verification at the account contract layer. What validateUserOp does for ERC-4337, but on the normal call path instead of through EntryPoint."
+    href: "/standards/lsp20-call-verification/"
+  - chip: "LSP·25"
+    label: "Execute Relay Call"
+    summary: "Sponsored execution as a function on the account itself. Signed messages a third party can submit on-chain — no bundler, no paymaster contract, no parallel mempool."
+    href: "/standards/lsp25-execute-relay-call/"
+  - chip: "LSP·14"
+    label: "Ownable 2-Step"
+    summary: "Two-step ownership transfer (nominate, then accept) plus delayed renunciation. The lifecycle Pectra and ERC-4337 leave to each wallet implementation, here as a shared standard."
+    href: "/standards/lsp14-ownable-2-step/"
+  - chip: "LSP·11"
+    label: "Basic Social Recovery"
+    summary: "Standardised guardian-based account recovery with configurable voting thresholds. Authoritative because there's no residual EOA key above it to override the recovered configuration."
+    href: "https://docs.lukso.tech/standards/access-control/lsp11-basic-social-recovery/"
+  - chip: "LSP·1"
+    label: "Universal Receiver"
+    summary: "One hook for every asset type and every transfer. Accounts react to incoming value through a single typed entry point — the inbox Pectra and ERC-4337 don't define."
+    href: "/standards/lsp1-universal-receiver/"
+  - chip: "LSP·17"
+    label: "Contract Extension"
+    summary: "Standardised mechanism for extending account behaviour after deployment — without the storage-collision risks EIP-7702 warns about when switching delegate implementations."
+    href: "/standards/lsp17-contract-extension/"
+  - chip: "LSP·3"
+    label: "Profile Metadata"
+    summary: "Accounts have an identity, not just an address — name, avatar, bio, links, stored on the account itself under typed ERC-725Y keys (LSP-2 schemas)."
+    href: "/standards/lsp3-profile-metadata/"
+
+compareRows:
+  - row: "transaction flow"
+    left: "user → UserOp pool → bundler → EntryPoint → account"
+    right: "user (controller) → account contract"
+  - row: "permission layer"
+    left: "validator module (per-account, non-standard)"
+    right: "LSP-6 Key Manager (standardized)"
+  - row: "gas sponsorship"
+    left: "paymaster (separate contract)"
+    right: "LSP-25 executeRelayCall (on the account)"
+  - row: "signature verification"
+    left: "validateUserOp on the account"
+    right: "LSP-20 lsp20VerifyCall inline"
+  - row: "trace / explorer"
+    left: "handleOps + EntryPoint hop"
+    right: "direct call into the account contract"
+compareHref: "/standards/compare/erc4337-lsp-stack/"
+
+useErc: "When you need account abstraction layered onto a chain whose native transaction model is EOA-anchored, with pluggable per-account validators and a separate aggregation/sponsorship plane decoupled from the account contract itself. The strength is decoupling: validators are swappable, mixable per UserOp, and the EntryPoint is the shared coordination plane."
+useLsp: "When you want the account contract to be the call entry point — no EntryPoint, no UserOperation envelope, no bundler. msg.sender at downstream targets is the account; LSP-6 vocabulary expresses permissions in one standard; LSP-25 makes sponsored execution a function on the account contract itself."
+
+aliases:
+  - "ERC4337"
+  - "EIP-4337"
+  - "account abstraction"
+  - "Ethereum account abstraction"
+  - "AA standard"
+  - "UserOperation"
+  - "smart account standard"
+
+faqs:
+  - q: "What does ERC-4337 stand for?"
+    a: "ERC stands for Ethereum Request for Comments. ERC-4337 is the 4337th proposal in that series, titled 'Account Abstraction Using Alt Mempool'. It specifies how contract accounts can behave like first-class transactors on Ethereum without any consensus-layer changes — via a parallel mempool of UserOperation objects, a singleton EntryPoint contract, and bundlers that pack UserOperations into ordinary transactions."
+  - q: "Who created ERC-4337?"
+    a: "Vitalik Buterin proposed ERC-4337 on 29 September 2021 with six co-authors: Yoav Weiss (Ethereum Foundation, account-abstraction lead), Dror Tirosh, Shahaf Nacson, Alex Forshtat, Kristof Gazso, and Tjaden Hess. Vitalik also wrote the original Medium post explaining the design philosophy ('Account Abstraction Without Ethereum Protocol Changes'), making clear that the alt-mempool architecture was chosen specifically to avoid requiring a hard fork."
+  - q: "When was ERC-4337 deployed on mainnet?"
+    a: "The reference EntryPoint v0.6 deployed to Ethereum mainnet on 1 March 2023. EntryPoint v0.7 followed in 2024 with improved paymaster and aggregator interfaces. EntryPoint v0.8 deployed in May 2025 alongside the Pectra hard fork, adding native support for EIP-7702 delegations."
+  - q: "What is account abstraction?"
+    a: "Account abstraction lets accounts supply their own validation logic via smart-contract code, instead of every account being a fixed EOA (externally owned account) controlled by a single private key. With AA, a wallet can require a multisig signature, accept a passkey, allow social recovery, enforce per-session spending limits, sponsor gas in any token, batch many actions into one transaction — without changing the underlying protocol. ERC-4337 implements this above the protocol; EIP-7702 added a complementary delegation primitive at the protocol layer in 2025."
+  - q: "What is a UserOperation?"
+    a: "A UserOperation is the ERC-4337 envelope that wraps everything a smart account wants to do in a single signed package: the sender account, nonce, calldata, gas limits, optional initCode (to deploy the account on first use), optional paymasterAndData (for gas sponsorship), and a signature. UserOperations live in a separate mempool from normal transactions and are eventually packed by a bundler into a call to EntryPoint.handleOps()."
+  - q: "What is a bundler in ERC-4337?"
+    a: "A bundler is an off-chain actor that watches the UserOperation mempool, validates UserOps (running validateUserOp against the destination account and paymaster), packs valid ones into a single transaction calling EntryPoint.handleOps(), and submits it on-chain. Bundlers earn fees from each UserOp. The position is privileged — bundlers can censor, reorder, or extract value from the UserOps they see — which is the centralization concern the spec's own maintainers have flagged in public talks."
+  - q: "What is a paymaster?"
+    a: "A paymaster is an optional ERC-4337 contract that sponsors gas for a UserOperation. The user signs a UserOp that references a paymaster; the bundler asks the paymaster (via validatePaymasterUserOp) whether it's willing to cover the gas; if yes, the paymaster pays from its ETH deposit at EntryPoint, and runs postOp afterwards to do any per-user accounting (e.g. charging the user in an ERC-20). Paymaster trust is a separate failure surface — wallets ship per-paymaster integrations."
+  - q: "What's the difference between ERC-4337 and EIP-7702?"
+    a: "ERC-4337 deploys a separate smart-contract account that holds funds and processes UserOperations through bundlers and an EntryPoint. EIP-7702 (Pectra, May 2025) lets an existing EOA delegate execution to contract code in a single transaction, without redeploying. The two are framed as complementary: EIP-7702 lets EOAs gain ERC-4337's UX (gas sponsorship, batching, session keys) without losing their address, history, ENS, or reputation. The catch is that an EIP-7702 EOA still has its original secp256k1 key — an attacker who steals that key can sign another 7702 authorization and reset the delegation, which is why EIP-7851 (still a draft as of mid-2026) was proposed to permanently revoke residual ECDSA authority. A pure contract account (ERC-4337 standalone, or a LUKSO Universal Profile) doesn't have that residual root."
+  - q: "Did Pectra fix ERC-4337's limitations?"
+    a: "Pectra (May 2025) ships EIP-7702 — EOAs can now delegate to contract code at the protocol level, which closes the 'existing addresses can't become smart accounts' gap and lets EOAs use ERC-4337's bundler and paymaster infrastructure without redeploying. That's real progress. But the layered structure remains: validator modules are still per-account (no shared permission vocabulary), the bundler/EntryPoint hop is still there for sponsored execution, and a 7702 EOA retains its original ECDSA key (a compromised key can override any recovery). EIP-7851 aims to revoke the residual ECDSA authority but is still a draft. The LUKSO LSP stack starts from a contract account with no residual root, with permissions (LSP-6), receiving hooks (LSP-1), social recovery (LSP-11), ownership transitions (LSP-14), and relayed execution (LSP-25) standardised across the ecosystem rather than added wallet-by-wallet."
+  - q: "Is ERC-4337 the same as a smart wallet?"
+    a: "No. ERC-4337 is a standard that smart wallets can implement. Smart wallets predate ERC-4337 (Gnosis Safe, for instance, was deployed in 2018) and many still operate outside the 4337 stack via direct contract calls or relayers. ERC-4337 standardizes one specific architecture for smart-wallet execution: UserOperation envelope, alt mempool, bundler, EntryPoint, paymaster. A Universal Profile on LUKSO is a smart wallet that does not use the 4337 stack."
+  - q: "What is a Universal Profile, and how does it compare to ERC-4337?"
+    a: "A Universal Profile is a LUKSO smart-contract account composed from LSP-0 (the account itself, an ERC-725 contract), LSP-6 (Key Manager — standardized permissions), LSP-20 (inline call verification), and LSP-25 (executeRelayCall — sponsored execution as a function on the account). Compared to ERC-4337, the architecture is fused rather than layered: there is no EntryPoint, no UserOperation envelope, no bundler, no paymaster contract. The controller signs, a relayer (if any) submits, the account validates inline via LSP-6 permissions, and the call executes. See the full comparison at ercsolved.dev/standards/compare/erc4337-lsp-stack/."
+
+timeline:
+  - year: "Nov 2015"
+    text: "Vitalik Buterin and Fabian Vogelsteller co-author ERC-20 — the moment the two paths first crossed."
+    href: "https://eips.ethereum.org/EIPS/eip-20"
+  - year: "2017"
+    text: "Vogelsteller proposes ERC-725 (smart-contract identity) and co-founds LUKSO with Marjorie Hernandez."
+    href: "https://eips.ethereum.org/EIPS/eip-725"
+  - year: "2017–20"
+    text: "EIP-86, EIP-2938, EIP-3074 explore protocol-level account-abstraction approaches. None reach broad consensus; each requires consensus-layer changes."
+  - year: "Nov 2018"
+    text: "Tabookey (Yoav Weiss, Dror Tirosh, Alex Forshtat) publish ERC-1613 (Gas Station Network v1) — the first standardised meta-transaction proposal."
+    href: "https://eips.ethereum.org/EIPS/eip-1613"
+  - year: "Aug 2020"
+    text: "ERC-2771 (Secure Protocol for Native Meta Transactions) finalised by an 11-author group including the Tabookey team and Fabian Vogelsteller — trusted-forwarder meta transactions become the standard."
+    href: "https://eips.ethereum.org/EIPS/eip-2771"
+  - year: "Sept 2021"
+    text: "Vitalik Buterin proposes ERC-4337 with the Tabookey core team (Weiss, Tirosh, Forshtat) plus Nacson, Gazso, Hess — explicitly framed as 'account abstraction without Ethereum protocol changes'. The meta-transaction lineage absorbs the account-abstraction ambition."
+    href: "https://github.com/ethereum/EIPs/issues/4337"
+  - year: "Mar 2023"
+    text: "ERC-4337 EntryPoint v0.6 deploys to Ethereum mainnet after audits by OpenZeppelin and Certora."
+  - year: "2023"
+    text: "LUKSO mainnet launches with LSP-0 + LSP-6 + LSP-20 + LSP-25 as the native account stack — plus LSP-1 receiver hooks, LSP-3 identity, LSP-11 social recovery, LSP-14 ownership lifecycle, LSP-17 extensions. A coherent system, not a patch stack."
+    href: "https://docs.lukso.tech/"
+  - year: "2024"
+    text: "EntryPoint v0.7 ships with improved paymaster and aggregator interfaces. At Devcon SEA in November, Yoav Weiss outlines a roadmap toward 'modular native AA approach for L1 and L2' — the spec's own lead acknowledging the layered model's limits."
+    href: "https://etherspot.io/blog/all-about-abstraction-devcon-2024-highlights-smart-contract-revolution-yoav-weiss-on-aa-future-and-aa-developer-survey/"
+  - year: "May 2025"
+    text: "Pectra hard fork lands EIP-7702 (co-authored by Vitalik): EOAs gain protocol-level ability to delegate execution to contract code. EntryPoint v0.8 deploys alongside, with native EIP-7702 integration. The residual ECDSA root key remains."
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - year: "2025 →"
+    text: "EIP-7851 (proposed) aims to let a 7702-delegated EOA permanently disable its residual ECDSA authority — still a draft as of mid-2026. The Ethereum account model continues evolving via layered patches; LUKSO continues to ship account abstraction as a coherent substrate-level system."
+    href: "https://eips.ethereum.org/EIPS/eip-7851"
+
+glossary:
+  - term: "Account abstraction"
+    def: "The general idea of letting accounts supply their own validation logic via smart contract code, instead of fixing the validation rules at the protocol layer. ERC-4337 implements it above the protocol; EIP-7702 added a protocol-level primitive in 2025."
+  - term: "EOA"
+    def: "Externally Owned Account. An Ethereum address controlled by a single keypair. Until EIP-7702, EOAs had no contract code and no programmable validation."
+  - term: "UserOperation"
+    def: "The ERC-4337 envelope wrapping a smart-account intent (sender, nonce, calldata, gas, signature, optional initCode, optional paymaster data). UserOps live in a separate mempool and are bundled into normal transactions."
+  - term: "Bundler"
+    def: "An off-chain actor that picks valid UserOperations from the alt-mempool, packs them into a call to EntryPoint.handleOps(), and submits the resulting transaction on-chain. Bundlers earn fees and carry centralization risk."
+  - term: "EntryPoint"
+    def: "The singleton ERC-4337 contract that receives bundled UserOperations, runs validation, calls into accounts and paymasters, and handles gas accounting. Versions: v0.6 (Mar 2023), v0.7 (2024), v0.8 (May 2025)."
+  - term: "Paymaster"
+    def: "An optional ERC-4337 contract that pays gas on behalf of users. Has its own ETH deposit at EntryPoint, its own validation function, and its own postOp accounting hook."
+  - term: "Validator"
+    def: "The function on a smart-account contract (validateUserOp) that decides whether a UserOperation is authorized. Each ERC-4337 account implements this however it wants — no shared permission vocabulary."
+  - term: "Aggregator"
+    def: "An ERC-4337 component that can verify a batch of signatures as one (e.g., BLS aggregation), reducing per-UserOp signature-verification cost. Optional, less widely deployed than the rest of the stack."
+  - term: "Smart account"
+    def: "A contract that holds user funds and executes user-authorized actions. Predates ERC-4337 (e.g., Gnosis Safe, 2018) and can be implemented inside or outside the 4337 architecture."
+  - term: "EIP-7702"
+    def: "Pectra-era (May 2025) protocol upgrade that lets an EOA delegate execution to contract code for a transaction. Complementary to ERC-4337 — lets EOAs use the 4337 ecosystem without redeploying."
+
+primarySources:
+  - label: "Original GitHub issue #4337 (Vitalik Buterin, 29 Sept 2021)"
+    href: "https://github.com/ethereum/EIPs/issues/4337"
+  - label: "EIP-4337 finalized specification"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "Vitalik Buterin on Medium: \"ERC-4337: Account Abstraction Without Ethereum Protocol Changes\""
+    href: "https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a"
+  - label: "ERC-1613 (Gas Station Network v1, Tabookey, Nov 2018) — meta-transaction lineage"
+    href: "https://eips.ethereum.org/EIPS/eip-1613"
+  - label: "ERC-2771 (Secure Protocol for Native Meta Transactions, Aug 2020, 11 authors incl. Fabian Vogelsteller)"
+    href: "https://eips.ethereum.org/EIPS/eip-2771"
+  - label: "EntryPoint v0.8 release notes"
+    href: "https://erc4337.substack.com/p/entrypoint-v08-released"
+  - label: "eth-infinitism/account-abstraction reference implementation"
+    href: "https://github.com/eth-infinitism/account-abstraction"
+  - label: "EIP-7702 specification (Pectra, May 2025)"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "EIP-7851 (draft) — Code-Controlled EOA Delegation / residual ECDSA revocation"
+    href: "https://eips.ethereum.org/EIPS/eip-7851"
+  - label: "Yoav Weiss at Devcon SEA, Nov 2024 — modular native AA roadmap"
+    href: "https://etherspot.io/blog/all-about-abstraction-devcon-2024-highlights-smart-contract-revolution-yoav-weiss-on-aa-future-and-aa-developer-survey/"
+  - label: "LUKSO LSP-0 ERC-725 Account docs"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "LUKSO LSP-6 Key Manager docs"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "LUKSO LSP-11 Basic Social Recovery docs"
+    href: "https://docs.lukso.tech/standards/access-control/lsp11-basic-social-recovery/"
+  - label: "LUKSO LSP-25 Execute Relay Call docs"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+
+mentions:
+  - name: "EIP-86 (Buterin, predecessor AA proposal)"
+    url: "https://github.com/ethereum/EIPs/issues/86"
+  - name: "EIP-2938 (account abstraction, predecessor)"
+    url: "https://eips.ethereum.org/EIPS/eip-2938"
+  - name: "EIP-3074 (AUTH/AUTHCALL, predecessor)"
+    url: "https://eips.ethereum.org/EIPS/eip-3074"
+  - name: "ERC-1613 (Gas Station Network v1, meta-tx lineage)"
+    url: "https://eips.ethereum.org/EIPS/eip-1613"
+  - name: "ERC-2771 (trusted-forwarder meta transactions)"
+    url: "https://eips.ethereum.org/EIPS/eip-2771"
+  - name: "EIP-7702 (EOA delegation, Pectra 2025)"
+    url: "https://eips.ethereum.org/EIPS/eip-7702"
+  - name: "EIP-7851 (draft) — Code-Controlled EOA Delegation / residual ECDSA revocation"
+    url: "https://eips.ethereum.org/EIPS/eip-7851"
+  - name: "EIP-7562 (AA Validation Scope Rules)"
+    url: "https://eips.ethereum.org/EIPS/eip-7562"
+  - name: "ERC-7579 (modular account standard)"
+    url: "https://eips.ethereum.org/EIPS/eip-7579"
+  - name: "ERC-6900 (modular account standard)"
+    url: "https://eips.ethereum.org/EIPS/eip-6900"
+  - name: "Gnosis Safe (pre-4337 smart account)"
+    url: "https://safe.global/"
+  - name: "LUKSO LSP-0 ERC-725 Account"
+    url: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - name: "LUKSO LSP-1 Universal Receiver"
+    url: "https://docs.lukso.tech/standards/accounts/lsp1-universal-receiver/"
+  - name: "LUKSO LSP-3 Profile Metadata"
+    url: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
+  - name: "LUKSO LSP-6 Key Manager"
+    url: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - name: "LUKSO LSP-11 Basic Social Recovery"
+    url: "https://docs.lukso.tech/standards/access-control/lsp11-basic-social-recovery/"
+  - name: "LUKSO LSP-14 Ownable 2-Step"
+    url: "https://docs.lukso.tech/standards/access-control/lsp14-ownable-2-step/"
+  - name: "LUKSO LSP-17 Contract Extension"
+    url: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
+  - name: "LUKSO LSP-20 Call Verification"
+    url: "https://docs.lukso.tech/standards/accounts/lsp20-call-verification/"
+  - name: "LUKSO LSP-25 Execute Relay Call"
+    url: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - name: "LUKSO LSP-7 Digital Asset"
+    url: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+  - name: "LUKSO LSP-8 Identifiable Digital Asset"
+    url: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+
+related:
+  - "problems/erc4337-bundler-tax"
+  - "problems/wallet-permissions"
+  - "problems/gasless-onboarding"
+  - "standards/lsp0-erc725-account"
+  - "standards/lsp6-key-manager"
+  - "standards/lsp20-call-verification"
+  - "standards/lsp25-execute-relay-call"
+  - "standards/compare/erc4337-lsp-stack"
+  - "erc/erc-20"
+  - "erc/erc-721"
+
+docs:
+  - label: "eips.ethereum.org / EIP-4337"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "docs.lukso.tech / LSP-0 ERC-725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "docs.lukso.tech / LSP-6 Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "docs.lukso.tech / LSP-25 Execute Relay Call"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+---
+
+{/* ─── slot: lede (renders in the hero) ─────────────────────────────────── */}
+<Fragment slot="lede">
+
+ERC-4337 is the standard that gave Ethereum *account abstraction without changing the protocol* — a phrase taken directly from the title of the lead author's own 2021 introduction post. Smart-contract accounts get to behave like first-class transactors via a parallel mempool of UserOperations, a singleton EntryPoint contract, bundlers, and paymasters; the whole machinery sits on top of an Ethereum protocol that was built around externally-owned accounts. The standard works, it's mainnet-live since March 2023, and its own authors have spent the years since walking it toward the protocol layer. This page walks the history, the moving parts, the tradeoffs the spec's own authors have acknowledged, and the LUKSO LSP stack the author of ERC-20 designed as a substrate-level alternative.
+
+</Fragment>
+
+{/* ─── slot: origin ──────────────────────────────────────────────────── */}
+<Fragment slot="origin">
+
+Account abstraction was on the table for years before ERC-4337. [**EIP-86**](https://github.com/ethereum/EIPs/issues/86) (Vitalik Buterin, 2017) proposed protocol-level AA via a special precompile. [**EIP-2938**](https://eips.ethereum.org/EIPS/eip-2938) (2020) re-attempted it with a new transaction type. [**EIP-3074**](https://eips.ethereum.org/EIPS/eip-3074) (2021) introduced `AUTH`/`AUTHCALL` opcodes for invoker contracts. None of them shipped — each required consensus-layer changes that the network was not ready to ratify.
+
+Meanwhile, **a parallel meta-transaction track had been running since 2018**. The team at **Tabookey** — **Yoav Weiss**, **Dror Tirosh**, and **Alex Forshtat** — published [**ERC-1613 (Gas Station Network v1)**](https://eips.ethereum.org/EIPS/eip-1613) as the first standardized "user signs off-chain, relayer pays gas" proposal. Two years later, the standardized successor [**ERC-2771 (Secure Protocol for Native Meta Transactions)**](https://eips.ethereum.org/EIPS/eip-2771) was opened by Alex Forshtat in July 2020 and finalized in August 2020 with eleven co-authors — including the same Tabookey core team plus Ronan Sandford, Patrick McCorry, Hadrien Croubois, Nicolas Venturo, Gavin John, and (notably) **Fabian Vogelsteller**. ERC-2771 standardized the trusted-forwarder pattern: contracts opt in to recover the original signer via `_msgSender()` from the last 20 bytes of calldata. It became the substrate for OpenGSN v2, OpenZeppelin Defender Relayer, Gelato, and Biconomy — and its [Security Considerations](https://eips.ethereum.org/EIPS/eip-2771) section is candid about the load-bearing trust assumption: "A malicious forwarder may forge the value of `_msgSender()` and effectively send transactions from any address."
+
+The two threads — protocol-level account abstraction (86 → 2938 → 3074) and contract-level meta transactions (1613 → 2771) — converged when Vitalik proposed ERC-4337 in late 2021. The Tabookey/OpenGSN team brought their meta-transaction experience directly: Weiss, Tirosh, and Forshtat appear on all three (GSN v1, ERC-2771, ERC-4337). The bundler is GSN's relay server, generalized. The EntryPoint is GSN's RelayHub, generalized. The paymaster is what gas sponsorship looks like when you bake it into the standard instead of leaving it to integrators. ERC-4337 is the meta-transaction lineage absorbing the account-abstraction ambition.
+
+On **29 September 2021**, [Vitalik Buterin opened GitHub issue #4337](https://github.com/ethereum/EIPs/issues/4337) with co-authors **Yoav Weiss** (Ethereum Foundation account-abstraction lead), **Dror Tirosh**, **Shahaf Nacson**, **Alex Forshtat**, **Kristof Gazso**, and **Tjaden Hess**. Vitalik also wrote a [Medium post on Infinitism](https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a) framing the design — and the title itself was the strongest tell about what was being chosen:
+
+> ERC-4337: Account Abstraction *Without* Ethereum Protocol Changes.
+
+That's the lead author of the standard telling the audience, in plain text, that this is a workaround chosen specifically to avoid a hard fork. The [EIP-4337 Abstract](https://eips.ethereum.org/EIPS/eip-4337) is just as direct:
+
+> Historically, users could interact with Ethereum only by sending transactions from special accounts controlled by private keys, with transaction validation entirely enforced by fixed protocol rules. Account abstraction is an alternative model that allows each account to supply its own validation logic executed as smart contract code, while the protocol provides only minimal constraints.
+
+The mechanism: a separate mempool of `UserOperation` envelopes; a singleton **EntryPoint** contract that everyone agrees on; bundlers that watch the alt-mempool, validate UserOps, and pack them into a single `handleOps` transaction on-chain; optional paymasters that sponsor gas from their own deposits. The smart account is a contract that implements `validateUserOp`; the EntryPoint calls it before executing.
+
+[EntryPoint **v0.6** deployed to Ethereum mainnet on 1 March 2023](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789), after audits by OpenZeppelin and Certora. **v0.7** shipped in 2024 with improved paymaster and aggregator interfaces. **v0.8** deployed in May 2025 — and that timing is significant, because alongside it Ethereum's [**Pectra hard fork**](https://eips.ethereum.org/EIPS/eip-7702) activated EIP-7702, a protocol-level primitive that lets externally-owned accounts delegate execution to contract code in a single transaction.
+
+EIP-7702 is co-authored by Vitalik Buterin — the lead author of ERC-4337. Four years after framing AA as something to ship *without* protocol changes, he was co-signing the protocol-level change. The [EIP-7702 Motivation section](https://eips.ethereum.org/EIPS/eip-7702) is candid about the gap it was patching: existing EOAs cannot become ERC-4337 smart accounts without losing their address history, their ENS records, their reputation, and their airdrop eligibility. Six months earlier, at [Devcon SEA in November 2024](https://etherspot.io/blog/all-about-abstraction-devcon-2024-highlights-smart-contract-revolution-yoav-weiss-on-aa-future-and-aa-developer-survey/), Yoav Weiss had laid out a roadmap toward what he called a "modular native AA approach for L1 and L2." The spec's own authors and maintainers, in their own words, were walking ERC-4337 toward the substrate.
+
+The rest of this page is about what that journey reveals — the tradeoffs ERC-4337 made deliberately to avoid a fork, and how a different design choice (account abstraction as substrate, not layer) plays out on LUKSO.
+
+</Fragment>
+
+{/* ─── slot: spec (after the SpecBlock) ─────────────────────────────── */}
+<Fragment slot="spec">
+
+The mental model: a user signs a `UserOperation`; it lands in a separate alt-mempool; a **bundler** picks it up, validates it (by simulating `validateUserOp` on the account and `validatePaymasterUserOp` on any paymaster), packs valid UserOps into a single transaction calling `EntryPoint.handleOps()`, and submits on-chain. The EntryPoint runs validation again on-chain, calls into the smart account to execute the user's actual `callData`, and (if a paymaster was involved) calls `postOp` for sponsorship accounting.
+
+The full surface is much larger than the few signatures shown above: 30+ methods across `IEntryPoint`, `IAccount`, `IPaymaster`, `IAggregator`, with several version-specific shapes (the `PackedUserOperation` struct above is the v0.7+ form). Audit and tooling complexity sits on the size of that surface. Canonical specification: [eips.ethereum.org/EIPS/eip-4337](https://eips.ethereum.org/EIPS/eip-4337).
+
+</Fragment>
+
+{/* ─── slot: whatsBroken (intro paragraph before the limits list) ───── */}
+<Fragment slot="whatsBroken">
+
+Five tradeoffs the layered approach pays for. The spec's authors made these calls deliberately to avoid a hard fork — none of this is a hidden bug. But each one is a real cost, and the existence of EIP-7702 is the authors' own implicit acknowledgement that some of these gaps eventually needed a protocol-level patch.
+
+</Fragment>
+
+{/* ─── slot: vogelsteller (after the h2 in the second-act band) ─────── */}
+<Fragment slot="vogelsteller">
+
+The two co-authors of ERC-20 ended up answering the same account-abstraction question with two structurally different stacks. The divergence is deeper than ERC-4337 alone — it begins with ERC-2771, runs through the LSP suite as a coherent system, and now meets Ethereum's Pectra upgrade where the two approaches finally have to be compared in production.
+
+In November 2015, [**Vitalik Buterin** and **Fabian Vogelsteller**](https://eips.ethereum.org/EIPS/eip-20) co-authored ERC-20 — the moment their paths first crossed in the historical record. Five years later, they were on the [**ERC-2771**](https://eips.ethereum.org/EIPS/eip-2771) author list together as well: Vogelsteller was co-author #10 of the Secure Protocol for Native Meta Transactions, alongside the Tabookey/OpenGSN team (Weiss, Tirosh, Forshtat) who would go on to co-author ERC-4337. He saw the trusted-forwarder pattern, the relayer-infrastructure burden, and the per-contract `_msgSender()` opt-in cost from inside the standard. He saw what GSN v1 had cost integrators, and he could see what ERC-4337 was about to repeat at a larger scale.
+
+The lesson he took from being inside both ERC-20 and ERC-2771: **ERCs ship minimum interfaces deliberately, and the cost shows up as half-baked solutions stacked on top of each other.** ERC-20 left receivers and metadata to the application layer; ERC-2771 left permissions and relayer infrastructure to integrators; ERC-4337 added bundlers and paymasters; EIP-7702 (Pectra, May 2025) patched the EOA-can't-become-a-smart-account gap from the protocol side; [EIP-7851](https://eips.ethereum.org/EIPS/eip-7851) — still a draft as of mid-2026 — aims to let a 7702-delegated EOA permanently disable its residual ECDSA authority. Each one fixes a real problem the previous one left open. None of them was designed to compose with the others.
+
+So Vogelsteller and the LUKSO team designed [**LSPs**](https://docs.lukso.tech/) as a coherent system from the bottom up. The account stack is four standards working together by design, not five layered patches catching each other's gaps:
+
+- [**LSP-0 ERC-725 Account**](/standards/lsp0-erc725-account/) — the contract account itself. It owns assets, executes calls, holds typed key/value storage. There is no EntryPoint singleton; the account contract IS the entry point. `msg.sender` at downstream targets is the account, natively.
+- [**LSP-6 Key Manager**](/standards/lsp6-key-manager/) — the standardized permission vocabulary. `AllowedCalls`, `AllowedStandards`, `AllowedERC725YDataKeys`, value caps, granular bitfields, instant revocation. The piece that ERC-4337 and EIP-7702 deliberately leave to each wallet implementation, here as a shared standard every controller, app, and relayer can read.
+- [**LSP-20 Call Verification**](/standards/lsp20-call-verification/) — inline call verification at the account contract layer. The equivalent of `validateUserOp`, but on the normal call path rather than through an EntryPoint hop.
+- [**LSP-25 Execute Relay Call**](/standards/lsp25-execute-relay-call/) — sponsored execution as a function on the account itself. A controller signs, a relayer submits, LSP-6 permissions still gate what the signing controller may do. No bundler, no paymaster contract, no parallel mempool, no `ERC2771Context` mixin to inherit.
+
+### Pectra shipped. Why is the LSP stack still the better answer?
+
+Ethereum's Pectra hard fork (May 2025) is real progress. EIP-7702 gives existing EOAs the ability to delegate execution to contract code in a single transaction, and EntryPoint v0.8 plugs that delegation into the ERC-4337 ecosystem natively. An EOA can now batch transactions, accept passkey signatures, and use gas sponsorship without redeploying. The major Pectra advantage over LUKSO is exactly that: it upgrades an existing Ethereum address without moving its assets, approvals, history, or identity to a newly deployed contract account.
+
+That said — and this is the substantive comparison — even with Pectra, the LSP stack covers several things 7702 + 4337 don't, or covers them less coherently:
+
+**1. Authoritative recovery and key revocation.** An EIP-7702 EOA gains smart-account semantics by delegating execution to contract code, but the original `secp256k1` key never goes away. An attacker who compromises the original key can sign another 7702 authorization to replace the delegation and reset recovery. EIP-7851 is a draft that aims to let a 7702 account permanently disable its residual ECDSA authority — but as of mid-2026 it's still a draft, not part of Pectra. A Universal Profile has no hidden root key above its Key Manager; recovery is authoritative because there's nothing the recovered configuration can be overridden by. LSP-11 standardises social recovery with guardians and a configurable voting threshold; LSP-6 governs the permission to add, remove, or replace controllers.
+
+**2. A standardised permission vocabulary across the ecosystem.** ERC-4337 delegates validation policy to each wallet implementation; EIP-7702 inherits that. The modular-account ecosystem (ERC-7579, ERC-6900) is converging on similar ideas as optional wallet-vendor layers. LSP-6 makes the permission model part of the primary account stack — so wallets, apps, indexers, and tooling can inspect and manage permissions without learning every account vendor's custom module design.
+
+**3. A standardised on-chain identity and data store.** Neither Pectra nor ERC-4337 defines where an account should keep profile metadata, application preferences, issued or received assets, or extension configuration. LUKSO uses **ERC-725Y** as a generic key-value store with **LSP-2** schemas and **LSP-3** profile keys, so the account is simultaneously a wallet, identity, profile, and application-data container. A 7702/4337 account can store all of these things — there's just no shared data model for them.
+
+**4. Safer ownership transitions.** [**LSP-14 Ownable 2-Step**](/standards/lsp14-ownable-2-step/) requires the current owner to nominate a new owner and the nominated owner to explicitly accept; renunciation includes a delay and confirmation. ERC-4337 and EIP-7702 don't define an equivalent lifecycle — each wallet implementation invents one, and the failure mode is "I clicked the wrong button and transferred ownership to a typo."
+
+**5. Predictable account initialisation and upgrades.** EIP-7702 doesn't run deployment initcode when delegation is installed, so wallet developers have to protect initialisation against front-running. Switching between delegate implementations can produce storage collisions because the new implementation executes on the EOA's existing storage. Universal Profiles are deployed and initialised as contracts; LSP-6 permissions live in the profile's ERC-725Y storage rather than inside the Key Manager, so the Key Manager can be replaced without discarding the permission configuration. [**LSP-17 Contract Extension**](/standards/lsp17-contract-extension/) standardises the extension mechanism.
+
+**6. Standardised receiving and reaction hooks.** Pectra and ERC-4337 address authorisation and execution; they don't define how an account learns about incoming assets or messages. [**LSP-1 Universal Receiver**](/standards/lsp1-universal-receiver/) is one entry point for structured notifications, with **LSP-5** and **LSP-10** standardising the records for received assets and vaults. A Universal Profile has the equivalent of an inbox, not just a balance.
+
+**7. Predictable account semantics.** A 7702 account is a hybrid: it has code, it can still originate ECDSA transactions like an EOA, its code is only a pointer to another contract, and EIP-7702 itself notes that it breaks several historical EVM invariants — including code that assumes `tx.origin == msg.sender`. A Universal Profile is unambiguously a contract account: ERC-1271 signature validation, LSP-20 call verification, and the LSP account interfaces all apply consistently.
+
+### Honest framing — what LUKSO does NOT uniquely solve
+
+A pure ERC-4337 smart account can implement nearly all of these features. Transaction batching is account-level execution. Sponsored gas is a paymaster. Session keys are a custom validator. Multisig is account logic. Alternative signatures live inside the validator. Modular functionality has [ERC-7579](https://eips.ethereum.org/EIPS/eip-7579) and [ERC-6900](https://eips.ethereum.org/EIPS/eip-6900). And in some respects ERC-4337 ships a richer standardised gas market — bundlers and paymasters — than LSP-25's straightforward relayer pattern.
+
+So the LUKSO advantage isn't "Ethereum can't ship these features." It's a different one, four parts:
+
+1. **No irrevocable EOA root.** A Universal Profile's address is not cryptographically tied to one permanent private key.
+2. **Recovery and controller replacement are authoritative.** When a controller is removed or rotated, it actually loses authority — there's no parallel root key that can override the new configuration.
+3. **Permissions, identity, receiving hooks, and extensions are standardised across the account ecosystem.** Apps, indexers, and wallets read one vocabulary, not per-vendor modules.
+4. **Hybrid-account and storage-migration complexities don't exist.** A UP is a contract, deployed as a contract, upgraded as a contract — no 7702 storage collisions, no front-runnable initcode, no broken `tx.origin` assumptions.
+
+The architectural difference, summarised:
+
+> **7702 + 4337:** permanent EOA root → programmable delegate → optional recovery, permissions, and modules (each wallet's call).
+>
+> **LUKSO Universal Profile:** contract account root → replaceable Key Manager → standardised controllers, permissions, recovery, data, and extensions (one shared system).
+
+[LUKSO mainnet went live in 2023](https://docs.lukso.tech/) with this stack as native standards rather than layered patterns. The funnel for this site is not "switch to LUKSO." It is: when your ERC-4337 + Pectra design is paying the tax that comes from stacking half-baked standards on top of each other — residual EOA keys, validator fragmentation, per-protocol identity invention, ownership-transition mistakes, hybrid-account semantics — there is a coherent account system designed from the bottom up by one of the people who watched those tradeoffs accumulate from inside ERC-20 and ERC-2771 and ERC-725. The funnel works when the cost lands on you.
+
+</Fragment>

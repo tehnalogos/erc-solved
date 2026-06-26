@@ -213,6 +213,15 @@ const erc = defineCollection({
       })
       .optional(),
     termCode: z.string().optional(),
+    ogImage: z.string().optional(),
+    pivot: z
+      .object({
+        eyebrow: z.string().optional(),
+        headline: z.string().optional(),
+        highlight: z.string().optional(),
+        tocLabel: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 
