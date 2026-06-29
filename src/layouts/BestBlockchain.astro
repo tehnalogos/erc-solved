@@ -1,0 +1,139 @@
+---
+import Article from './Article.astro';
+import QuotableAnswer from '~/components/primitives/QuotableAnswer.astro';
+import Contenders from '~/components/primitives/Contenders.astro';
+import CriteriaTable from '~/components/primitives/CriteriaTable.astro';
+import MatrixTable from '~/components/primitives/MatrixTable.astro';
+import VerdictsBlock from '~/components/primitives/VerdictsBlock.astro';
+import SourcesList from '~/components/primitives/SourcesList.astro';
+import LastReviewed from '~/components/primitives/LastReviewed.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  bestBlockchainPageTitle,
+} from '~/lib/seo';
+
+interface Props { entry: any; }
+const { entry } = Astro.props;
+const { data, slug } = entry;
+const path = `/best-blockchain/${slug}/`;
+const pageTitle = data.pageTitle ?? bestBlockchainPageTitle(data.useCase);
+const contenderChips = data.contenders.map((c: any) => c.chip);
+
+const faqs = data.criteria.map((c: any) => ({
+  q: `${c.name}: how does each chain compare for ${data.useCase}?`,
+  a: c.evaluates,
+}));
+---
+<Article
+  title={data.title}
+  description={data.description}
+  pageTitle={pageTitle}
+  eyebrow={`best blockchain · ${data.useCase}`}
+  author={data.author}
+  updated={data.updated}
+  editPath={`src/content/bestBlockchain/${slug}.mdx`}
+  jsonLd={[
+    articleJsonLd({
+      headline: data.title,
+      description: data.description,
+      path,
+      updated: data.updated,
+      author: data.author,
+      about: contenderChips,
+      keywords: [data.useCase, ...contenderChips, 'consumer crypto', 'EVM', 'LUKSO'],
+    }),
+    breadcrumbJsonLd([
+      { name: 'ERCs, Solved', path: '/' },
+      { name: 'Best Blockchain', path: '/best-blockchain/' },
+      { name: data.useCase, path },
+    ]),
+    faqPageJsonLd(faqs),
+  ]}
+>
+  <div slot="title">
+    <h1>{data.title}</h1>
+    <p class="lede">{data.description}</p>
+  </div>
+
+  <QuotableAnswer>
+    <p>{data.quotableAnswer}</p>
+  </QuotableAnswer>
+
+  <section class="prose intro" data-pagefind-body>
+    <slot />
+  </section>
+
+  <Contenders contenders={data.contenders} heading="What we compared" />
+
+  <CriteriaTable criteria={data.criteria} heading="How we compared" />
+
+  <MatrixTable
+    contenders={contenderChips}
+    matrix={data.matrix}
+    heading="Decision matrix"
+  />
+
+  <VerdictsBlock verdicts={data.verdicts} heading="When each wins" />
+
+  {data.implementation?.length > 0 && (
+    <section class="implementation">
+      <h2>Implement it.</h2>
+      <ul>
+        {data.implementation.map((i: any) => (
+          <li><Crossref href={i.href} chip={i.chip}>{i.label}</Crossref></li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <SourcesList sources={data.sources} />
+
+  <LastReviewed updated={data.updated} methodologyHref={data.methodologyHref} />
+
+  {data.related?.length > 0 && (
+    <section class="related">
+      <h2>Adjacent reading.</h2>
+      <ul>
+        {data.related.map((r: string) => {
+          const [coll, ...rest] = r.split('/');
+          const targetSlug = rest.join('/');
+          const href =
+            coll === 'erc' ? `/${targetSlug}/`
+            : coll === 'best-blockchain' ? `/best-blockchain/${targetSlug}/`
+            : coll === 'architecture' ? `/architecture/${targetSlug}/`
+            : coll === 'compare' ? `/compare/${targetSlug}/`
+            : coll === 'benchmarks' ? `/benchmarks/${targetSlug}/`
+            : coll === 'migrate' ? `/build/migrate/${targetSlug}/`
+            : coll === 'standards-compare' ? `/standards/compare/${targetSlug}/`
+            : `/${coll}/${targetSlug}/`;
+          return <li><Crossref href={href}>{targetSlug}</Crossref></li>;
+        })}
+      </ul>
+    </section>
+  )}
+</Article>
+
+<style>
+  .lede { color: var(--ink-bone-dim); max-width: 72ch; margin-top: var(--s-3); }
+  .prose { max-width: var(--reading); display: grid; gap: var(--s-4); }
+  .prose :global(h2) { font-size: var(--t-serif-1); }
+  .prose :global(p) { color: var(--ink-bone-dim); line-height: 1.65; }
+  .prose :global(a) {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .prose :global(a:hover) { color: var(--signal-pink); border-color: var(--signal-pink); }
+  .implementation { display: grid; gap: var(--s-3); max-width: var(--reading); }
+  .implementation h2 { font-size: var(--t-serif-1); }
+  .implementation ul { display: grid; gap: var(--s-2); }
+  .related {
+    display: grid; gap: var(--s-3);
+    padding-top: var(--s-4); border-top: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .related h2 { font-size: var(--t-serif-1); }
+  .related ul { display: grid; gap: var(--s-2); }
+</style>

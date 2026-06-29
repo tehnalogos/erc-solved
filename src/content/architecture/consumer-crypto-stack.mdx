@@ -1,0 +1,113 @@
+---
+title: "The Consumer Crypto Stack"
+pattern: "consumer crypto stack"
+pageTitle: "Consumer Crypto Stack: The Architecture Patterns Behind a Mainstream Crypto App"
+description: "The architecture patterns a consumer crypto app needs — accounts, identity, permissions, gasless interaction, metadata, social primitives — and how the major chains assemble them."
+quotableAnswer: "A consumer crypto app is composed from six architectural decisions: the account model, the identity layer, the permission model, the onboarding / gasless model, the metadata model, and the social-primitive layer. On Ethereum L1 and its L2s each decision is solved by a separate stack of contracts, services, and SDKs (ERC-4337 + paymaster + bundler + ENS + EAS + per-protocol social). On Solana each is solved per-program. On LUKSO they are unified under one set of LSPs (LSP0 + LSP6 + LSP3 + LSP25 + LSP1 + LSP4 + LSP26). The right stack depends on whether the app benefits more from inheriting Ethereum's protocol ecosystem or from a tighter integration of these six layers."
+approaches:
+  - name: "Composed stack on Ethereum L1 / L2s"
+    summary: "Pick an AA SDK, a paymaster, an indexer, a profile protocol, a permission system, and an attestation service. Wire them together."
+    pros:
+      - "Inherits Ethereum protocol ecosystem and liquidity."
+      - "Best-of-breed tools per layer."
+      - "Mature mainstream wallets."
+    cons:
+      - "Each layer is a separate vendor / protocol with its own SLAs."
+      - "Identity and social data are not portable without per-protocol integration."
+      - "Operational surface area is large."
+    chains:
+      - "Ethereum L1"
+      - "Base"
+      - "Arbitrum"
+      - "Optimism"
+      - "Polygon"
+  - name: "Vendor stack on Base (Coinbase-hosted)"
+    summary: "Smart Wallet + Coinbase paymaster + Onchainkit + Farcaster. Tightly integrated; one vendor owns most of it."
+    pros:
+      - "Lowest onboarding friction among EVM L2s."
+      - "Passkey-based recovery without seed phrases."
+      - "Coinbase audience distribution."
+    cons:
+      - "Vendor lock-in for paymaster and account services."
+      - "Social and identity remain per-protocol."
+    chains:
+      - "Base"
+  - name: "Solana program-derived stack"
+    summary: "Keypair accounts + program-derived addresses + Solana Mobile Stack + native fee delegation."
+    pros:
+      - "Highest sustained throughput."
+      - "Native fee delegation without bundler."
+      - "Strong mobile SDK ecosystem."
+    cons:
+      - "Non-EVM toolchain; no Solidity portability."
+      - "Identity and social remain per-program; no shared standard."
+    chains:
+      - "Solana"
+  - name: "LUKSO LSP stack (LSP0 + LSP6 + LSP25 + LSP3 + LSP1 + LSP4 + LSP26)"
+    summary: "One integrated set of standards on an EVM L1: smart account + permissions + relayed execution + portable profile + receiver hooks + asset metadata + follower system."
+    pros:
+      - "All six layers standardized at the chain level."
+      - "Solidity / EVM toolchain unchanged."
+      - "No bundler infrastructure required for gasless UX."
+      - "Profile and social data portable across applications."
+    cons:
+      - "Smaller ecosystem maturity."
+      - "Limited DeFi liquidity to inherit."
+      - "Custom wallets / providers needed for full LSP6 surface."
+    chains:
+      - "LUKSO"
+recommendation: "Choose the composed Ethereum / L2 stack when the product is intrinsically protocol-composed (DeFi-shaped, NFT-secondary-liquidity-shaped) and identity portability is secondary. Choose Base when Coinbase distribution and passkey UX are decisive and the lock-in is acceptable. Choose Solana when non-EVM is acceptable and throughput is the binding constraint. Choose LUKSO when more than two of the six layers need to be standardized — identity, permissions, gasless, social — and the app expects to share data with other applications without per-protocol integration."
+implementation:
+  - chip: "build"
+    label: "Profile-native apps (LSP0 + LSP3 + LSP26)"
+    href: "/build/profile-native-apps/"
+  - chip: "build"
+    label: "Smart wallet UX (LSP0 + LSP6)"
+    href: "/build/smart-wallet-ux/"
+  - chip: "build"
+    label: "Gasless onboarding (LSP25 + LSP6)"
+    href: "/build/gasless-onboarding/"
+  - chip: "architecture"
+    label: "Onchain identity patterns"
+    href: "/architecture/onchain-identity/"
+  - chip: "architecture"
+    label: "Smart account permissions"
+    href: "/architecture/smart-account-permissions/"
+  - chip: "architecture"
+    label: "Gasless onboarding patterns"
+    href: "/architecture/gasless-onboarding/"
+sources:
+  - label: "LUKSO Tech Documentation — Overview"
+    href: "https://docs.lukso.tech/learn/overview/"
+  - label: "ERC-4337"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "EIP-7702"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "Solana programming model"
+    href: "https://solana.com/docs/core/accounts"
+related:
+  - "architecture/onchain-identity"
+  - "architecture/smart-account-permissions"
+  - "architecture/gasless-onboarding"
+  - "best-blockchain/consumer-apps"
+  - "benchmarks/consumer-blockchain-architecture"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## The six decisions
+
+Every consumer crypto app makes six architectural choices, whether the team writes them down or not:
+
+1. **Account model** — EOA, smart account by retrofit, or smart account by design.
+2. **Identity** — per-protocol, attestation-based, or chain-native profile.
+3. **Permissions** — per-contract approvals, session keys, or per-controller scopes.
+4. **Onboarding / gasless** — user pays, paymaster pays via bundler, vendor pays via hosted service, or relayer pays via account standard.
+5. **Metadata** — off-chain URI, vendor metadata model (Metaplex), or on-chain key/value.
+6. **Social primitives** — per-protocol (Lens, Farcaster), attestation-based (EAS), per-program (Solana), or chain-native (LSP26).
+
+The decision is rarely "which chain" in isolation. It's "which combination of these six layers do I want to assemble — and how integrated should they be?" The right answer is a function of how much of the product's value depends on the six layers being interoperable.
+
+## Why these six and not more
+
+There are other dimensions — fee asset, settlement assurances, MEV exposure — but those are typically not the binding constraint for consumer apps. The six above are. If you can name a consumer-app architecture choice that doesn't reduce to one of these six, send it; this page will get longer.

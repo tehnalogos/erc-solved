@@ -1,0 +1,41 @@
+---
+interface Props {
+  updated: Date | string;
+  methodologyHref?: string;
+}
+const { updated, methodologyHref } = Astro.props;
+const date = new Date(updated).toISOString().slice(0, 10);
+---
+<aside class="last-reviewed" data-last-reviewed={date}>
+  <span class="label">Last reviewed</span>
+  <time datetime={date}>{date}</time>
+  {methodologyHref && (
+    <span class="meta">
+      ·
+      <a href={methodologyHref}>methodology</a>
+    </span>
+  )}
+</aside>
+
+<style>
+  .last-reviewed {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+    color: var(--ink-fog);
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding: var(--s-2) 0;
+  }
+  .last-reviewed .label {
+    color: var(--ink-fog);
+  }
+  .last-reviewed time { color: var(--ink-bone-dim); }
+  .last-reviewed a {
+    color: var(--ink-bone-dim);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .last-reviewed a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+</style>

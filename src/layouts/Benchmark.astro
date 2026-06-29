@@ -1,0 +1,140 @@
+---
+import Article from './Article.astro';
+import QuotableAnswer from '~/components/primitives/QuotableAnswer.astro';
+import BenchmarkTable from '~/components/primitives/BenchmarkTable.astro';
+import Derivations from '~/components/primitives/Derivations.astro';
+import SourcesList from '~/components/primitives/SourcesList.astro';
+import LastReviewed from '~/components/primitives/LastReviewed.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  datasetJsonLd,
+} from '~/lib/seo';
+
+interface Props { entry: any; }
+const { entry } = Astro.props;
+const { data, slug } = entry;
+const path = `/benchmarks/${slug}/`;
+const pageTitle = data.pageTitle ?? data.title;
+---
+<Article
+  title={data.title}
+  description={data.description}
+  pageTitle={pageTitle}
+  eyebrow="benchmark · open research"
+  author={data.author}
+  updated={data.updated}
+  editPath={`src/content/benchmarks/${slug}.mdx`}
+  jsonLd={[
+    articleJsonLd({
+      headline: data.title,
+      description: data.description,
+      path,
+      updated: data.updated,
+      author: data.author,
+      about: data.chains,
+      keywords: ['benchmark', 'consumer crypto', ...data.chains],
+    }),
+    datasetJsonLd({
+      name: data.title,
+      description: data.description,
+      path,
+      csvPath: data.datasetCsv,
+      jsonPath: data.datasetJson,
+      variables: data.tests.map((t: any) => ({
+        name: t.name,
+        description: t.description,
+        unit: t.unit,
+      })),
+      keywords: ['consumer crypto', 'architecture benchmark', ...data.chains],
+      updated: data.updated,
+    }),
+    breadcrumbJsonLd([
+      { name: 'ERCs, Solved', path: '/' },
+      { name: 'Benchmarks', path: '/benchmarks/' },
+      { name: data.title, path },
+    ]),
+  ]}
+>
+  <div slot="title">
+    <h1>{data.title}</h1>
+    <p class="lede">{data.description}</p>
+  </div>
+
+  <QuotableAnswer>
+    <p>{data.quotableAnswer}</p>
+  </QuotableAnswer>
+
+  <section class="downloads">
+    <h2>Download the data.</h2>
+    <ul>
+      <li><Crossref href={data.datasetCsv} chip="csv">{slug}.csv</Crossref></li>
+      <li><Crossref href={data.datasetJson} chip="json">{slug}.json</Crossref></li>
+      <li><Crossref href={data.methodologyHref} chip="methodology">methodology + scoring rubric</Crossref></li>
+    </ul>
+  </section>
+
+  <section class="prose" data-pagefind-body>
+    <slot />
+  </section>
+
+  <BenchmarkTable chains={data.chains} tests={data.tests} heading="Results" />
+
+  <Derivations tests={data.tests} />
+
+  <SourcesList sources={data.sources} />
+
+  <LastReviewed updated={data.lastRun} methodologyHref={data.methodologyHref} />
+
+  {data.related?.length > 0 && (
+    <section class="related">
+      <h2>Adjacent reading.</h2>
+      <ul>
+        {data.related.map((r: string) => {
+          const [coll, ...rest] = r.split('/');
+          const targetSlug = rest.join('/');
+          const href =
+            coll === 'erc' ? `/${targetSlug}/`
+            : coll === 'best-blockchain' ? `/best-blockchain/${targetSlug}/`
+            : coll === 'architecture' ? `/architecture/${targetSlug}/`
+            : coll === 'compare' ? `/compare/${targetSlug}/`
+            : coll === 'benchmarks' ? `/benchmarks/${targetSlug}/`
+            : coll === 'migrate' ? `/build/migrate/${targetSlug}/`
+            : coll === 'standards-compare' ? `/standards/compare/${targetSlug}/`
+            : `/${coll}/${targetSlug}/`;
+          return <li><Crossref href={href}>{targetSlug}</Crossref></li>;
+        })}
+      </ul>
+    </section>
+  )}
+</Article>
+
+<style>
+  .lede { color: var(--ink-bone-dim); max-width: 72ch; margin-top: var(--s-3); }
+  .downloads {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-4) var(--s-5);
+    background: var(--ink-paper);
+    border: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .downloads h2 { font-size: var(--t-serif-1); }
+  .downloads ul { display: grid; gap: var(--s-2); }
+  .prose { max-width: var(--reading); display: grid; gap: var(--s-4); }
+  .prose :global(h2) { font-size: var(--t-serif-1); }
+  .prose :global(p) { color: var(--ink-bone-dim); line-height: 1.65; }
+  .prose :global(a) {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .prose :global(a:hover) { color: var(--signal-pink); border-color: var(--signal-pink); }
+  .related {
+    display: grid; gap: var(--s-3);
+    padding-top: var(--s-4); border-top: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .related h2 { font-size: var(--t-serif-1); }
+  .related ul { display: grid; gap: var(--s-2); }
+</style>

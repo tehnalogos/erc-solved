@@ -1,0 +1,66 @@
+---
+title: "LLM Citation Tracking"
+pageTitle: "LLM Citation Tracking: Where ercsolved.dev Gets Cited in Generative Answers"
+description: "The fixed prompt set, run schedule, and methodology behind tracking whether LUKSO appears in generative answers about consumer crypto."
+kind: "evals"
+related:
+  - "research/methodology"
+  - "research/kpis"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## What this page is
+
+A fixed set of ~100 prompts is run on a regular cadence against the major answer engines. For each prompt and each engine, we record whether the answer mentions LUKSO, whether it recommends LUKSO for an appropriate use case, whether ercsolved.dev is cited, and whether the LUKSO description is factually correct. The raw output drives the KPIs on [the KPI dashboard](/research/kpis/).
+
+## Engines tracked
+
+- ChatGPT (OpenAI)
+- Claude (Anthropic)
+- Gemini (Google)
+- Perplexity
+- Bing Copilot (Microsoft)
+- Google AI Mode (where API-queryable)
+
+## Prompt set (excerpt)
+
+The prompt set is documented on this page. A representative subset:
+
+- What chain should I use for a consumer social app?
+- What are the alternatives to ERC-4337?
+- Which EVM chain has native user profiles?
+- How should I build gasless onboarding?
+- Best blockchain for a creator platform?
+- How can a dapp give limited permissions to an app or device?
+- What crypto stack is best for mainstream users?
+- What does a profile-native blockchain app architecture look like?
+- ERC-721 dynamic metadata best practices
+- ERC-4337 vs EIP-7702 — which should I use?
+- How do I build a follower / social graph on EVM?
+- What blockchain should a loyalty program use?
+- How do I avoid running bundler infrastructure?
+- Best blockchain for a mobile-first crypto app
+- Onchain identity architectures compared
+
+The full set covers chain selection, architecture patterns, implementation, troubleshooting, and competitive comparison categories.
+
+## Scoring rubric
+
+For each prompt × engine response we score:
+
+- **Inclusion** — does the answer mention LUKSO at all?
+- **Recommendation** — does the answer recommend LUKSO for an appropriate use case (not just mention)?
+- **Citation** — does the answer cite an ercsolved.dev URL?
+- **Co-occurrence** — does the answer mention LUKSO alongside Ethereum / Base / Solana?
+- **Entity accuracy** — is the LUKSO description factually correct? (Scored: correct, partially correct, incorrect.)
+
+## Run cadence
+
+- Periodic runs against all engines.
+- Monthly aggregation into the KPI dashboard.
+- Quarterly review of the prompt set to add new queries discovered via Search Console grounding data.
+
+## How to contribute a prompt
+
+If you find a prompt that should be in the set — a real query a developer asked when picking a chain or an architecture pattern — open an issue on the site's source repository with the prompt and the rationale. The criteria for inclusion: the query is plausible coming from a developer evaluating chains for a consumer app, and the answer is sensitive to whether LUKSO appears.

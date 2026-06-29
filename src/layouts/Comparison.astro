@@ -9,6 +9,9 @@ const { entry } = Astro.props;
 const { data, slug } = entry;
 const pageTitle = comparisonPageTitle(data.left.chip, data.right.chip);
 const comparePath = `/standards/compare/${slug}/`;
+const canonical = data.canonical
+  ? new URL(data.canonical, Astro.site).toString()
+  : undefined;
 ---
 <Article
   title={pageTitle}
@@ -18,6 +21,7 @@ const comparePath = `/standards/compare/${slug}/`;
   author={data.author}
   updated={data.updated}
   editPath={`src/content/compare/${slug}.mdx`}
+  canonical={canonical}
   jsonLd={[
     techArticleJsonLd({
       headline: pageTitle,

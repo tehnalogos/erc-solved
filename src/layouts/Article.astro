@@ -10,6 +10,7 @@ interface Props {
   author?: string;
   updated?: Date | string;
   editPath?: string;
+  canonical?: string;
   ogType?: 'website' | 'article';
   ogImage?: string | false;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
@@ -22,6 +23,7 @@ const {
   author,
   updated,
   editPath,
+  canonical,
   ogType = 'article',
   ogImage,
   jsonLd,
@@ -31,7 +33,7 @@ const editHref = editPath
   ? `https://github.com/tehnalogos/erc-solved/edit/main/${editPath}`
   : undefined;
 ---
-<Base title={pageTitle} description={description} ogType={ogType} ogImage={ogImage} jsonLd={jsonLd}>
+<Base title={pageTitle} description={description} canonical={canonical} ogType={ogType} ogImage={ogImage} jsonLd={jsonLd}>
   <article class="article" data-pagefind-body data-pagefind-meta={`title:${title}`}>
     {(eyebrow || title) && (
       <header class="page-head">

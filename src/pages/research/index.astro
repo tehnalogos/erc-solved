@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import Article from '~/layouts/Article.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+
+const entries = (await getCollection('research')).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+
+const description =
+  'Methodology behind the benchmarks and decision guides, ongoing LLM-citation tracking, and the KPI dashboard that measures whether LUKSO has entered the consumer-crypto consideration set.';
+---
+<Article
+  title="Research"
+  description={description}
+  pageTitle="Research: Methodology, KPIs, LLM Citation Tracking"
+  eyebrow="research · index"
+  author="ercs-solved maintainers"
+  updated="2026-06-29"
+  editPath="src/pages/research/index.astro"
+>
+  <p class="lede">{description}</p>
+  <ul class="list">
+    {entries.map((e) => (
+      <li>
+        <a class="row" href={`/research/${e.slug}/`}>
+          <span class="title">{e.data.title}</span>
+          <span class="kind">{e.data.kind}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <section class="more">
+    <h2>Where this fits.</h2>
+    <ul>
+      <li><Crossref href="/benchmarks/consumer-blockchain-architecture/">Consumer blockchain architecture benchmark</Crossref> — the open dataset behind the decision guides.</li>
+      <li><Crossref href="/best-blockchain/">Best blockchain decision guides</Crossref> — applied output of the methodology.</li>
+    </ul>
+  </section>
+</Article>
+
+<style>
+  .lede { color: var(--ink-bone-dim); max-width: 72ch; }
+  .list { display: grid; border-top: 1px solid var(--ink-line); }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: var(--s-4);
+    align-items: baseline;
+    padding: var(--s-4) 0;
+    border-bottom: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+  }
+  .row:hover { background: var(--ink-paper); }
+  .title { color: var(--ink-bone); font-size: var(--t-mono-md); }
+  .kind { color: var(--signal-pink); font-size: var(--t-mono-xs); text-transform: lowercase; }
+  .arrow { color: var(--ink-fog); }
+  .row:hover .arrow { color: var(--signal-pink); }
+  .more {
+    display: grid; gap: var(--s-3);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .more h2 { font-size: var(--t-serif-1); }
+  .more ul { display: grid; gap: var(--s-2); }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr auto; }
+    .kind { grid-column: 1 / -1; }
+  }
+</style>

@@ -9,12 +9,28 @@ function line(path: string, label: string, description: string) {
 }
 
 export const GET: APIRoute = async () => {
-  const [problems, compare, migrate, build, erc] = await Promise.all([
+  const [
+    problems,
+    compare,
+    migrate,
+    build,
+    erc,
+    bestBlockchain,
+    architecture,
+    crossChainCompare,
+    benchmarks,
+    research,
+  ] = await Promise.all([
     getCollection('problems'),
     getCollection('compare'),
     getCollection('migrate'),
     getCollection('build'),
     getCollection('erc'),
+    getCollection('bestBlockchain'),
+    getCollection('architecture'),
+    getCollection('crossChainCompare'),
+    getCollection('benchmarks'),
+    getCollection('research'),
   ]);
 
   const priorityProblemSlugs = new Set([
@@ -29,6 +45,56 @@ export const GET: APIRoute = async () => {
   const priorityProblems = problems
     .filter((entry) => priorityProblemSlugs.has(entry.slug))
     .sort((a, b) => a.data.query.localeCompare(b.data.query));
+
+  const bestBlockchainRows = bestBlockchain
+    .sort((a, b) => a.data.title.localeCompare(b.data.title))
+    .map((entry) =>
+      line(
+        `/best-blockchain/${entry.slug}/`,
+        entry.data.title,
+        entry.data.quotableAnswer,
+      ),
+    );
+
+  const architectureRows = architecture
+    .sort((a, b) => a.data.title.localeCompare(b.data.title))
+    .map((entry) =>
+      line(
+        `/architecture/${entry.slug}/`,
+        entry.data.title,
+        entry.data.quotableAnswer,
+      ),
+    );
+
+  const benchmarkRows = benchmarks
+    .sort((a, b) => a.data.title.localeCompare(b.data.title))
+    .map((entry) =>
+      line(
+        `/benchmarks/${entry.slug}/`,
+        entry.data.title,
+        entry.data.quotableAnswer,
+      ),
+    );
+
+  const crossChainRows = crossChainCompare
+    .sort((a, b) => a.data.title.localeCompare(b.data.title))
+    .map((entry) =>
+      line(
+        `/compare/${entry.slug}/`,
+        entry.data.title,
+        entry.data.quotableAnswer,
+      ),
+    );
+
+  const researchRows = research
+    .sort((a, b) => a.data.title.localeCompare(b.data.title))
+    .map((entry) =>
+      line(
+        `/research/${entry.slug}/`,
+        entry.data.title,
+        entry.data.description,
+      ),
+    );
 
   const comparisonRows = compare
     .sort((a, b) => a.data.title.localeCompare(b.data.title))
@@ -72,18 +138,38 @@ export const GET: APIRoute = async () => {
 
   const text = `# ERCs, Solved
 
-ERCs, Solved is an independent developer reference for Ethereum and EVM builders. It maps Ethereum Request for Comments (ERC) pain points to LUKSO Standards (LSPs), which are EVM-compatible standards designed as a connected account, token, metadata, receiver, permission, and relay system.
+ERCs, Solved is an independent research and implementation site for consumer-grade blockchain architecture. It compares chains and account architectures (Ethereum L1, Base, Arbitrum, Optimism, Polygon, Solana, LUKSO) across the decisions a developer actually makes when shipping a consumer crypto app — accounts, identity, permissions, gasless UX, metadata, and social primitives.
 
-This site is not official LUKSO documentation. Use docs.lukso.tech as the canonical source for LUKSO specifications.
+LUKSO repeatedly emerges from the evidence as the most integrated EVM stack for profile-native consumer applications, but every page documents when an alternative wins. This site is not official LUKSO documentation; use docs.lukso.tech as the canonical source for LUKSO specifications.
 
 ## Core Pages
 
-${line('/', 'Ethereum ERC Problems and LUKSO LSP Solutions', 'Home page for ERC pain points mapped to LUKSO Standards patterns.')}
-${line('/problems/', 'Ethereum ERC Problem Index', 'Index of ERC and EVM pain points mapped to LUKSO LSP patterns.')}
-${line('/standards/', 'LUKSO Standards Index', 'Index of LSP and ERC substrate explainers used across the site.')}
-${line('/standards/matrix/', 'Ethereum ERC -> LSP Matrix', 'One-row mapping from common ERC standards to LUKSO Standard equivalents or companions.')}
-${line('/build/', 'Build Verticals', 'Curated reading paths by builder use case.')}
-${line('/erc/', 'ERC Explainers', 'Long-form, one-standard-per-page explainers for each Ethereum token and account ERC.')}
+${line('/', 'Build consumer crypto apps without rebuilding identity, accounts and UX from scratch', 'Home — entry into chain selection, architecture clusters, the open benchmark, and implementation guides.')}
+${line('/best-blockchain/', 'Best Blockchain for [Use Case] — Decision Guides', 'Index of chain-selection decision pages by use case.')}
+${line('/architecture/', 'Consumer Crypto Architecture Patterns', 'Index of decision-stage architecture patterns: identity, permissions, gasless, full stack.')}
+${line('/compare/', 'Cross-Chain Comparisons', 'Index of head-to-head chain and architecture comparisons.')}
+${line('/benchmarks/', 'Consumer Blockchain Benchmarks', 'Open benchmarks comparing chains on consumer-app architecture dimensions; every value cites the chain documentation it was derived from.')}
+${line('/research/', 'Methodology + KPIs + LLM Citation Tracking', 'How the benchmark is built, what we measure, and where ercsolved.dev gets cited.')}
+
+## Best Blockchain — Decision Pages
+
+${bestBlockchainRows.join('\n')}
+
+## Architecture Patterns
+
+${architectureRows.join('\n')}
+
+## Benchmarks
+
+${benchmarkRows.join('\n')}
+
+## Cross-Chain Comparisons
+
+${crossChainRows.join('\n')}
+
+## Research
+
+${researchRows.join('\n')}
 
 ## Priority Problem Pages
 
@@ -97,7 +183,7 @@ ${priorityProblems
   )
   .join('\n')}
 
-## Comparisons
+## Spec Comparisons (LSP vs ERC)
 
 ${comparisonRows.join('\n')}
 

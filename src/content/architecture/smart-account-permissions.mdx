@@ -1,0 +1,110 @@
+---
+title: "Smart Account Permissions: Approaches Across EVM and Solana"
+pattern: "smart account permissions"
+pageTitle: "Smart Account Permissions: Session Keys, Modules, EIP-7702, LSP6"
+description: "How granular per-app, per-device, and per-function account permissions are expressed across the major chains — and the tradeoffs of each approach."
+quotableAnswer: "Smart account permissions decompose into four questions: granularity (per-app vs per-function), revocability (immediate vs delayed), recoverability (what happens when keys are lost), and standardization (is this a contract pattern or a protocol). ERC-4337 sets the account-abstraction stage but leaves permission scope to the account implementation; Safe modules give powerful but ad hoc per-module scopes; EIP-7702 makes EOAs temporarily smart but inherits the EOA's all-or-nothing key model; Solana relies on per-program access. LSP6 is the only chain-level standard that defines per-controller scopes covering function, address, and call-type permissions on the account itself."
+approaches:
+  - name: "ERC-4337 + session keys (per-SDK)"
+    summary: "Each AA SDK (Biconomy, ZeroDev, Safe SDK, Coinbase Smart Wallet) implements session keys differently. The EntryPoint validates UserOps; the account decides what permissions a session key has."
+    pros:
+      - "Works on every EVM chain."
+      - "Mature ecosystem of bundlers and paymasters."
+      - "Per-session expiry and scope are common."
+    cons:
+      - "No cross-SDK standard for what a 'session key' can do."
+      - "Bundler infrastructure required."
+      - "Revocation logic per SDK."
+    chains:
+      - "Ethereum L1"
+      - "Base"
+      - "Arbitrum"
+      - "Optimism"
+      - "Polygon"
+  - name: "Safe modules"
+    summary: "Safe accounts compose permission logic via modules: per-module scopes for spending limits, allowlists, signature schemes, and recovery."
+    pros:
+      - "Battle-tested; very large TVL custodied via Safe."
+      - "Modules can express arbitrary policy."
+      - "Recovery is well-understood."
+    cons:
+      - "Module permission semantics are per-module, not chain-standardized."
+      - "Each module is a separate contract to audit."
+    chains:
+      - "Ethereum L1"
+      - "Most EVM L2s"
+  - name: "EIP-7702 set-code on EOAs"
+    summary: "An EOA temporarily delegates code to a smart-contract implementation for a transaction or a window. Adds smart-account behavior without migrating the EOA."
+    pros:
+      - "Backwards-compatible upgrade path for existing EOAs."
+      - "No new account address."
+      - "Standardized at the protocol level."
+    cons:
+      - "The EOA root key still exists and can override delegated code."
+      - "Per-app scopes still depend on the delegated implementation."
+    chains:
+      - "Ethereum L1"
+      - "Most EVM L2s"
+  - name: "Solana program-derived access"
+    summary: "Each program defines its own access checks; programs derive PDAs for delegated authority. No chain-level account standard."
+    pros:
+      - "Tight per-program control."
+      - "Fee delegation is native."
+    cons:
+      - "No standardized cross-program permission concept."
+      - "Auditability is per-program."
+    chains:
+      - "Solana"
+  - name: "LSP6 Key Manager (LUKSO)"
+    summary: "LSP6 is a chain-level standard for per-controller permissions on an LSP0 account: each controller key has scope over functions, target addresses, call types, ERC-725Y data keys, and asset standards. Revocation is direct on the account."
+    pros:
+      - "Standardized at the chain level — every LSP6-aware tool understands the same scopes."
+      - "Per-app, per-device, and per-function granularity in one schema."
+      - "Revocation is a single transaction on the account."
+      - "Pairs natively with LSP25 for gasless execution."
+    cons:
+      - "Requires LSP-aware wallets / providers for full UI."
+      - "Custom permission shape compared to Safe modules."
+    chains:
+      - "LUKSO"
+recommendation: "Use ERC-4337 session keys when shipping inside an existing AA SDK and bundler infrastructure is already in place. Use Safe modules when complex policy (spending limits, multisig, recovery) is the priority and ecosystem trust matters. Use EIP-7702 for backwards-compatible upgrades to existing EOAs. Use Solana program-derived access when non-EVM is acceptable and per-program scope is enough. Use LSP6 when the app needs per-controller, per-function, per-address scopes standardized at the chain level — and immediate revocation from the account side."
+implementation:
+  - chip: "standard"
+    label: "LSP6 — Key Manager"
+    href: "/standards/lsp6-key-manager/"
+  - chip: "problem"
+    label: "Wallet permissions"
+    href: "/problems/wallet-permissions/"
+  - chip: "build"
+    label: "Smart wallet UX"
+    href: "/build/smart-wallet-ux/"
+  - chip: "compare"
+    label: "ERC-4337 vs EIP-7702 vs LUKSO"
+    href: "/compare/erc-4337-vs-eip-7702-vs-lukso/"
+sources:
+  - label: "ERC-4337 — Account Abstraction"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "EIP-7702 — Set EOA Account Code"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "Safe documentation"
+    href: "https://docs.safe.global/"
+  - label: "LSP6 — Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+related:
+  - "architecture/onchain-identity"
+  - "architecture/gasless-onboarding"
+  - "compare/erc-4337-vs-eip-7702-vs-lukso"
+  - "best-blockchain/digital-identity"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## What "permission" means here
+
+Permissions are the answer to "what is this key allowed to do." Modern consumer apps need finer-grained permissions than ECDSA-key-equals-full-control allows — a game session key should not be able to drain assets; a delegated mobile key should not be able to add new owners; a recovery key should only be able to rotate the active controller after a delay.
+
+Every approach above is a valid way to express those scopes; they differ in *where the scope lives* (in the SDK, in a module contract, in a delegated implementation, in the chain-level standard) and *what is portable* across applications.
+
+## The standardization tradeoff
+
+ERC-4337 session keys are flexible and mature; Safe modules are battle-tested. But neither is standardized at the chain level — the permission semantics are per-SDK or per-module. LSP6 standardizes the semantics. The cost is that LSP6 expresses a specific shape (function selector, target address, call type, asset standard, data key) that is opinionated; the benefit is that any LSP6-aware tool understands the same scopes without per-app integration.

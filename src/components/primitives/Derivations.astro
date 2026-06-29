@@ -1,0 +1,161 @@
+---
+import Crossref from './Crossref.astro';
+
+interface Citation {
+  chain: string;
+  label: string;
+  href: string;
+  excerpt?: string;
+}
+interface Derivation {
+  methodology: string;
+  citations: Citation[];
+}
+interface Test {
+  name: string;
+  description: string;
+  unit?: string;
+  derivation: Derivation;
+}
+interface Props {
+  tests: Test[];
+  heading?: string;
+  luksoLabel?: string;
+}
+const {
+  tests,
+  heading = 'How each metric was scored',
+  luksoLabel = 'LUKSO',
+} = Astro.props;
+---
+<section class="derivations">
+  <h2>{heading}.</h2>
+  <p class="lede">
+    Every value in the matrix above is derived from a chain's own documentation. The methodology paragraph for each metric explains what is being counted; the per-chain citations point at the document the number came from.
+  </p>
+  <ol class="list">
+    {tests.map((t, i) => (
+      <li class="item">
+        <header>
+          <span class="ord">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{t.name}</h3>
+          {t.unit && <span class="unit">unit · {t.unit}</span>}
+        </header>
+        <p class="methodology">{t.derivation.methodology}</p>
+        <ul class="citations">
+          {t.derivation.citations.map((c) => (
+            <li class:list={['cite', { 'is-lukso': c.chain === luksoLabel }]}>
+              <span class="chain">{c.chain}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+              <span class="source">
+                <Crossref href={c.href}>{c.label}</Crossref>
+              </span>
+              {c.excerpt && <span class="excerpt">{c.excerpt}</span>}
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .derivations { display: grid; gap: var(--s-5); }
+  .derivations > h2 { font-size: var(--t-serif-1); }
+  .derivations .lede {
+    color: var(--ink-bone-dim);
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    line-height: 1.65;
+    max-width: var(--reading);
+    margin: 0;
+  }
+  .list {
+    display: grid;
+    gap: var(--s-5);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .item {
+    border: 1px solid var(--ink-line);
+    background: var(--ink-paper);
+    padding: var(--s-4) var(--s-5);
+    display: grid;
+    gap: var(--s-3);
+  }
+  .item header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--s-3);
+  }
+  .ord {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    letter-spacing: 0.08em;
+  }
+  .item h3 {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: 22px;
+    color: var(--ink-bone);
+    line-height: 1.2;
+    margin: 0;
+  }
+  .unit {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+  }
+  .methodology {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone-dim);
+    line-height: 1.65;
+    margin: 0;
+    max-width: 78ch;
+  }
+  .citations {
+    display: grid;
+    gap: var(--s-2);
+    padding: var(--s-3) 0 0;
+    margin: 0;
+    list-style: none;
+    border-top: 1px dashed var(--ink-line);
+  }
+  .cite {
+    display: grid;
+    grid-template-columns: 14ch auto 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    line-height: 1.55;
+  }
+  .cite .chain {
+    color: var(--ink-bone);
+    text-transform: lowercase;
+  }
+  .cite.is-lukso .chain { color: var(--signal-pink); }
+  .cite .arrow { color: var(--ink-line); }
+  .cite .source { color: var(--ink-bone-dim); }
+  .cite .excerpt {
+    grid-column: 2 / -1;
+    color: var(--ink-fog);
+    font-size: var(--t-mono-xs);
+    line-height: 1.55;
+    margin-top: var(--s-1);
+  }
+
+  @media (max-width: 720px) {
+    .cite { grid-template-columns: 1fr; gap: var(--s-1); }
+    .cite .arrow { display: none; }
+    .cite .excerpt { grid-column: 1; }
+    .item header { grid-template-columns: auto 1fr; }
+    .unit { grid-column: 1 / -1; }
+  }
+</style>
