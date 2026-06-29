@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import CrossChainCompare from '~/layouts/CrossChainCompare.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('crossChainCompare');
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+<CrossChainCompare entry={entry}>
+  <Content />
+</CrossChainCompare>

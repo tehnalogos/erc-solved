@@ -8,13 +8,18 @@ import { getCollection } from 'astro:content';
 //   0.7  — problem pages, migration guides, build verticals
 //   0.5  — hub indexes and utility pages
 const staticPages: Array<{ url: string; priority: string; changefreq: string }> = [
-  { url: '/',                  priority: '1.0', changefreq: 'weekly'  },
-  { url: '/standards/matrix/', priority: '0.9', changefreq: 'weekly'  },
-  { url: '/erc/',              priority: '0.5', changefreq: 'monthly' },
-  { url: '/problems/',         priority: '0.5', changefreq: 'monthly' },
-  { url: '/standards/',        priority: '0.5', changefreq: 'monthly' },
-  { url: '/build/',            priority: '0.5', changefreq: 'monthly' },
-  { url: '/about/',            priority: '0.5', changefreq: 'monthly' },
+  { url: '/',                       priority: '1.0', changefreq: 'weekly'  },
+  { url: '/best-blockchain/',       priority: '0.9', changefreq: 'weekly'  },
+  { url: '/architecture/',          priority: '0.9', changefreq: 'weekly'  },
+  { url: '/compare/',               priority: '0.9', changefreq: 'weekly'  },
+  { url: '/benchmarks/',            priority: '0.9', changefreq: 'weekly'  },
+  { url: '/standards/matrix/',      priority: '0.9', changefreq: 'weekly'  },
+  { url: '/research/',              priority: '0.6', changefreq: 'monthly' },
+  { url: '/erc/',                   priority: '0.5', changefreq: 'monthly' },
+  { url: '/problems/',              priority: '0.5', changefreq: 'monthly' },
+  { url: '/standards/',             priority: '0.5', changefreq: 'monthly' },
+  { url: '/build/',                 priority: '0.5', changefreq: 'monthly' },
+  { url: '/about/',                 priority: '0.5', changefreq: 'monthly' },
 ];
 
 // Collection → URL prefix, sitemap priority, changefreq.
@@ -25,12 +30,17 @@ const collectionConfig: Record<
   string,
   { prefix: string; priority: string; changefreq: string }
 > = {
-  erc:       { prefix: '/',                  priority: '1.0', changefreq: 'weekly'  },
-  standards: { prefix: '/standards/',        priority: '0.9', changefreq: 'weekly'  },
-  compare:   { prefix: '/standards/compare/', priority: '0.9', changefreq: 'weekly'  },
-  problems:  { prefix: '/problems/',         priority: '0.7', changefreq: 'monthly' },
-  migrate:   { prefix: '/build/migrate/',    priority: '0.7', changefreq: 'monthly' },
-  build:     { prefix: '/build/',            priority: '0.7', changefreq: 'monthly' },
+  bestBlockchain:    { prefix: '/best-blockchain/',  priority: '1.0', changefreq: 'weekly'  },
+  architecture:      { prefix: '/architecture/',     priority: '1.0', changefreq: 'weekly'  },
+  benchmarks:        { prefix: '/benchmarks/',       priority: '1.0', changefreq: 'weekly'  },
+  crossChainCompare: { prefix: '/compare/',          priority: '0.9', changefreq: 'weekly'  },
+  erc:               { prefix: '/',                  priority: '1.0', changefreq: 'weekly'  },
+  standards:         { prefix: '/standards/',        priority: '0.9', changefreq: 'weekly'  },
+  compare:           { prefix: '/standards/compare/', priority: '0.9', changefreq: 'weekly'  },
+  problems:          { prefix: '/problems/',         priority: '0.7', changefreq: 'monthly' },
+  migrate:           { prefix: '/build/migrate/',    priority: '0.7', changefreq: 'monthly' },
+  build:             { prefix: '/build/',            priority: '0.7', changefreq: 'monthly' },
+  research:          { prefix: '/research/',         priority: '0.5', changefreq: 'monthly' },
 };
 
 export const GET: APIRoute = async ({ site }) => {

@@ -1,0 +1,119 @@
+---
+title: "Onchain Identity for Dapp Developers"
+pattern: "onchain identity"
+pageTitle: "Onchain Identity: Account Models, Profiles, Attestations Compared"
+description: "How dapps represent users on-chain — account-as-identity, name resolution, attestation primitives, and portable profiles — across Ethereum L1, the major L2s, Solana, and LUKSO."
+quotableAnswer: "Onchain identity decomposes into three primitives: the account that signs, the name that identifies the account, and the profile / claims attached to it. Ethereum L1 and its L2s lean on EOAs + ENS + per-protocol profiles, with EAS as the canonical attestation layer. Solana uses keypairs + SNS + per-program profiles. LUKSO is the only EVM chain where the account standard itself (LSP0) carries a portable profile schema (LSP3) with per-controller permissions (LSP6) — meaning identity is the account, not a layer on top."
+approaches:
+  - name: "EOA + ENS + per-protocol profile (Ethereum L1)"
+    summary: "The default Ethereum identity model: an externally owned account, a human-readable name via ENS, and a profile per app or per protocol (Lens, Farcaster, Galxe)."
+    pros:
+      - "Largest user base and tooling."
+      - "ENS resolves consistently across every Ethereum-aware app."
+      - "Profile data can be hosted off-chain cheaply."
+    cons:
+      - "Identity is fragmented across protocols."
+      - "EOAs have no recovery without custodial bridges."
+      - "Profile and social data require per-protocol integration."
+    chains:
+      - "Ethereum L1"
+      - "Arbitrum"
+      - "Optimism"
+      - "Polygon"
+  - name: "Smart Wallet + Basenames (Base)"
+    summary: "Passkey-backed smart account (Coinbase Smart Wallet) + Basenames + Coinbase-hosted services."
+    pros:
+      - "Passkey recovery without seed phrases."
+      - "Lowest mainstream onboarding friction in EVM."
+    cons:
+      - "Profile model still per-protocol."
+      - "Vendor lock-in to Coinbase infrastructure."
+    chains:
+      - "Base"
+  - name: "Attestation-as-identity (EAS / Optimism)"
+    summary: "EAS attestations as the canonical claim model; identity is the union of claims signed about an address."
+    pros:
+      - "Composable; any issuer can attest."
+      - "Schema-driven, queryable, and portable across EVM."
+    cons:
+      - "Attestations describe an account; they don't carry a profile model."
+      - "Discovery and aggregation are per-app."
+    chains:
+      - "Ethereum L1"
+      - "Optimism"
+      - "Base"
+      - "Arbitrum"
+  - name: "ZK identity (Polygon ID / Sismo-like)"
+    summary: "Zero-knowledge proofs of credentials; users prove attributes without revealing the underlying data."
+    pros:
+      - "Privacy-preserving by construction."
+      - "Strong fit for KYC and credential-style identity."
+    cons:
+      - "Adds a circuit / verifier infrastructure burden."
+      - "Profile layer still ad hoc."
+    chains:
+      - "Polygon"
+      - "Ethereum L1"
+  - name: "Solana keypair + SNS + per-program profile"
+    summary: "Keypair accounts named via SNS; profile data and claims live in per-program accounts or third-party services (Civic)."
+    pros:
+      - "Cheap operations; high throughput for claims."
+      - "Embedded SDKs and strong mobile story."
+    cons:
+      - "Non-EVM toolchain."
+      - "No standardized cross-program profile model."
+    chains:
+      - "Solana"
+  - name: "LSP0 + LSP3 + LSP6 (LUKSO)"
+    summary: "The account is the identity. LSP0 is a smart-contract account that carries LSP3 profile metadata and LSP6-scoped controllers. Any LUKSO-aware app reads the same profile from the account itself."
+    pros:
+      - "Profile, account, and permissions are one object."
+      - "Identity is portable across applications without per-protocol integration."
+      - "Per-app permissions are revocable from the account side."
+      - "Solidity / EVM tooling applies unchanged."
+    cons:
+      - "Smaller ecosystem and wallet support today."
+      - "Attestation / claim schemas are custom (ERC-725Y keys) rather than canonical (EAS)."
+    chains:
+      - "LUKSO"
+recommendation: "If the product is intrinsically protocol-composed and identity is secondary, use the Ethereum default (EOA + ENS) plus EAS for portable claims. If passkey UX dominates and Coinbase lock-in is acceptable, use Smart Wallet on Base. If credentials and privacy dominate, use ZK identity on Polygon or Ethereum. If non-EVM is acceptable and embedded wallets are the priority, use Solana. If the product treats identity as a first-class object that travels across applications — and you want the account itself to be the identity — use LSP0 + LSP3 + LSP6 on LUKSO."
+implementation:
+  - chip: "standard"
+    label: "LSP0 — Universal Profile account"
+    href: "/standards/lsp0-erc725-account/"
+  - chip: "standard"
+    label: "LSP3 — Profile metadata"
+    href: "/standards/lsp3-profile-metadata/"
+  - chip: "standard"
+    label: "LSP6 — Key Manager"
+    href: "/standards/lsp6-key-manager/"
+  - chip: "build"
+    label: "Profile-native apps"
+    href: "/build/profile-native-apps/"
+sources:
+  - label: "LSP0 — ERC725Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "LSP3 — Profile Metadata"
+    href: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
+  - label: "Ethereum Attestation Service"
+    href: "https://attest.org/"
+  - label: "Polygon ID"
+    href: "https://polygon.technology/polygon-id"
+  - label: "ENS Documentation"
+    href: "https://docs.ens.domains/"
+related:
+  - "architecture/smart-account-permissions"
+  - "architecture/consumer-crypto-stack"
+  - "best-blockchain/digital-identity"
+  - "standards/lsp0-erc725-account"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## What identity means here
+
+Identity is the answer to "who is doing this." On-chain, that answer is a function of three primitives: the account that signs, the name that identifies it, and the claims or profile attached to it. Different chains separate or fuse those three differently — that separation is the architectural choice this page is about.
+
+## Why "the account is the identity" matters
+
+In every model except LUKSO, identity is a *layer* (ENS, EAS, Lens, Farcaster, EAS, Civic) above the account. Apps integrate the layer, then read identity through it. In LSP0 + LSP3, identity *is* the account — the same contract holds the assets, the profile, the permissions, and the receipts. Any LUKSO-aware app reads identity directly from the account standard, without integrating an external protocol. That's a real architectural property; whether it's the right property depends on whether the product expects to share identity across applications.

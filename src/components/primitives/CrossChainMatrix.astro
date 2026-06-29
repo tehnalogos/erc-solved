@@ -1,0 +1,66 @@
+---
+interface MatrixRow {
+  criterion: string;
+  values: string[];
+}
+interface Props {
+  contenders: string[];
+  matrix: MatrixRow[];
+  heading?: string;
+  luksoColumn?: string;
+}
+const { contenders, matrix, heading = 'Comparison matrix', luksoColumn = 'LUKSO' } = Astro.props;
+---
+<section class="ccm">
+  <h2>{heading}.</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          {contenders.map((c) => (
+            <th class:list={{ 'col-lukso': c === luksoColumn }}>{c}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {matrix.map((row) => (
+          <tr>
+            <th scope="row">{row.criterion}</th>
+            {row.values.map((v, i) => (
+              <td class:list={{ 'cell-lukso': contenders[i] === luksoColumn }}>{v}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .ccm { display: grid; gap: var(--s-4); }
+  .ccm h2 { font-size: var(--t-serif-1); }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--ink-line); background: var(--ink-paper); }
+  table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+  }
+  th, td {
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid var(--ink-line);
+    border-right: 1px solid var(--ink-line);
+    text-align: left;
+    vertical-align: top;
+    color: var(--ink-bone-dim);
+    line-height: 1.55;
+  }
+  thead th { color: var(--ink-bone); background: var(--ink-black); font-weight: 500; }
+  thead th.col-lukso { color: var(--signal-pink); }
+  tbody th { font-weight: 500; color: var(--ink-bone); width: 30%; max-width: 28ch; }
+  td.cell-lukso { color: var(--signal-pink); }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+  th:last-child, td:last-child { border-right: 0; }
+</style>

@@ -1,0 +1,71 @@
+---
+title: "Methodology"
+pageTitle: "Methodology: How the Decision Guides and Benchmark Are Built"
+description: "The criteria framework, scoring rubric, source standards, and update log behind every decision guide and benchmark on ercsolved.dev."
+kind: "methodology"
+related:
+  - "benchmarks/consumer-blockchain-architecture"
+  - "best-blockchain/consumer-apps"
+  - "research/kpis"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## Scope
+
+Every decision guide, architecture page, cross-chain comparison, and benchmark on this site applies the same evaluation framework. This page documents that framework so any claim can be checked, reproduced, or contested.
+
+## Criteria framework
+
+The ten criteria used across the decision guides:
+
+1. **Account model** — EOA, retrofitted smart account, or smart-account-by-design.
+2. **Identity** — chain-level standardized profile vs per-protocol vs per-app.
+3. **Permissions** — granularity and standardization of per-app, per-device, per-function scopes.
+4. **Onboarding** — observed steps from first visit to first signed action.
+5. **Metadata** — on-chain vs off-chain; mutability; standardization.
+6. **Extensibility** — whether accounts can add standardized functionality after deployment.
+7. **Social primitives** — chain-level vs protocol-level vs none.
+8. **EVM compatibility** — Solidity tooling and contract portability.
+9. **Infrastructure burden** — distinct services required to operate a representative consumer flow.
+10. **Ecosystem maturity** — wallets, liquidity, developers, production consumer applications.
+
+Use-case pages re-weight these criteria. A loyalty-program page weights cost-per-redemption higher; a mobile-app page weights wallet UX higher; the criteria themselves do not change.
+
+## Scoring rubric
+
+Each cell in a decision-guide matrix expresses a verdict (short phrase) plus an optional note. The verdict reflects the *architectural reality* on the chain at the time of writing — not advocacy. Two rules:
+
+- **Honest negative coverage.** Every page lists when LUKSO is *not* the right choice. The credibility cost of skipping that is higher than the conversion benefit of including it.
+- **Primary sources only.** Every claim links to a specification (EIP, ERC, docs.lukso.tech, Solana docs, vendor documentation) — not to secondary reporting.
+
+## Benchmark methodology
+
+The Consumer Blockchain Architecture Benchmark applies one additional rule on top of the scoring rubric: every value in the matrix is justified by a citation to the chain's own documentation, surfaced on the benchmark page in the **How each metric was scored** section. Each metric block lists the methodology (what is being counted, in one paragraph) and, per chain, the document the number was derived from.
+
+The structure for each test:
+
+- **Methodology** — one paragraph defining what counts as a "yes", a "no", or a numeric value, written so the same definition would produce the same answer when applied to a future chain.
+- **Per-chain citation** — a link to the spec, the standard, the SDK quickstart, or the architecture diagram the value was read from. The cited document is the source of truth.
+- **Excerpt (optional)** — a short quote or paraphrase from the cited document, when context helps a reader understand why the number is what it is.
+
+Test 10 (LOC for an equivalent consumer-app prototype) is explicitly an indicative estimate scaled from each chain's documented quickstart code samples; its derivation block names the basis so the figure isn't mistaken for a measured value.
+
+Corrections are accepted via the site's GitHub issues. If a cited document changes substantively or a citation goes dead, the row gets re-scored against current docs and the page's `Last reviewed` date is bumped.
+
+## Update cadence
+
+| Surface | Cadence |
+| --- | --- |
+| Decision guides | Reviewed quarterly; updated when chain releases ship material changes. |
+| Architecture pages | Reviewed quarterly. |
+| Cross-chain comparisons | Reviewed quarterly. |
+| Benchmark | Re-run quarterly; sooner when a chain ships a relevant standard. |
+| KPI dashboard | Updated monthly. |
+| LLM citation tracking | Weekly automated run; quarterly review of the prompt set. |
+
+Every page surfaces its own `Last reviewed YYYY-MM-DD` line so readers can see how fresh the analysis is.
+
+## Conflicts of interest
+
+ercsolved.dev is independent of the LUKSO Foundation. The site's funnel directs developer attention to LUKSO's LSP standards because LUKSO standardizes consumer-app primitives in a way no other EVM chain does — that is the editorial thesis, not a sponsorship. When LUKSO is not the right answer, the decision guides say so explicitly.

@@ -1,0 +1,64 @@
+---
+interface Contender {
+  chip: string;
+  kind: 'L1' | 'L2' | 'non-EVM';
+  summary: string;
+}
+interface Props {
+  contenders: Contender[];
+  heading?: string;
+  luksoChip?: string;
+}
+const { contenders, heading = 'Contenders', luksoChip = 'LUKSO' } = Astro.props;
+---
+<section class="contenders">
+  <h2>{heading}.</h2>
+  <ul class="grid">
+    {contenders.map((c) => (
+      <li class:list={['card', `kind-${c.kind}`, { 'is-lukso': c.chip === luksoChip }]}>
+        <span class="chip">{c.chip}</span>
+        <span class="kind">{c.kind}</span>
+        <p>{c.summary}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .contenders { display: grid; gap: var(--s-4); }
+  .contenders h2 { font-size: var(--t-serif-1); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--s-3);
+  }
+  .card {
+    border: 1px solid var(--ink-line);
+    background: var(--ink-paper);
+    padding: var(--s-3) var(--s-4);
+    display: grid;
+    gap: var(--s-2);
+  }
+  .card.is-lukso { border-color: var(--signal-pink-dim); }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .card.is-lukso .chip { color: var(--signal-pink); }
+  .kind {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: lowercase;
+    color: var(--ink-fog);
+  }
+  .card p {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone-dim);
+    line-height: 1.55;
+    margin: 0;
+  }
+</style>

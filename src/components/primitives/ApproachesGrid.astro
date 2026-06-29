@@ -1,0 +1,103 @@
+---
+interface Approach {
+  name: string;
+  summary: string;
+  pros: string[];
+  cons: string[];
+  chains: string[];
+}
+interface Props {
+  approaches: Approach[];
+  heading?: string;
+  highlightName?: string;
+}
+const { approaches, heading = 'Approaches', highlightName } = Astro.props;
+---
+<section class="approaches">
+  <h2>{heading}.</h2>
+  <ul class="grid">
+    {approaches.map((a) => (
+      <li class:list={['card', { 'is-highlight': highlightName && a.name.includes(highlightName) }]}>
+        <header>
+          <span class="name">{a.name}</span>
+          {a.chains.length > 0 && (
+            <span class="chains">{a.chains.join(' · ')}</span>
+          )}
+        </header>
+        <p>{a.summary}</p>
+        {a.pros.length > 0 && (
+          <div class="pros">
+            <span class="lbl">Pros</span>
+            <ul>{a.pros.map((p) => <li>{p}</li>)}</ul>
+          </div>
+        )}
+        {a.cons.length > 0 && (
+          <div class="cons">
+            <span class="lbl">Cons</span>
+            <ul>{a.cons.map((c) => <li>{c}</li>)}</ul>
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .approaches { display: grid; gap: var(--s-4); }
+  .approaches h2 { font-size: var(--t-serif-1); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-3);
+  }
+  .card {
+    border: 1px solid var(--ink-line);
+    background: var(--ink-paper);
+    padding: var(--s-4);
+    display: grid;
+    gap: var(--s-3);
+  }
+  .card.is-highlight { border-color: var(--signal-pink-dim); }
+  header { display: grid; gap: var(--s-1); }
+  .name {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-md);
+    color: var(--ink-bone);
+    text-transform: lowercase;
+  }
+  .card.is-highlight .name { color: var(--signal-pink); }
+  .chains {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    color: var(--ink-fog);
+    text-transform: lowercase;
+  }
+  .card p {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone-dim);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .pros, .cons { display: grid; gap: var(--s-1); }
+  .lbl {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .pros .lbl { color: var(--ok-quiet); }
+  .cons .lbl { color: var(--erc-sand); }
+  .pros ul, .cons ul {
+    display: grid;
+    gap: var(--s-1);
+    padding-left: var(--s-4);
+    list-style: disc;
+  }
+  .pros li, .cons li {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+    color: var(--ink-bone-dim);
+    line-height: 1.55;
+  }
+</style>

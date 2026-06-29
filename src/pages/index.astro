@@ -4,7 +4,30 @@ import DiffArrow from '~/components/primitives/DiffArrow.astro';
 import Authorship from '~/components/primitives/Authorship.astro';
 
 const description =
-  'A spec-grade field guide for Ethereum and EVM builders. Ethereum Request for Comments (ERC) pain points mapped to the LUKSO LSP standards that were designed instead of layered.';
+  'Independent architecture comparisons and implementation guides for consumer crypto apps — smart accounts, gasless onboarding, onchain profiles, permissions, social primitives, and digital assets across Ethereum, EVM L2s, Solana, and LUKSO.';
+
+const decide = [
+  { label: 'Consumer apps',         use: 'general',         href: '/best-blockchain/consumer-apps/' },
+  { label: 'EVM consumer apps',     use: 'EVM only',        href: '/best-blockchain/evm-consumer-apps/' },
+  { label: 'Social apps',           use: 'identity-first',  href: '/best-blockchain/social-apps/' },
+  { label: 'Creator platforms',     use: 'mintable goods',  href: '/best-blockchain/creator-platforms/' },
+  { label: 'Loyalty programs',      use: 'gasless members', href: '/best-blockchain/loyalty-programs/' },
+  { label: 'Digital identity',      use: 'sovereignty',     href: '/best-blockchain/digital-identity/' },
+];
+
+const architect = [
+  { label: 'Consumer crypto stack',     pattern: 'the six decisions',   href: '/architecture/consumer-crypto-stack/' },
+  { label: 'Onchain identity',          pattern: 'account-as-identity', href: '/architecture/onchain-identity/' },
+  { label: 'Smart account permissions', pattern: 'per-controller',      href: '/architecture/smart-account-permissions/' },
+  { label: 'Gasless onboarding',        pattern: 'relayed execution',   href: '/architecture/gasless-onboarding/' },
+];
+
+const compare = [
+  { label: 'Ethereum vs Base vs LUKSO',                  href: '/compare/ethereum-vs-base-vs-lukso/' },
+  { label: 'ERC-4337 vs EIP-7702 vs LUKSO Universal Profiles', href: '/compare/erc-4337-vs-eip-7702-vs-lukso/' },
+  { label: 'Solana vs LUKSO for consumer apps',          href: '/compare/solana-vs-lukso-consumer-apps/' },
+  { label: 'Open benchmark — 10 dimensions across 7 chains', href: '/benchmarks/consumer-blockchain-architecture/' },
+];
 
 const verticals = [
   { label: 'Token economics',         stack: 'LSP7 + LSP4',                href: '/build/token-economics/' },
@@ -26,65 +49,70 @@ const commonPainPoints = [
 ---
 
 <Base
-  title="Ethereum ERC Problems and LUKSO LSP Solutions"
+  title="Build Consumer Crypto Apps Without Rebuilding Identity, Accounts, and UX From Scratch"
   description={description}
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Ethereum ERC Problems and LUKSO LSP Solutions',
+    name: 'Build Consumer Crypto Apps Without Rebuilding Identity, Accounts, and UX From Scratch',
     description,
     url: 'https://www.ercsolved.dev/',
     about: [
-      'Ethereum Request for Comments',
-      'ERC standards',
+      'Consumer crypto applications',
+      'Ethereum and EVM L2 architecture',
+      'Solana account model',
       'LUKSO LSP standards',
-      'EVM builder guidance',
+      'Smart accounts and account abstraction',
+      'Onchain identity and profiles',
+      'Gasless onboarding',
     ],
   }}
 >
-  <section class="hero has-halo" data-pagefind-body data-pagefind-meta="title:Ethereum ERC Problems and LUKSO LSP Solutions">
+  <section class="hero has-halo" data-pagefind-body data-pagefind-meta="title:Build Consumer Crypto Apps Without Rebuilding Identity, Accounts, and UX From Scratch">
     <div class="hero-inner">
       <div class="boot" aria-label="status">
         <span class="typed">
           <span class="sigil">//</span>
-          <span class="long">field manual · 12 problems · 15 standards · ready</span>
-          <span class="short">field manual · ready</span>
+          <span class="long">consumer crypto field manual · 12 problems · 15 standards · 7 chains</span>
+          <span class="short">consumer crypto · ready</span>
         </span>
         <span class="caret" aria-hidden="true">▍</span>
       </div>
 
       <h1 class="h1-stagger">
-        <span class="word" style="--i:0">ERCs</span>
-        <span class="word" style="--i:1">are</span>
-        <span class="word" style="--i:2">interfaces.</span>
+        <span class="word" style="--i:0">Build</span>
+        <span class="word" style="--i:1">consumer</span>
+        <span class="word" style="--i:2">crypto</span>
+        <span class="word" style="--i:3">apps</span>
         <span class="break"></span>
-        <span class="word dim" style="--i:3">LSPs</span>
-        <span class="word dim" style="--i:4">are</span>
-        <span class="word dim" style="--i:5">the</span>
-        <span class="word dim" style="--i:6">system.</span>
+        <span class="word dim" style="--i:4">without</span>
+        <span class="word dim" style="--i:5">rebuilding</span>
+        <span class="word dim" style="--i:6">identity,</span>
+        <span class="word dim" style="--i:7">accounts,</span>
+        <span class="word dim" style="--i:8">and</span>
+        <span class="word dim" style="--i:9">UX.</span>
       </h1>
 
       <p class="lede" data-reveal>
-        ERC-20, ERC-721, and ERC-1155 won by underspecifying. Every team since has paid the
-        integration
-        tax — approval phishing, NFTs stranded in vaults, tokenURI servers offline, EOAs you
-        can't recover, ERC-4337 stacks bolted on to fake what an account should be. This is the
-        reference for the standards that were designed instead of layered.
+        Independent architecture comparisons and implementation guides covering smart
+        accounts, gasless onboarding, onchain profiles, permissions, social primitives, and
+        digital assets across Ethereum, EVM L2s, Solana, and LUKSO. LUKSO repeatedly emerges
+        from the evidence as the most integrated EVM stack for profile-native consumer
+        applications — see <a class="ledelink" href="/benchmarks/consumer-blockchain-architecture/">the benchmark</a>.
       </p>
       <div class="cta-row" data-reveal>
-        <a class="cta magnetic" href="/problems/">
+        <a class="cta magnetic" href="/best-blockchain/consumer-apps/">
           <span class="bracket">[</span>
-          <span class="label">start with your problem</span>
+          <span class="label">pick the chain</span>
           <span class="arrow">→</span>
           <span class="bracket">]</span>
         </a>
-        <span class="cta-meta">or browse <a href="/standards/matrix/">the ERC ↔ LSP matrix</a></span>
+        <span class="cta-meta">or read <a href="/architecture/consumer-crypto-stack/">the architecture stack</a></span>
       </div>
     </div>
   </section>
 
   <script>
-    // Hero halo — pink radial gradient that follows the cursor.
     const hero = document.querySelector<HTMLElement>('.hero.has-halo');
     if (hero) {
       let raf = 0;
@@ -104,10 +132,9 @@ const commonPainPoints = [
       hero.addEventListener('pointerleave', () => { hero.dataset.halo = ''; });
     }
 
-    // Magnetic CTA — gentle pull toward the cursor when close.
     document.querySelectorAll<HTMLElement>('.magnetic').forEach((el) => {
-      const PULL = 0.22;       // % of distance from center
-      const RANGE = 90;        // px radius where magnetism kicks in
+      const PULL = 0.22;
+      const RANGE = 90;
       let raf = 0;
       const apply = (dx: number, dy: number) => {
         el.style.setProperty('--mx', `${dx}px`);
@@ -133,11 +160,92 @@ const commonPainPoints = [
     });
   </script>
 
+  <section class="band decide" data-reveal>
+    <div class="band-inner">
+      <div class="band-head">
+        <span class="eyebrow">decide · best blockchain for…</span>
+        <h2>Pick a chain by use case.</h2>
+        <p class="dim">Same architecture criteria, different weighting per use case. Honest verdicts about when each chain wins.</p>
+      </div>
+      <ul class="vert-grid">
+        {decide.map(v => (
+          <li>
+            <a class="vert" href={v.href}>
+              <span class="vert-label">{v.label}</span>
+              <span class="vert-stack">{v.use}</span>
+              <span class="vert-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="band architect" data-reveal>
+    <div class="band-inner">
+      <div class="band-head">
+        <span class="eyebrow">architect · patterns before chain</span>
+        <h2>Decide the pattern first.</h2>
+        <p class="dim">Every consumer crypto app makes six architecture decisions — accounts, identity, permissions, onboarding, metadata, social. Pick the pattern; the chain follows.</p>
+      </div>
+      <ul class="vert-grid four">
+        {architect.map(v => (
+          <li>
+            <a class="vert" href={v.href}>
+              <span class="vert-label">{v.label}</span>
+              <span class="vert-stack">{v.pattern}</span>
+              <span class="vert-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="band compare" data-reveal>
+    <div class="band-inner">
+      <div class="band-head">
+        <span class="eyebrow">compare · head-to-head</span>
+        <h2>Cross-chain comparisons + the open benchmark.</h2>
+      </div>
+      <ul class="query-list">
+        {compare.map(({ label, href }) => (
+          <li>
+            <a class="query-row" href={href}>
+              <span class="q">{label}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="band verticals" data-reveal>
+    <div class="band-inner">
+      <div class="band-head">
+        <span class="eyebrow">build · reading lists by vertical</span>
+        <h2>Pick a vertical. Get a reading list.</h2>
+      </div>
+      <ul class="vert-grid">
+        {verticals.map(v => (
+          <li>
+            <a class="vert" href={v.href}>
+              <span class="vert-label">{v.label}</span>
+              <span class="vert-stack">{v.stack}</span>
+              <span class="vert-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
   <section class="example">
     <div class="example-inner">
       <div class="example-head">
-        <span class="eyebrow">the pattern, in one example</span>
-        <h2 class="example-title">The approval problem, <span class="solved">solved.</span></h2>
+        <span class="eyebrow">standards & problems · the pattern, in one example</span>
+        <h2 class="example-title">ERCs are interfaces. LSPs are <span class="solved">the system.</span></h2>
         <p class="dim">
           A signature comparison. The <span class="amber">−</span> line is the ERC surface you
           inherit. The <span class="pink">+</span> line is the LSP design you can build around.
@@ -167,26 +275,6 @@ const commonPainPoints = [
     </div>
   </section>
 
-  <section class="band verticals" data-reveal>
-    <div class="band-inner">
-      <div class="band-head">
-        <span class="eyebrow">what are you building?</span>
-        <h2>Pick a vertical. Get a reading list.</h2>
-      </div>
-      <ul class="vert-grid">
-        {verticals.map(v => (
-          <li>
-            <a class="vert" href={v.href}>
-              <span class="vert-label">{v.label}</span>
-              <span class="vert-stack">{v.stack}</span>
-              <span class="vert-arrow" aria-hidden="true">→</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
   <section class="band queries" data-reveal>
     <div class="band-inner">
       <div class="band-head">
@@ -196,7 +284,7 @@ const commonPainPoints = [
       <ul class="query-list">
         {commonPainPoints.map(({ q, a, href }) => (
           <li>
-            <a class="query-row" href={href}>
+            <a class="query-row pain" href={href}>
               <span class="q">{q}</span>
               <span class="arrow" aria-hidden="true">→</span>
               <span class="a">{a}</span>
@@ -211,7 +299,7 @@ const commonPainPoints = [
     <div class="footnote-inner">
       <Authorship
         author="ercs-solved maintainers"
-        updated="2026-06-22"
+        updated="2026-06-29"
         editHref="https://github.com/tehnalogos/erc-solved/edit/main/src/pages/index.astro"
       />
     </div>
@@ -231,8 +319,6 @@ const commonPainPoints = [
     position: relative;
     min-width: 0;
   }
-  /* Prevent any wide child (e.g. the boot strip with nowrap) from
-     blowing up the grid past viewport width — would clip everything. */
   .hero-inner > * { min-width: 0; max-width: 100%; }
   .boot { max-width: 100%; overflow: hidden; }
 
@@ -252,6 +338,11 @@ const commonPainPoints = [
     font-size: var(--t-mono-md);
     color: var(--ink-bone-dim);
   }
+  .lede .ledelink {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .lede .ledelink:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
 
   .cta-row {
     display: flex;
@@ -286,43 +377,20 @@ const commonPainPoints = [
   }
   .cta-meta a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
 
-  .example {
-    padding: var(--s-7) var(--s-5) var(--s-9);
-    border-top: 1px solid var(--ink-line);
-  }
-  .example-inner {
-    max-width: var(--container);
-    margin: 0 auto;
-    display: grid;
-    gap: var(--s-5);
-  }
-  .example-head { display: grid; gap: var(--s-3); }
-  .example-title {
-    font-size: clamp(28px, 3.5vw, 44px);
-    max-width: 18ch;
-  }
-  .example-title .solved { color: var(--signal-pink); }
-  .example-head p { max-width: 64ch; }
-  .amber { color: var(--erc-sand); font-family: var(--font-mono); }
-  .pink  { color: var(--signal-pink); font-family: var(--font-mono); }
-
-  .example-foot { font-size: var(--t-mono-sm); }
-  .example-foot a {
-    color: var(--ink-bone);
-    border-bottom: 1px solid var(--ink-line);
-  }
-  .example-foot a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
-
   .band { padding: var(--s-9) var(--s-5); border-top: 1px solid var(--ink-line); }
   .band-inner { max-width: var(--container); margin: 0 auto; display: grid; gap: var(--s-6); }
-  .band-head { display: grid; gap: var(--s-3); }
+  .band-head { display: grid; gap: var(--s-3); max-width: 72ch; }
   .band-head h2 { font-size: clamp(28px, 3.5vw, 44px); }
+  .band-head p.dim { color: var(--ink-bone-dim); }
 
   .vert-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     border-top: 1px solid var(--ink-line);
     border-left: 1px solid var(--ink-line);
+  }
+  .vert-grid.four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .vert {
     display: grid;
@@ -365,30 +433,62 @@ const commonPainPoints = [
   }
   .query-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: baseline;
     gap: var(--s-4);
     padding: var(--s-4) var(--s-2);
     border-bottom: 1px solid var(--ink-line);
     font-family: var(--font-mono);
   }
-  .query-row .q { color: var(--erc-sand); font-size: var(--t-mono-md); }
+  .query-row.pain {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+  .query-row .q { color: var(--ink-bone); font-size: var(--t-mono-md); }
+  .query-row.pain .q { color: var(--erc-sand); }
   .query-row .arrow { color: var(--ink-line); }
   .query-row .a { color: var(--signal-pink); font-size: var(--t-mono-md); }
   .query-row:hover { background: var(--ink-paper); }
   .query-row:hover .arrow { color: var(--ink-bone); }
 
-  .footnote { padding: 0 var(--s-5); }
+  .example {
+    padding: var(--s-7) var(--s-5) var(--s-9);
+    border-top: 1px solid var(--ink-line);
+  }
+  .example-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    gap: var(--s-5);
+  }
+  .example-head { display: grid; gap: var(--s-3); }
+  .example-title {
+    font-size: clamp(28px, 3.5vw, 44px);
+    max-width: 18ch;
+  }
+  .example-title .solved { color: var(--signal-pink); }
+  .example-head p { max-width: 64ch; }
+  .amber { color: var(--erc-sand); font-family: var(--font-mono); }
+  .pink  { color: var(--signal-pink); font-family: var(--font-mono); }
+
+  .example-foot { font-size: var(--t-mono-sm); }
+  .example-foot a {
+    color: var(--ink-bone);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .example-foot a:hover { color: var(--signal-pink); border-color: var(--signal-pink); }
+
+  .footnote { padding: 0 var(--s-5) var(--s-7); }
   .footnote-inner { max-width: var(--container); margin: 0 auto; }
 
   @media (max-width: 900px) {
     .vert-grid { grid-template-columns: 1fr; }
+    .vert-grid.four { grid-template-columns: 1fr; }
   }
   @media (max-width: 640px) {
     .hero { padding: var(--s-7) var(--s-4) var(--s-5); }
-    .example { padding: var(--s-6) var(--s-4) var(--s-7); }
     .band { padding: var(--s-7) var(--s-4); }
-    .query-row { grid-template-columns: 1fr; gap: var(--s-1); padding: var(--s-3) 0; }
-    .query-row .arrow { display: none; }
+    .example { padding: var(--s-6) var(--s-4) var(--s-7); }
+    .query-row.pain { grid-template-columns: 1fr; gap: var(--s-1); padding: var(--s-3) 0; }
+    .query-row.pain .arrow { display: none; }
   }
 </style>

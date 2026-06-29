@@ -56,6 +56,7 @@ const compare = defineCollection({
     left: z.object({ chip: z.string(), label: z.string() }),
     right: z.object({ chip: z.string(), label: z.string() }),
     description: z.string(),
+    canonical: z.string().optional(),
     verdict: z.object({
       useLeft: z.string(),
       useRight: z.string(),
@@ -65,6 +66,156 @@ const compare = defineCollection({
       .array(z.object({ row: z.string(), left: z.string(), right: z.string() }))
       .default([]),
     docs: z.array(z.object({ label: z.string(), href: z.string().url() })).default([]),
+    related: z.array(z.string()).default([]),
+    author: z.string().default('ercs-solved maintainers'),
+    updated: z.coerce.date(),
+  }),
+});
+
+const ratingSchema = z.object({
+  contender: z.string(),
+  verdict: z.string(),
+  note: z.string().optional(),
+});
+
+const sourceSchema = z.object({ label: z.string(), href: z.string().url() });
+
+const bestBlockchain = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    useCase: z.string(),
+    pageTitle: z.string(),
+    description: z.string(),
+    quotableAnswer: z.string(),
+    criteria: z.array(z.object({ name: z.string(), evaluates: z.string() })),
+    contenders: z.array(
+      z.object({
+        chip: z.string(),
+        kind: z.enum(['L1', 'L2', 'non-EVM']),
+        summary: z.string(),
+      }),
+    ),
+    matrix: z.array(
+      z.object({
+        criterion: z.string(),
+        ratings: z.array(ratingSchema),
+      }),
+    ),
+    verdicts: z.array(z.object({ contender: z.string(), when: z.string() })),
+    implementation: z
+      .array(z.object({ chip: z.string(), label: z.string(), href: z.string() }))
+      .default([]),
+    sources: z.array(sourceSchema).default([]),
+    methodologyHref: z.string().default('/research/methodology/'),
+    related: z.array(z.string()).default([]),
+    author: z.string().default('ercs-solved maintainers'),
+    updated: z.coerce.date(),
+  }),
+});
+
+const architecture = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    pattern: z.string(),
+    pageTitle: z.string(),
+    description: z.string(),
+    quotableAnswer: z.string(),
+    approaches: z.array(
+      z.object({
+        name: z.string(),
+        summary: z.string(),
+        pros: z.array(z.string()).default([]),
+        cons: z.array(z.string()).default([]),
+        chains: z.array(z.string()).default([]),
+      }),
+    ),
+    recommendation: z.string(),
+    implementation: z
+      .array(z.object({ chip: z.string(), label: z.string(), href: z.string() }))
+      .default([]),
+    sources: z.array(sourceSchema).default([]),
+    related: z.array(z.string()).default([]),
+    author: z.string().default('ercs-solved maintainers'),
+    updated: z.coerce.date(),
+  }),
+});
+
+const crossChainCompare = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    pageTitle: z.string(),
+    contenders: z.array(z.string()),
+    useCase: z.string(),
+    description: z.string(),
+    quotableAnswer: z.string(),
+    matrix: z.array(
+      z.object({
+        criterion: z.string(),
+        values: z.array(z.string()),
+      }),
+    ),
+    verdicts: z.array(z.object({ contender: z.string(), when: z.string() })),
+    sources: z.array(sourceSchema).default([]),
+    related: z.array(z.string()).default([]),
+    author: z.string().default('ercs-solved maintainers'),
+    updated: z.coerce.date(),
+  }),
+});
+
+const benchmarks = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    pageTitle: z.string(),
+    description: z.string(),
+    quotableAnswer: z.string(),
+    chains: z.array(z.string()),
+    datasetCsv: z.string(),
+    datasetJson: z.string(),
+    methodologyHref: z.string().default('/research/methodology/'),
+    tests: z.array(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        unit: z.string().optional(),
+        results: z.array(
+          z.object({
+            chain: z.string(),
+            value: z.string(),
+            source: z.string().url().optional(),
+          }),
+        ),
+        derivation: z.object({
+          methodology: z.string(),
+          citations: z.array(
+            z.object({
+              chain: z.string(),
+              label: z.string(),
+              href: z.string().url(),
+              excerpt: z.string().optional(),
+            }),
+          ),
+        }),
+      }),
+    ),
+    sources: z.array(sourceSchema).default([]),
+    related: z.array(z.string()).default([]),
+    author: z.string().default('ercs-solved maintainers'),
+    lastRun: z.coerce.date(),
+    updated: z.coerce.date(),
+  }),
+});
+
+const research = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    pageTitle: z.string(),
+    description: z.string(),
+    kind: z.enum(['methodology', 'kpis', 'evals', 'note']).default('note'),
     related: z.array(z.string()).default([]),
     author: z.string().default('ercs-solved maintainers'),
     updated: z.coerce.date(),
@@ -278,4 +429,16 @@ const erc = defineCollection({
   }),
 });
 
-export const collections = { problems, standards, compare, migrate, build, erc };
+export const collections = {
+  problems,
+  standards,
+  compare,
+  migrate,
+  build,
+  erc,
+  bestBlockchain,
+  architecture,
+  crossChainCompare,
+  benchmarks,
+  research,
+};

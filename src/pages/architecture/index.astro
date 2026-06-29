@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import Article from '~/layouts/Article.astro';
+import Crossref from '~/components/primitives/Crossref.astro';
+
+const entries = (await getCollection('architecture')).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+
+const description =
+  'Architecture patterns that precede chain selection: smart account permissions, gasless onboarding, onchain identity, and the consumer crypto stack as a whole.';
+---
+<Article
+  title="Consumer Crypto Architecture Patterns"
+  description={description}
+  pageTitle="Consumer Crypto Architecture Patterns: Decision-Stage Guides"
+  eyebrow="architecture · index"
+  author="ercs-solved maintainers"
+  updated="2026-06-29"
+  editPath="src/pages/architecture/index.astro"
+>
+  <p class="lede">{description}</p>
+  <p class="lede">
+    Decide the pattern before locking in a chain. Each page lists every competing approach
+    honestly — ERC-4337, EIP-7702, Safe modules, Solana program-derived accounts, LUKSO LSPs —
+    with explicit pros, cons, and "when each wins" recommendations.
+  </p>
+  <ul class="list">
+    {entries.map((e) => (
+      <li>
+        <a class="row" href={`/architecture/${e.slug}/`}>
+          <span class="title">{e.data.title}</span>
+          <span class="pattern">{e.data.pattern}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <section class="more">
+    <h2>Where this fits.</h2>
+    <ul>
+      <li><Crossref href="/best-blockchain/">Best blockchain decision guides</Crossref> — chain selection by use case.</li>
+      <li><Crossref href="/benchmarks/consumer-blockchain-architecture/">Open benchmark</Crossref> — reproducible data behind these recommendations.</li>
+    </ul>
+  </section>
+</Article>
+
+<style>
+  .lede { color: var(--ink-bone-dim); max-width: 72ch; }
+  .list { display: grid; border-top: 1px solid var(--ink-line); }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: var(--s-4);
+    align-items: baseline;
+    padding: var(--s-4) 0;
+    border-bottom: 1px solid var(--ink-line);
+    font-family: var(--font-mono);
+  }
+  .row:hover { background: var(--ink-paper); }
+  .title { color: var(--ink-bone); font-size: var(--t-mono-md); }
+  .pattern { color: var(--signal-pink); font-size: var(--t-mono-sm); text-transform: lowercase; }
+  .arrow { color: var(--ink-fog); }
+  .row:hover .arrow { color: var(--signal-pink); }
+  .more {
+    display: grid;
+    gap: var(--s-3);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--ink-line);
+    max-width: var(--reading);
+  }
+  .more h2 { font-size: var(--t-serif-1); }
+  .more ul { display: grid; gap: var(--s-2); }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr auto; }
+    .pattern { grid-column: 1 / -1; }
+  }
+</style>

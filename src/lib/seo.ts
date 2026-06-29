@@ -192,6 +192,105 @@ export function howToJsonLd(input: {
   };
 }
 
+export function articleJsonLd({
+  headline,
+  description,
+  path,
+  updated,
+  author = AUTHOR_NAME,
+  about = [],
+  keywords,
+}: ArticleInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline,
+    description,
+    author: { '@type': 'Organization', name: author },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    mainEntityOfPage: absoluteUrl(path),
+    dateModified: updated ? new Date(updated).toISOString().slice(0, 10) : undefined,
+    isAccessibleForFree: true,
+    about,
+    ...(keywords?.length ? { keywords: keywords.join(', ') } : {}),
+  };
+}
+
+type DatasetVariable = { name: string; description?: string; unit?: string };
+export function datasetJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+  csvPath?: string;
+  jsonPath?: string;
+  repoUrl?: string;
+  variables?: DatasetVariable[];
+  keywords?: string[];
+  updated?: Date | string;
+  license?: string;
+}) {
+  const distribution: Record<string, unknown>[] = [];
+  if (input.csvPath) {
+    distribution.push({
+      '@type': 'DataDownload',
+      encodingFormat: 'text/csv',
+      contentUrl: absoluteUrl(input.csvPath),
+    });
+  }
+  if (input.jsonPath) {
+    distribution.push({
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: absoluteUrl(input.jsonPath),
+    });
+  }
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: input.name,
+    description: input.description,
+    url: absoluteUrl(input.path),
+    isAccessibleForFree: true,
+    license: input.license ?? 'https://creativecommons.org/licenses/by/4.0/',
+    creator: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    ...(input.updated ? { dateModified: new Date(input.updated).toISOString().slice(0, 10) } : {}),
+    ...(distribution.length ? { distribution } : {}),
+    ...(input.repoUrl ? { isBasedOn: input.repoUrl } : {}),
+    ...(input.variables?.length
+      ? {
+          variableMeasured: input.variables.map((v) => ({
+            '@type': 'PropertyValue',
+            name: v.name,
+            ...(v.description ? { description: v.description } : {}),
+            ...(v.unit ? { unitText: v.unit } : {}),
+          })),
+        }
+      : {}),
+    ...(input.keywords?.length ? { keywords: input.keywords.join(', ') } : {}),
+  };
+}
+
+export function bestBlockchainPageTitle(useCase: string) {
+  return `Best Blockchain for ${useCase}: An EVM-Native Architecture Comparison`;
+}
+
+export function architecturePageTitle(pattern: string) {
+  return `${pattern}: Architecture Patterns Compared`;
+}
+
+export function crossChainPageTitle(contenders: string[], useCase?: string) {
+  const head = contenders.join(' vs ');
+  return useCase ? `${head}: ${useCase}` : head;
+}
+
 export function techArticleJsonLd({
   headline,
   description,

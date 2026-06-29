@@ -1,0 +1,43 @@
+---
+interface Props {
+  label?: string;
+}
+const { label } = Astro.props;
+---
+<section class="quotable" data-quotable role="note" aria-label="Summary">
+  {label && <span class="eyebrow">{label}</span>}
+  <div class="body"><slot /></div>
+</section>
+
+<style>
+  .quotable {
+    border: 1px solid var(--ink-line);
+    border-left: 3px solid var(--signal-pink);
+    background: var(--ink-paper);
+    padding: var(--s-4) var(--s-5);
+    display: grid;
+    gap: var(--s-2);
+    max-width: var(--reading);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--signal-pink);
+  }
+  .body {
+    color: var(--ink-bone);
+    font-size: var(--t-mono-md);
+    line-height: 1.65;
+    font-family: var(--font-mono);
+  }
+  .body :global(p) { margin: 0; }
+  .body :global(p + p) { margin-top: var(--s-3); }
+  .body :global(strong) { color: var(--ink-bone); font-weight: 500; }
+  .body :global(a) {
+    color: var(--signal-pink);
+    border-bottom: 1px solid var(--signal-pink-dim);
+  }
+  .body :global(a:hover) { border-color: var(--signal-pink); }
+</style>

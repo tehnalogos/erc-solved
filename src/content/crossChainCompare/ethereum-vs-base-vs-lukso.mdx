@@ -1,0 +1,87 @@
+---
+title: "Ethereum vs Base vs LUKSO for Consumer Apps"
+pageTitle: "Ethereum vs Base vs LUKSO for Consumer Apps: Account Models, Identity, Onboarding"
+contenders: ["Ethereum L1", "Base", "LUKSO"]
+useCase: "consumer apps"
+description: "Head-to-head comparison of Ethereum L1, Base, and LUKSO for shipping a consumer crypto app — account model, identity, onboarding, permissions, social primitives, and ecosystem maturity."
+quotableAnswer: "Ethereum L1 wins on liquidity, protocol composability, and ecosystem maturity, with consumer UX layered on via ERC-4337. Base wins on onboarding via Coinbase Smart Wallet and passkey-based recovery, with vendor-hosted infrastructure reducing operational burden. LUKSO wins when more than two of identity, permissions, social, and gasless need to be standardized at the chain level — and the team accepts an early ecosystem in exchange for an integrated architecture."
+matrix:
+  - criterion: "Account model"
+    values:
+      - "EOA + ERC-4337 (per-SDK)"
+      - "EOA + Coinbase Smart Wallet (passkeys)"
+      - "LSP0 smart account by default"
+  - criterion: "Identity"
+    values:
+      - "ENS + per-protocol profile"
+      - "Basenames + Smart Wallet"
+      - "LSP3 portable profile"
+  - criterion: "Permissions"
+    values:
+      - "Session keys via AA SDK"
+      - "Session keys via Smart Wallet"
+      - "LSP6 per-controller scopes"
+  - criterion: "Onboarding"
+    values:
+      - "High friction (EOA + AA stack)"
+      - "Low friction (Coinbase-hosted)"
+      - "Low friction (LSP25 relayer)"
+  - criterion: "Social primitives"
+    values:
+      - "Protocol-layer (Lens, Farcaster)"
+      - "Farcaster dominant"
+      - "LSP26 follower system"
+  - criterion: "Gasless UX"
+    values:
+      - "Paymaster + bundler"
+      - "Coinbase paymaster"
+      - "LSP25 relayer (no bundler)"
+  - criterion: "Liquidity / DeFi reach"
+    values:
+      - "Deepest"
+      - "Growing fast"
+      - "Limited"
+  - criterion: "Ecosystem maturity"
+    values:
+      - "Mature"
+      - "Maturing fast"
+      - "Early"
+  - criterion: "Vendor lock-in"
+    values:
+      - "None"
+      - "Coinbase-hosted services"
+      - "LSP-aware wallets / providers"
+verdicts:
+  - contender: "Ethereum L1"
+    when: "Liquidity, protocol composability, or institutional credibility is the binding constraint. Use Ethereum L1 when the product is intrinsically protocol-shaped."
+  - contender: "Base"
+    when: "Mainstream consumer reach via Coinbase distribution and passkey UX dominates. The lock-in to Coinbase-hosted infrastructure is acceptable."
+  - contender: "LUKSO"
+    when: "The product is identity-first or social-first; needs gasless interaction without bundler infrastructure; benefits from per-controller permissions; or expects to share profile data across multiple applications without per-protocol integration."
+sources:
+  - label: "Ethereum.org documentation"
+    href: "https://ethereum.org/en/developers/docs/"
+  - label: "Base documentation"
+    href: "https://docs.base.org/"
+  - label: "LUKSO Tech Documentation"
+    href: "https://docs.lukso.tech/"
+  - label: "Coinbase Smart Wallet"
+    href: "https://www.smartwallet.dev/"
+related:
+  - "best-blockchain/consumer-apps"
+  - "best-blockchain/evm-consumer-apps"
+  - "compare/erc-4337-vs-eip-7702-vs-lukso"
+  - "architecture/consumer-crypto-stack"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## Why these three
+
+Three chains, three different bets on what a consumer crypto app needs:
+
+- **Ethereum L1** is the largest possible market and the deepest liquidity, but the consumer-app stack is composed from separately maintained protocols and infrastructure.
+- **Base** is the lowest-friction onboarding surface in EVM today, but the integration story is vendor-hosted — Coinbase owns the wallet, the paymaster, and most of the distribution.
+- **LUKSO** is the only EVM L1 where account, permissions, relay, profile, and social are unified under one set of LSPs — the trade is an early ecosystem in exchange for chain-level integration.
+
+Pick the bet that matches the constraint your product is bound by.

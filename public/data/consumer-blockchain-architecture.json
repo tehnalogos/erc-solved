@@ -1,0 +1,145 @@
+{
+  "name": "Consumer Blockchain Architecture Benchmark",
+  "version": "2026-06-29",
+  "license": "CC-BY-4.0",
+  "source": "https://www.ercsolved.dev/benchmarks/consumer-blockchain-architecture/",
+  "repository": "https://github.com/tehnalogos/consumer-blockchain-benchmark",
+  "chains": ["Ethereum L1", "Base", "Arbitrum", "Optimism", "Polygon", "Solana", "LUKSO"],
+  "tests": [
+    {
+      "name": "Infrastructure components for gas sponsorship",
+      "unit": "count",
+      "lower_is_better": true,
+      "results": {
+        "Ethereum L1": 4,
+        "Base": 2,
+        "Arbitrum": 4,
+        "Optimism": 4,
+        "Polygon": 3,
+        "Solana": 1,
+        "LUKSO": 1
+      }
+    },
+    {
+      "name": "Contracts + services for profile-aware account",
+      "unit": "count",
+      "lower_is_better": true,
+      "results": {
+        "Ethereum L1": 5,
+        "Base": 4,
+        "Arbitrum": 5,
+        "Optimism": 5,
+        "Polygon": 5,
+        "Solana": 3,
+        "LUKSO": 2
+      }
+    },
+    {
+      "name": "Steps from first visit to first signed action",
+      "unit": "steps",
+      "lower_is_better": true,
+      "results": {
+        "Ethereum L1": 7,
+        "Base": 3,
+        "Arbitrum": 6,
+        "Optimism": 6,
+        "Polygon": 5,
+        "Solana": 4,
+        "LUKSO": 3
+      }
+    },
+    {
+      "name": "Granularity of standardized permissions",
+      "unit": "dimensions",
+      "higher_is_better": true,
+      "results": {
+        "Ethereum L1": 0,
+        "Base": 0,
+        "Arbitrum": 0,
+        "Optimism": 0,
+        "Polygon": 0,
+        "Solana": 0,
+        "LUKSO": 5
+      }
+    },
+    {
+      "name": "Cross-application profile shared",
+      "unit": "yes/no",
+      "results": {
+        "Ethereum L1": "no",
+        "Base": "no",
+        "Arbitrum": "no",
+        "Optimism": "no",
+        "Polygon": "no",
+        "Solana": "no",
+        "LUKSO": "yes (LSP3)"
+      }
+    },
+    {
+      "name": "Assets notify receiving account",
+      "unit": "yes/no",
+      "results": {
+        "Ethereum L1": "per-token (ERC-721/1155 onReceived)",
+        "Base": "per-token",
+        "Arbitrum": "per-token",
+        "Optimism": "per-token",
+        "Polygon": "per-token",
+        "Solana": "no",
+        "LUKSO": "yes (LSP1)"
+      }
+    },
+    {
+      "name": "Accounts can add functionality post-deployment",
+      "unit": "yes/no",
+      "results": {
+        "Ethereum L1": "per-account (Safe modules / Diamonds)",
+        "Base": "per-account",
+        "Arbitrum": "per-account",
+        "Optimism": "per-account",
+        "Polygon": "per-account",
+        "Solana": "per-program",
+        "LUKSO": "yes (LSP17)"
+      }
+    },
+    {
+      "name": "Standardized mutable token metadata",
+      "unit": "yes/no",
+      "results": {
+        "Ethereum L1": "ERC-4906 signal",
+        "Base": "ERC-4906 signal",
+        "Arbitrum": "ERC-4906 signal",
+        "Optimism": "ERC-4906 signal",
+        "Polygon": "ERC-4906 signal",
+        "Solana": "Metaplex mutability",
+        "LUKSO": "yes (LSP4 + ERC-725Y)"
+      }
+    },
+    {
+      "name": "Chain-level social relationships protocol",
+      "unit": "yes/no",
+      "results": {
+        "Ethereum L1": "no (Lens, Farcaster are protocols above)",
+        "Base": "no (Farcaster)",
+        "Arbitrum": "no",
+        "Optimism": "no",
+        "Polygon": "no (Lens)",
+        "Solana": "no",
+        "LUKSO": "yes (LSP26)"
+      }
+    },
+    {
+      "name": "LOC for equivalent consumer-app prototype",
+      "unit": "LOC",
+      "lower_is_better": true,
+      "results": {
+        "Ethereum L1": "~3200",
+        "Base": "~2400",
+        "Arbitrum": "~3100",
+        "Optimism": "~3100",
+        "Polygon": "~2900",
+        "Solana": "~2200",
+        "LUKSO": "~900"
+      }
+    }
+  ]
+}

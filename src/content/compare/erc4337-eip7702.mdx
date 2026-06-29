@@ -3,7 +3,8 @@ title: "ERC-4337 vs EIP-7702"
 left: { chip: "ERC-4337", label: "alt-mempool smart accounts" }
 right: { chip: "EIP-7702", label: "EOA delegation" }
 description: "ERC-4337 and EIP-7702 are complementary account-abstraction paths: 4337 defines the UserOperation, EntryPoint, bundler, and paymaster architecture; 7702 lets existing EOAs delegate execution to contract code."
-updated: 2026-06-26
+canonical: "/compare/erc-4337-vs-eip-7702-vs-lukso/"
+updated: 2026-06-29
 verdict:
   useLeft: "Use ERC-4337 when the product is a contract-account wallet flow that needs UserOperations, bundlers, paymasters, validation modules, and the current AA vendor ecosystem."
   useRight: "Use EIP-7702 when the product must upgrade existing EOAs in place: keep the same address, ENS, history, reputation, and airdrop footprint while delegating execution to wallet code."

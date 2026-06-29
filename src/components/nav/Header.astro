@@ -3,10 +3,12 @@ import Wordmark from '~/components/brand/Wordmark.astro';
 
 const pathname = Astro.url.pathname;
 const nav = [
-  { label: 'Problems', href: '/problems/' },
-  { label: 'Explainers', href: '/erc/' },
-  { label: 'Standards', href: '/standards/' },
+  { label: 'Decide', href: '/best-blockchain/' },
+  { label: 'Architecture', href: '/architecture/' },
+  { label: 'Compare', href: '/compare/' },
+  { label: 'Benchmarks', href: '/benchmarks/' },
   { label: 'Build', href: '/build/' },
+  { label: 'Standards', href: '/standards/' },
 ];
 const isActive = (href: string) =>
   href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -103,8 +105,8 @@ const isActive = (href: string) =>
       width: 100%;
       min-width: 0;
       display: grid;
-      grid-template-columns: repeat(4, max-content) minmax(0, 1fr);
-      gap: var(--s-4);
+      grid-template-columns: repeat(6, max-content) minmax(0, 1fr);
+      gap: var(--s-3);
     }
     .search-trigger {
       justify-self: end;
@@ -113,9 +115,9 @@ const isActive = (href: string) =>
     }
   }
 
-  @media (max-width: 560px) {
+  @media (max-width: 720px) {
     nav {
-      grid-template-columns: repeat(4, max-content);
+      grid-template-columns: repeat(3, max-content);
       gap: var(--s-3);
     }
     .search-trigger {

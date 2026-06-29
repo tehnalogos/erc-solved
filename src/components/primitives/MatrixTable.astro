@@ -1,0 +1,89 @@
+---
+interface Rating {
+  contender: string;
+  verdict: string;
+  note?: string;
+}
+interface MatrixRow {
+  criterion: string;
+  ratings: Rating[];
+}
+interface Props {
+  contenders: string[];
+  matrix: MatrixRow[];
+  heading?: string;
+  luksoColumn?: string;
+}
+const { contenders, matrix, heading = 'Decision matrix', luksoColumn = 'LUKSO' } = Astro.props;
+---
+<section class="matrix">
+  <h2>{heading}.</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          {contenders.map((c) => (
+            <th class:list={{ 'col-lukso': c === luksoColumn }}>{c}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {matrix.map((row) => (
+          <tr>
+            <th scope="row">{row.criterion}</th>
+            {contenders.map((c) => {
+              const r = row.ratings.find((x) => x.contender === c);
+              return (
+                <td class:list={{ 'cell-lukso': c === luksoColumn }}>
+                  <span class="verdict">{r?.verdict ?? '—'}</span>
+                  {r?.note && <span class="note">{r.note}</span>}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .matrix { display: grid; gap: var(--s-4); }
+  .matrix h2 { font-size: var(--t-serif-1); }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--ink-line); background: var(--ink-paper); }
+  table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: var(--t-mono-sm);
+  }
+  th, td {
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid var(--ink-line);
+    border-right: 1px solid var(--ink-line);
+    text-align: left;
+    vertical-align: top;
+    color: var(--ink-bone-dim);
+    line-height: 1.55;
+  }
+  thead th { color: var(--ink-bone); background: var(--ink-black); font-weight: 500; }
+  thead th.col-lukso { color: var(--signal-pink); }
+  tbody th {
+    font-weight: 500;
+    color: var(--ink-bone);
+    width: 30%;
+    max-width: 28ch;
+  }
+  td .verdict { display: block; color: var(--ink-bone); }
+  td .note {
+    display: block;
+    margin-top: var(--s-1);
+    color: var(--ink-fog);
+    font-size: var(--t-mono-xs);
+  }
+  td.cell-lukso .verdict { color: var(--signal-pink); }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+  th:last-child, td:last-child { border-right: 0; }
+</style>

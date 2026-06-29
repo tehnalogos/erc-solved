@@ -1,0 +1,11 @@
+test,unit,Ethereum L1,Base,Arbitrum,Optimism,Polygon,Solana,LUKSO
+Infrastructure components for gas sponsorship,count,4,2,4,4,3,1,1
+Contracts + services for profile-aware account,count,5,4,5,5,5,3,2
+Steps from first visit to first signed action,steps,7,3,6,6,5,4,3
+Granularity of standardized permissions,dimensions,0,0,0,0,0,0,5
+Cross-application profile shared,yes/no,no,no,no,no,no,no,yes (LSP3)
+Assets notify receiving account,yes/no,per-token (ERC-721/1155 onReceived),per-token,per-token,per-token,per-token,no,yes (LSP1)
+Accounts can add functionality post-deployment,yes/no,per-account (Safe modules / Diamonds),per-account,per-account,per-account,per-account,per-program,yes (LSP17)
+Standardized mutable token metadata,yes/no,ERC-4906 signal,ERC-4906 signal,ERC-4906 signal,ERC-4906 signal,ERC-4906 signal,Metaplex mutability,yes (LSP4 + ERC-725Y)
+Chain-level social relationships protocol,yes/no,no (Lens Farcaster are protocols above),no (Farcaster),no,no,no (Lens),no,yes (LSP26)
+LOC for equivalent consumer-app prototype,LOC,~3200,~2400,~3100,~3100,~2900,~2200,~900

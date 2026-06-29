@@ -1,0 +1,119 @@
+---
+title: "Gasless Onboarding Patterns"
+pattern: "gasless onboarding"
+pageTitle: "Gasless Onboarding: ERC-2771, ERC-4337 Paymasters, EIP-7702, LSP25 Compared"
+description: "How consumer crypto apps sponsor user transactions — meta-transactions, paymasters, EIP-7702 delegation, native fee delegation, and chain-standard relayed execution — and the operational tradeoffs of each."
+quotableAnswer: "Gasless onboarding has five mature patterns: meta-transactions via ERC-2771, paymasters via ERC-4337, set-code delegation via EIP-7702, vendor-hosted paymasters (Coinbase, Polygon Gas Station), native fee delegation (Solana), and relayed execution via account standard (LSP25). They differ in operational burden (do you run bundlers?), revocability (can the user constrain what the sponsor can sign?), and standardization (is the relay logic in your SDK, in a separate protocol, or in the account itself). For consumer apps that want to sponsor every interaction without operating bundler infrastructure, LSP25 and Solana fee delegation are the lowest-burden options; LSP25 wins among EVM stacks because the scope is constrained by LSP6 on the same account."
+approaches:
+  - name: "ERC-2771 meta-transactions"
+    summary: "User signs a typed-data message; a trusted forwarder submits it on-chain. Older but still widely used pattern."
+    pros:
+      - "Simple to implement; no bundler infrastructure."
+      - "Works on every EVM chain."
+    cons:
+      - "Requires forwarder integration in every contract being called."
+      - "No standard account-level scope; forwarder is fully trusted."
+    chains:
+      - "Ethereum L1"
+      - "All EVM L2s"
+  - name: "ERC-4337 paymaster + bundler"
+    summary: "Users sign UserOps; a paymaster contract pays gas; a bundler aggregates UserOps to the EntryPoint. Modern AA stack."
+    pros:
+      - "Standardized account-abstraction stack."
+      - "Per-operation policy on the paymaster."
+      - "Ecosystem of bundler / paymaster providers."
+    cons:
+      - "Bundler + paymaster + indexer required."
+      - "Paymaster policy logic is per-implementation."
+      - "Multiple new components to operate or rent."
+    chains:
+      - "Ethereum L1"
+      - "Base"
+      - "Arbitrum"
+      - "Optimism"
+      - "Polygon"
+  - name: "Vendor-hosted paymaster (Base / Polygon)"
+    summary: "Coinbase or Polygon hosts the paymaster and bundler. App configures a sponsorship policy."
+    pros:
+      - "Lowest operational burden in the EVM ecosystem."
+      - "Strong UX out of the box."
+    cons:
+      - "Vendor lock-in for sponsorship and bundler services."
+      - "Policy logic still per-implementation."
+    chains:
+      - "Base"
+      - "Polygon"
+  - name: "EIP-7702 set-code delegation"
+    summary: "EOA delegates to a smart-account implementation for the duration of a transaction. Pairs with paymaster for gasless flows."
+    pros:
+      - "Backwards-compatible with existing EOAs."
+      - "Standardized at the protocol level."
+    cons:
+      - "Still requires a paymaster + bundler combo for full gasless UX."
+      - "EOA root key remains overridable."
+    chains:
+      - "Ethereum L1"
+      - "Most EVM L2s"
+  - name: "Solana native fee delegation"
+    summary: "Solana transactions have a separate fee payer field. Any signer can pay; the user doesn't need a balance."
+    pros:
+      - "Built into the protocol; no bundler infrastructure."
+      - "Lowest overhead among production chains."
+    cons:
+      - "Non-EVM."
+      - "Scope of what the fee-payer can sign is per-program."
+    chains:
+      - "Solana"
+  - name: "LSP25 Execute Relay Call (LUKSO)"
+    summary: "LSP25 standardizes how a relayer submits a signed call to an LSP0 account. The relayer pays gas; the scope of what the relayed call can do is enforced by LSP6 on the same account."
+    pros:
+      - "No bundler / EntryPoint infrastructure."
+      - "Per-controller scope is enforced by LSP6 on the same account."
+      - "Standardized at the chain level — every LSP25-aware relayer behaves the same way."
+    cons:
+      - "Requires LSP25-aware relayer infrastructure."
+      - "Specific to LSP0 accounts."
+    chains:
+      - "LUKSO"
+recommendation: "Use ERC-2771 only when integrating with legacy contracts that already support forwarders. Use vendor-hosted paymasters (Base, Polygon) when the lowest operational burden among EVM and the vendor lock-in is acceptable. Use ERC-4337 with self-hosted bundlers when you need full control over the sponsorship pipeline and have the operational capacity to run it. Use EIP-7702 to upgrade existing EOAs without changing their address. Use Solana fee delegation when non-EVM is acceptable. Use LSP25 when the app needs standardized relayed execution scoped by LSP6 — and wants to avoid the bundler / EntryPoint / paymaster split entirely."
+implementation:
+  - chip: "standard"
+    label: "LSP25 — Execute Relay Call"
+    href: "/standards/lsp25-execute-relay-call/"
+  - chip: "build"
+    label: "Gasless onboarding (LSP25 + LSP6)"
+    href: "/build/gasless-onboarding/"
+  - chip: "erc"
+    label: "Gasless transactions explainer"
+    href: "/gasless-transactions/"
+  - chip: "problem"
+    label: "ERC-4337 bundler tax"
+    href: "/problems/erc4337-bundler-tax/"
+sources:
+  - label: "ERC-2771 — Secure Protocol for Native Meta Transactions"
+    href: "https://eips.ethereum.org/EIPS/eip-2771"
+  - label: "ERC-4337 — Account Abstraction"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "EIP-7702 — Set EOA Account Code"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "LSP25 — Execute Relay Call"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "Solana fee payers"
+    href: "https://solana.com/docs/core/fees"
+related:
+  - "architecture/smart-account-permissions"
+  - "architecture/consumer-crypto-stack"
+  - "compare/erc-4337-vs-eip-7702-vs-lukso"
+  - "best-blockchain/loyalty-programs"
+  - "problems/erc4337-bundler-tax"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## What "gasless" actually means
+
+"Gasless" is a UX claim, not a technical one — somebody pays the gas. The architectural choice is *who*, *with what scope*, *via which infrastructure*, and *what does the user have to trust*. The six approaches above all answer those questions; they differ in how much infrastructure the app operates and how the user's scope is constrained.
+
+## The bundler question
+
+The single biggest operational decision is whether you run bundler infrastructure. ERC-4337 makes the bundler a permanent part of the stack. Vendor-hosted paymasters externalize it. EIP-7702 still depends on it for full gasless UX. Solana avoids it via native fee delegation. LSP25 avoids it by making relayed execution part of the account standard itself — the relayer is a simple submit-call service, not a new piece of protocol infrastructure.

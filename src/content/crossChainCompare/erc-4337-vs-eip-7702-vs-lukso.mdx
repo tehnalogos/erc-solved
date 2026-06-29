@@ -1,0 +1,99 @@
+---
+title: "ERC-4337 vs EIP-7702 vs LUKSO Universal Profiles"
+pageTitle: "ERC-4337 vs EIP-7702 vs LUKSO Universal Profiles: Account Architectures Compared"
+contenders: ["ERC-4337", "EIP-7702", "LUKSO Universal Profile"]
+useCase: "smart-account architecture"
+description: "Three approaches to giving users a smart account on the EVM: ERC-4337 (account abstraction over EOAs), EIP-7702 (set-code delegation on EOAs), and LUKSO Universal Profiles (smart accounts as the chain default). What each actually does, and when each wins."
+quotableAnswer: "ERC-4337 ships account abstraction over a transaction system designed for EOAs — bundlers, EntryPoint, paymasters, and a parallel mempool sit on top of the chain. EIP-7702 lets an EOA temporarily delegate to a smart-contract implementation, keeping the EOA address but inheriting the EOA's all-or-nothing root key. LUKSO Universal Profiles ship account abstraction as the chain default — LSP0 is the account, LSP6 is the permission model, LSP25 is the relay protocol, all standardized. Choose ERC-4337 when you need EVM-wide compatibility and have bundler infrastructure; choose EIP-7702 for backwards-compatible upgrades of existing EOAs; choose LUKSO when the account standard itself should carry permissions and relayed execution."
+matrix:
+  - criterion: "Account type"
+    values:
+      - "Smart contract account, EOA still exists"
+      - "EOA with delegated code"
+      - "Smart contract account (LSP0)"
+  - criterion: "Default on which chains"
+    values:
+      - "None — opt-in stack on every EVM chain"
+      - "Per-EOA opt-in on EVM chains supporting EIP-7702"
+      - "Default account on LUKSO L1"
+  - criterion: "Infrastructure required"
+    values:
+      - "Bundler + EntryPoint + paymaster + indexer"
+      - "Paymaster + bundler (for full gasless UX)"
+      - "LSP25 relayer (single submit-call service)"
+  - criterion: "Permission model"
+    values:
+      - "Per-SDK session keys (Biconomy, ZeroDev, Coinbase, Safe)"
+      - "Inherits delegated implementation; EOA root key overrides"
+      - "LSP6 per-controller scopes (function, address, call type, data key)"
+  - criterion: "Revocation"
+    values:
+      - "Per-SDK; per-session expiry common"
+      - "Per delegated implementation; root key can override"
+      - "Single transaction on the account; immediate"
+  - criterion: "Recovery"
+    values:
+      - "Per-SDK; passkey-based in Smart Wallet / Safe modules in Safe"
+      - "Inherits delegated implementation"
+      - "Multi-controller / social recovery via LSP6 + LSP14"
+  - criterion: "Gasless UX"
+    values:
+      - "Paymaster + bundler"
+      - "Paymaster + bundler"
+      - "LSP25 relayer (no bundler)"
+  - criterion: "Cross-app portability"
+    values:
+      - "Address portable; permission semantics per-SDK"
+      - "Address portable; behavior depends on current delegation"
+      - "Account, profile, permissions, social all portable as one object"
+  - criterion: "EVM compatibility"
+    values:
+      - "Works on every EVM chain"
+      - "Works on EVM chains that adopt the EIP"
+      - "Native on LUKSO; works as EIP-4337-style smart account on any EVM chain"
+  - criterion: "Maturity"
+    values:
+      - "Mature; production-deployed across L1 + L2s"
+      - "Recent; rolling out as part of Pectra"
+      - "Production on LUKSO since mainnet (2023+)"
+verdicts:
+  - contender: "ERC-4337"
+    when: "EVM-wide compatibility is the binding constraint, and the team is willing to operate (or rent) bundler + paymaster infrastructure. Best fit when the app needs to work everywhere on EVM."
+  - contender: "EIP-7702"
+    when: "Backwards compatibility with existing EOAs is the priority — users keep their address but gain smart-account behavior. Best fit when upgrading an existing EOA user base."
+  - contender: "LUKSO Universal Profile"
+    when: "The app benefits from chain-level standardization of accounts, permissions, and relayed execution — and is willing to ship on LUKSO L1 to get all three integrated."
+sources:
+  - label: "ERC-4337 — Account Abstraction"
+    href: "https://eips.ethereum.org/EIPS/eip-4337"
+  - label: "EIP-7702 — Set EOA Account Code"
+    href: "https://eips.ethereum.org/EIPS/eip-7702"
+  - label: "LSP0 — ERC725Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "LSP6 — Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "LSP25 — Execute Relay Call"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+related:
+  - "architecture/smart-account-permissions"
+  - "architecture/gasless-onboarding"
+  - "best-blockchain/consumer-apps"
+  - "problems/erc4337-bundler-tax"
+  - "standards-compare/erc4337-eip7702"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## The three philosophies
+
+These three are not interchangeable implementations of the same idea — they're three different answers to "what should an account be."
+
+- **ERC-4337** says: the account stays a smart contract above an EOA-shaped transaction system. The bundler + EntryPoint + paymaster are a parallel infrastructure that makes smart accounts possible without protocol changes. The benefit is universality across EVM chains; the cost is parallel infrastructure.
+
+- **EIP-7702** says: keep the EOA address, but let it temporarily delegate to smart-account code. The benefit is backwards compatibility — users keep their existing address and the EOA-shaped tx pool still works. The cost is the EOA root key still exists and overrides the delegated implementation, so the security model is "EOA at root, smart account when convenient."
+
+- **LUKSO Universal Profile** says: the account standard itself is a smart contract. There is no EOA underneath; LSP0 is the account, and LSP6 carries permissions, LSP25 carries relayed execution, LSP3 carries profile metadata. The benefit is integration — every layer is standardized at the chain. The cost is shipping on LUKSO and using LSP-aware tooling.
+
+## Where this page extends the spec-level comparison
+
+For the standard-level diff between ERC-4337 and EIP-7702, see the existing [ERC-4337 vs EIP-7702 spec comparison](/standards/compare/erc4337-eip7702/). This page adds the LUKSO Universal Profile column and re-frames the decision from "which standard" to "which account architecture."

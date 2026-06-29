@@ -1,0 +1,75 @@
+---
+title: "KPI Dashboard"
+pageTitle: "KPI Dashboard: Measuring Whether LUKSO Entered the Consumer-Crypto Consideration Set"
+description: "Monthly KPIs tracking discovery-stage visibility — non-branded impressions, top-10 rankings for cornerstone queries, LUKSO LLM inclusion rate, and citation share."
+kind: "kpis"
+related:
+  - "research/methodology"
+  - "research/llm-citations"
+  - "benchmarks/consumer-blockchain-architecture"
+author: "ercs-solved maintainers"
+updated: 2026-06-29
+---
+
+## What this dashboard measures
+
+Traffic alone is the wrong primary metric here. The question is whether LUKSO appears in the developer's consideration set *before* they have searched for it — and whether the site's research and decision guides are part of what gets cited when that happens.
+
+The dashboard tracks nine metrics across three categories.
+
+## Search visibility (Search Console + Bing Webmaster)
+
+| Metric | Definition | Baseline (2026-06-29) | Latest |
+| --- | --- | --- | --- |
+| Non-branded impressions | Impressions on queries that do not contain "LUKSO" or "LSP". | TBD (baseline run after launch) | — |
+| Top-10 ranks (cornerstone) | Number of the 12 cornerstone queries in Google top-10. | 0 | — |
+| Bing AI cited URLs | URLs from ercsolved.dev cited in Bing AI Performance preview. | 0 | — |
+| Grounding queries | Queries Bing AI used to retrieve ercsolved.dev pages. | — | — |
+
+The 12 cornerstone queries:
+
+- best blockchain for consumer apps
+- best EVM chain for consumer dapps
+- best blockchain for social apps
+- best blockchain for creator platforms
+- best blockchain for loyalty programs
+- best blockchain for digital identity
+- best blockchain for NFT marketplaces
+- ERC-4337 alternatives
+- ERC-4337 vs EIP-7702
+- onchain identity for dapp developers
+- smart account permissions
+- how to build gasless crypto onboarding
+
+## LLM visibility (prompt-set tracker)
+
+| Metric | Definition | Baseline | Latest |
+| --- | --- | --- | --- |
+| LUKSO inclusion rate | % of tracked prompts where the answer mentions LUKSO. | TBD | — |
+| LUKSO recommendation rate | % where the answer recommends LUKSO for an appropriate use case. | TBD | — |
+| Citation share | % of generative answers that cite an ercsolved.dev URL. | TBD | — |
+| Competitor co-occurrence | % where LUKSO appears alongside Ethereum / Base / Solana in the same answer. | TBD | — |
+| Entity accuracy | % where the answer's LUKSO description is factually correct. | TBD | — |
+
+See [the LLM citations page](/research/llm-citations/) for the prompt set, the run history, and the methodology behind these numbers.
+
+## Distribution
+
+| Metric | Definition | Baseline | Latest |
+| --- | --- | --- | --- |
+| Independent referring domains | Distinct reputable developer sources that cite the research. | TBD | — |
+
+## How this gets updated
+
+The KPI table is hand-edited monthly. The numbers come from:
+
+- **Google Search Console** — non-branded impressions, top-10 ranks.
+- **Bing Webmaster Tools (AI Performance preview)** — cited URLs, grounding queries.
+- **The LLM evals repository** — inclusion / recommendation / citation / co-occurrence / entity accuracy.
+- **Ahrefs / OSS link-graph data** — independent referring domains.
+
+If a metric is `TBD`, it means the baseline measurement has not yet been recorded after launching the new surface area. The first month after launch is intentionally a baseline; meaningful changes are reported from month two onward.
+
+## What "good" looks like
+
+This is the first version of the dashboard. Targets will be set after one full quarter of data; until then the table is a structure, not a scoreboard.
