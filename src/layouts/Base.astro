@@ -39,12 +39,21 @@ const siteJsonLd = [
     name: 'ERCs, Solved',
     url: siteUrl,
     description: 'A field manual for Ethereum ERC problems and the LUKSO LSP standards that solve them.',
+    publisher: { '@type': 'Organization', name: 'ERCs, Solved', url: siteUrl },
+    inLanguage: 'en',
   },
   {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'ERCs, Solved',
+    alternateName: 'ercsolved.dev',
     url: siteUrl,
+    logo: `${siteUrl}/favicon.svg`,
+    description:
+      'Independent developer reference mapping Ethereum ERC standards to the LUKSO LSP standards that address their limitations.',
+    sameAs: [
+      'https://github.com/tehnalogos/erc-solved',
+    ],
   },
 ];
 const jsonLdPayload = jsonLd

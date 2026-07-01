@@ -3,6 +3,7 @@ import Article from './Article.astro';
 import StandardChip from '~/components/brand/StandardChip.astro';
 import DiffArrow from '~/components/primitives/DiffArrow.astro';
 import Verdict from '~/components/primitives/Verdict.astro';
+import QuotableAnswer from '~/components/primitives/QuotableAnswer.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
 import { getEntry } from 'astro:content';
 import {
@@ -71,7 +72,7 @@ const about = [
   jsonLd={[
     techArticleJsonLd({
       headline: pageTitle,
-      description: data.description,
+      description: data.quotableAnswer ?? data.description,
       path: problemPath,
       updated: data.updated,
       author: data.author,
@@ -106,6 +107,12 @@ const about = [
     from={data.diff.from}
     to={data.diff.to}
   />
+
+  {data.quotableAnswer && (
+    <QuotableAnswer label="quotable answer">
+      <p>{data.quotableAnswer}</p>
+    </QuotableAnswer>
+  )}
 
   <section class="answer">
     <span class="eyebrow">LUKSO route</span>

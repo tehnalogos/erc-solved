@@ -13,19 +13,30 @@ import {
   breadcrumbJsonLd,
   faqPageJsonLd,
   bestBlockchainPageTitle,
+  absoluteUrl,
+  slugify,
 } from '~/lib/seo';
 
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
 const path = `/best-blockchain/${slug}/`;
+const canonical = absoluteUrl(path);
 const pageTitle = data.pageTitle ?? bestBlockchainPageTitle(data.useCase);
 const contenderChips = data.contenders.map((c: any) => c.chip);
 
-const faqs = data.criteria.map((c: any) => ({
-  q: `${c.name}: how does each chain compare for ${data.useCase}?`,
-  a: c.evaluates,
-}));
+const faqs = [
+  ...data.criteria.map((c: any) => ({
+    q: `${c.name}: how does each chain compare for ${data.useCase}?`,
+    a: c.evaluates,
+    url: `${canonical}#criteria-${slugify(c.name)}`,
+  })),
+  ...data.verdicts.map((v: any) => ({
+    q: `When is ${v.contender} the right choice for ${data.useCase}?`,
+    a: v.when,
+    url: `${canonical}#verdict-${slugify(v.contender)}`,
+  })),
+];
 ---
 <Article
   title={data.title}
@@ -68,7 +79,7 @@ const faqs = data.criteria.map((c: any) => ({
 
   <Contenders contenders={data.contenders} heading="What we compared" />
 
-  <CriteriaTable criteria={data.criteria} heading="How we compared" />
+  <CriteriaTable criteria={data.criteria} heading="How we compared" idPrefix="criteria-" />
 
   <MatrixTable
     contenders={contenderChips}
@@ -76,7 +87,7 @@ const faqs = data.criteria.map((c: any) => ({
     heading="Decision matrix"
   />
 
-  <VerdictsBlock verdicts={data.verdicts} heading="When each wins" />
+  <VerdictsBlock verdicts={data.verdicts} heading="When each wins" idPrefix="verdict-" />
 
   {data.implementation?.length > 0 && (
     <section class="implementation">

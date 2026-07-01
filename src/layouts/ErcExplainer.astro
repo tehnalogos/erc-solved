@@ -4,6 +4,7 @@ import Base from './Base.astro';
 
 const md = (s?: string) => (s ? marked.parse(s) : '');
 import Authorship from '~/components/primitives/Authorship.astro';
+import QuotableAnswer from '~/components/primitives/QuotableAnswer.astro';
 import StandardChip from '~/components/brand/StandardChip.astro';
 import SpecBlock from '~/components/primitives/SpecBlock.astro';
 import DiffArrow from '~/components/primitives/DiffArrow.astro';
@@ -68,7 +69,7 @@ const faqsWithUrls = (data.faqs ?? []).map((f: any) => ({
 const jsonLd = [
   techArticleJsonLd({
     headline: data.pageTitle,
-    description: data.description,
+    description: data.quotableAnswer ?? data.description,
     path,
     updated: data.updated,
     author: data.author,
@@ -145,6 +146,26 @@ const pivot = {
 const pivotParts = pivot.headline.split(
   new RegExp(`(${pivot.highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`),
 );
+
+// Answer-shaped H2 headings. Defaults interpolate the standard name so
+// AI answer engines (Perplexity, ChatGPT, Google AI Overviews) can extract
+// them as standalone answer titles. Per-page override via `sectionHeadings`.
+const headings = {
+  origin: data.sectionHeadings?.origin ?? `How ${data.title} came to be.`,
+  spec:
+    data.sectionHeadings?.spec ??
+    (hasAbi ? `What ${data.title} actually is.` : `How ${data.title} actually works.`),
+  whatsBroken:
+    data.sectionHeadings?.whatsBroken ?? `What's broken about ${data.title}.`,
+  authorCriticism:
+    data.sectionHeadings?.authorCriticism ??
+    `What ${data.title} co-authors said about the standard.`,
+  compare:
+    data.sectionHeadings?.compare ?? `How ${data.title} and ${compareRightLabel} compare.`,
+  whenToUseWhich:
+    data.sectionHeadings?.whenToUseWhich ??
+    `When to use ${data.title} vs ${compareRightLabel}.`,
+};
 
 const toc = [
   { depth: 2, text: `What is ${data.title}?`,   slug: 'what-it-is' },
@@ -312,13 +333,20 @@ const toc = [
         <Verdict tone="use-lsp" label="tl;dr">
           <p>{data.tldr}</p>
         </Verdict>
+        {data.quotableAnswer && (
+          <div class="quotable-wrap">
+            <QuotableAnswer label="quotable answer">
+              <p>{data.quotableAnswer}</p>
+            </QuotableAnswer>
+          </div>
+        )}
       </div>
     </section>
 
     <section class="band" id="origin">
       <div class="band-inner">
         <span class="eyebrow">how the standard came to be</span>
-        <h2>The origin story.<a class="anchor" href="#origin" aria-label="Link to this section">#</a></h2>
+        <h2>{headings.origin}<a class="anchor" href="#origin" aria-label="Link to this section">#</a></h2>
         {data.origin && (
           <div class="prose" set:html={md(data.origin)} />
         )}
@@ -345,7 +373,7 @@ const toc = [
     <section class="band" id="the-spec">
       <div class="band-inner">
         <span class="eyebrow">{hasAbi ? 'the spec, end to end' : 'the stack, end to end'}</span>
-        <h2>{hasAbi ? `What ${data.title} actually is.` : `How ${data.title} actually works.`}<a class="anchor" href="#the-spec" aria-label="Link to this section">#</a></h2>
+        <h2>{headings.spec}<a class="anchor" href="#the-spec" aria-label="Link to this section">#</a></h2>
         {hasAbi && (
           <SpecBlock chip={data.title} chipKind={pageChipKind} caption={`${data.eipNumber ?? data.title} interface`} lang="solidity">{data.abi}</SpecBlock>
         )}
@@ -383,7 +411,7 @@ const toc = [
     <section class="band" id="whats-broken">
       <div class="band-inner">
         <span class="eyebrow">the integration tax</span>
-        <h2>What's broken about {data.title}.<a class="anchor" href="#whats-broken" aria-label="Link to this section">#</a></h2>
+        <h2>{headings.whatsBroken}<a class="anchor" href="#whats-broken" aria-label="Link to this section">#</a></h2>
         {data.whatsBroken && (
           <div class="prose lede-prose" set:html={md(data.whatsBroken)} />
         )}
@@ -423,7 +451,7 @@ const toc = [
       <section class="band author-criticism-band" id="author-criticism">
         <div class="band-inner">
           <span class="eyebrow">criticism from the source</span>
-          <h2>What {data.title} co-authors said about the standard.<a class="anchor" href="#author-criticism" aria-label="Link to this section">#</a></h2>
+          <h2>{headings.authorCriticism}<a class="anchor" href="#author-criticism" aria-label="Link to this section">#</a></h2>
           <p class="ac-intro">{data.authorCriticism.intro}</p>
 
           <ol class="ac-list">
@@ -495,7 +523,7 @@ const toc = [
       <section class="band" id="compare">
         <div class="band-inner">
           <span class="eyebrow">spec to spec, at a glance</span>
-          <h2>{comparisonLabel} in one table.<a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
+          <h2>{headings.compare}<a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
           <div class="compare-wrap" data-reveal>
             <table class="compare">
               <thead>
@@ -536,7 +564,7 @@ const toc = [
     <section class="band" id="when-to-use-which">
       <div class="band-inner">
         <span class="eyebrow">be honest about scope</span>
-        <h2>When to use which.<a class="anchor" href="#when-to-use-which" aria-label="Link to this section">#</a></h2>
+        <h2>{headings.whenToUseWhich}<a class="anchor" href="#when-to-use-which" aria-label="Link to this section">#</a></h2>
         <div class="verdict-pair">
           <Verdict tone="use-erc" label={`use ${data.title} when`}>
             <p>{data.useErc}</p>

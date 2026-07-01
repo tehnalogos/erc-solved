@@ -1,4 +1,6 @@
 ---
+import { slugify } from '~/lib/seo';
+
 interface Approach {
   name: string;
   summary: string;
@@ -10,14 +12,18 @@ interface Props {
   approaches: Approach[];
   heading?: string;
   highlightName?: string;
+  idPrefix?: string;
 }
-const { approaches, heading = 'Approaches', highlightName } = Astro.props;
+const { approaches, heading = 'Approaches', highlightName, idPrefix } = Astro.props;
 ---
 <section class="approaches">
   <h2>{heading}.</h2>
   <ul class="grid">
     {approaches.map((a) => (
-      <li class:list={['card', { 'is-highlight': highlightName && a.name.includes(highlightName) }]}>
+      <li
+        id={idPrefix ? `${idPrefix}${slugify(a.name)}` : undefined}
+        class:list={['card', { 'is-highlight': highlightName && a.name.includes(highlightName) }]}
+      >
         <header>
           <span class="name">{a.name}</span>
           {a.chains.length > 0 && (

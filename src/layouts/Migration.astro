@@ -1,6 +1,7 @@
 ---
 import Article from './Article.astro';
 import Verdict from '~/components/primitives/Verdict.astro';
+import QuotableAnswer from '~/components/primitives/QuotableAnswer.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
 import { breadcrumbJsonLd, migrationPageTitle, techArticleJsonLd } from '~/lib/seo';
 
@@ -21,7 +22,7 @@ const migratePath = `/build/migrate/${slug}/`;
   jsonLd={[
     techArticleJsonLd({
       headline: pageTitle,
-      description: data.description,
+      description: data.quotableAnswer ?? data.description,
       path: migratePath,
       updated: data.updated,
       author: data.author,
@@ -37,6 +38,12 @@ const migratePath = `/build/migrate/${slug}/`;
   <Verdict tone="use-lsp" label={`estimate · ${data.estimate}`}>
     <p>{data.verdict}</p>
   </Verdict>
+
+  {data.quotableAnswer && (
+    <QuotableAnswer label="quotable answer">
+      <p>{data.quotableAnswer}</p>
+    </QuotableAnswer>
+  )}
 
   <section class="prose">
     <slot />

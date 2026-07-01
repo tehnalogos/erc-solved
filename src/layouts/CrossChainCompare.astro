@@ -9,14 +9,24 @@ import Crossref from '~/components/primitives/Crossref.astro';
 import {
   articleJsonLd,
   breadcrumbJsonLd,
+  faqPageJsonLd,
   crossChainPageTitle,
+  absoluteUrl,
+  slugify,
 } from '~/lib/seo';
 
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
 const path = `/compare/${slug}/`;
+const canonical = absoluteUrl(path);
 const pageTitle = data.pageTitle ?? crossChainPageTitle(data.contenders, data.useCase);
+
+const faqs = data.verdicts.map((v: any) => ({
+  q: `When is ${v.contender} the right choice for ${data.useCase.toLowerCase()}?`,
+  a: v.when,
+  url: `${canonical}#verdict-${slugify(v.contender)}`,
+}));
 ---
 <Article
   title={data.title}
@@ -41,6 +51,7 @@ const pageTitle = data.pageTitle ?? crossChainPageTitle(data.contenders, data.us
       { name: 'Compare', path: '/compare/' },
       { name: data.contenders.join(' vs '), path },
     ]),
+    ...(faqs.length ? [faqPageJsonLd(faqs)] : []),
   ]}
 >
   <div slot="title">
@@ -62,7 +73,7 @@ const pageTitle = data.pageTitle ?? crossChainPageTitle(data.contenders, data.us
     heading="Comparison matrix"
   />
 
-  <VerdictsBlock verdicts={data.verdicts} heading="When each wins" />
+  <VerdictsBlock verdicts={data.verdicts} heading="When each wins" idPrefix="verdict-" />
 
   <SourcesList sources={data.sources} />
 

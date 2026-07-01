@@ -1,4 +1,6 @@
 ---
+import { slugify } from '~/lib/seo';
+
 interface Criterion {
   name: string;
   evaluates: string;
@@ -6,8 +8,9 @@ interface Criterion {
 interface Props {
   criteria: Criterion[];
   heading?: string;
+  idPrefix?: string;
 }
-const { criteria, heading = 'Criteria framework' } = Astro.props;
+const { criteria, heading = 'Criteria framework', idPrefix } = Astro.props;
 ---
 <section class="criteria">
   <h2>{heading}.</h2>
@@ -21,7 +24,7 @@ const { criteria, heading = 'Criteria framework' } = Astro.props;
       </thead>
       <tbody>
         {criteria.map((c) => (
-          <tr>
+          <tr id={idPrefix ? `${idPrefix}${slugify(c.name)}` : undefined}>
             <th scope="row">{c.name}</th>
             <td>{c.evaluates}</td>
           </tr>
