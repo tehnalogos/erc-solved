@@ -2,3 +2,7 @@ User-agent: *
 Allow: /
 
 Sitemap: https://www.ercsolved.dev/sitemap.xml
+
+# For LLMs
+# /llms.txt — link-list overview (all pages, one-line descriptions)
+# /llms-full.txt — dense per-page content index for single-fetch ingestion

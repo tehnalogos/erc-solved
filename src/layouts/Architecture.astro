@@ -5,13 +5,27 @@ import ApproachesGrid from '~/components/primitives/ApproachesGrid.astro';
 import SourcesList from '~/components/primitives/SourcesList.astro';
 import LastReviewed from '~/components/primitives/LastReviewed.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
-import { articleJsonLd, breadcrumbJsonLd, architecturePageTitle } from '~/lib/seo';
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  architecturePageTitle,
+  absoluteUrl,
+  slugify,
+} from '~/lib/seo';
 
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
 const path = `/architecture/${slug}/`;
+const canonical = absoluteUrl(path);
 const pageTitle = data.pageTitle ?? architecturePageTitle(data.pattern);
+
+const faqs = data.approaches.map((a: any) => ({
+  q: `What is the ${a.name} approach to ${data.pattern.toLowerCase()}?`,
+  a: a.summary,
+  url: `${canonical}#approach-${slugify(a.name)}`,
+}));
 ---
 <Article
   title={data.title}
@@ -36,6 +50,7 @@ const pageTitle = data.pageTitle ?? architecturePageTitle(data.pattern);
       { name: 'Architecture', path: '/architecture/' },
       { name: data.pattern, path },
     ]),
+    ...(faqs.length ? [faqPageJsonLd(faqs)] : []),
   ]}
 >
   <div slot="title">
@@ -55,6 +70,7 @@ const pageTitle = data.pageTitle ?? architecturePageTitle(data.pattern);
     approaches={data.approaches}
     heading="Approaches"
     highlightName="LSP"
+    idPrefix="approach-"
   />
 
   <section class="recommendation">

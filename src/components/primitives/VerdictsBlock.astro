@@ -1,4 +1,6 @@
 ---
+import { slugify } from '~/lib/seo';
+
 interface Verdict {
   contender: string;
   when: string;
@@ -7,14 +9,18 @@ interface Props {
   verdicts: Verdict[];
   luksoLabel?: string;
   heading?: string;
+  idPrefix?: string;
 }
-const { verdicts, luksoLabel = 'LUKSO', heading = 'When each wins' } = Astro.props;
+const { verdicts, luksoLabel = 'LUKSO', heading = 'When each wins', idPrefix } = Astro.props;
 ---
 <section class="verdicts">
   <h2>{heading}.</h2>
   <ul class="grid">
     {verdicts.map((v) => (
-      <li class:list={['card', { 'is-lukso': v.contender === luksoLabel }]}>
+      <li
+        id={idPrefix ? `${idPrefix}${slugify(v.contender)}` : undefined}
+        class:list={['card', { 'is-lukso': v.contender === luksoLabel }]}
+      >
         <span class="head">When {v.contender} wins</span>
         <p>{v.when}</p>
       </li>

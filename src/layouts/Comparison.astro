@@ -1,6 +1,7 @@
 ---
 import Article from './Article.astro';
 import Verdict from '~/components/primitives/Verdict.astro';
+import QuotableAnswer from '~/components/primitives/QuotableAnswer.astro';
 import Crossref from '~/components/primitives/Crossref.astro';
 import { breadcrumbJsonLd, comparisonPageTitle, techArticleJsonLd } from '~/lib/seo';
 
@@ -25,7 +26,7 @@ const canonical = data.canonical
   jsonLd={[
     techArticleJsonLd({
       headline: pageTitle,
-      description: data.description,
+      description: data.quotableAnswer ?? data.description,
       path: comparePath,
       updated: data.updated,
       author: data.author,
@@ -47,6 +48,12 @@ const canonical = data.canonical
     </h1>
     <p class="lede">{data.description}</p>
   </div>
+
+  {data.quotableAnswer && (
+    <QuotableAnswer label="quotable answer">
+      <p>{data.quotableAnswer}</p>
+    </QuotableAnswer>
+  )}
 
   <div class="verdict-grid">
     <Verdict tone="use-erc" label={`use ${data.left.chip}`}>

@@ -17,6 +17,7 @@ const problems = defineCollection({
     tagline: z.string(),
     query: z.string(),
     description: z.string(),
+    quotableAnswer: z.string().optional(),
     erc: ercEnum,
     lsps: z.array(z.string()),
     diff: z.object({ from: sideSchema, to: sideSchema }),
@@ -56,6 +57,7 @@ const compare = defineCollection({
     left: z.object({ chip: z.string(), label: z.string() }),
     right: z.object({ chip: z.string(), label: z.string() }),
     description: z.string(),
+    quotableAnswer: z.string().optional(),
     canonical: z.string().optional(),
     verdict: z.object({
       useLeft: z.string(),
@@ -229,6 +231,7 @@ const migrate = defineCollection({
     from: z.string(),
     to: z.string(),
     description: z.string(),
+    quotableAnswer: z.string().optional(),
     estimate: z.string(),
     verdict: z.string(),
     gotchas: z.array(z.string()).default([]),
@@ -246,6 +249,7 @@ const build = defineCollection({
     title: z.string(),
     vertical: z.string(),
     description: z.string(),
+    quotableAnswer: z.string().optional(),
     stack: z.array(z.string()),
     reading: z.array(z.object({ chip: z.string(), label: z.string(), href: z.string() })).default([]),
     docs: z.array(z.object({ label: z.string(), href: z.string().url() })).default([]),
@@ -263,6 +267,7 @@ const erc = defineCollection({
     headline: z.string(),
     pageTitle: z.string(),
     description: z.string(),
+    quotableAnswer: z.string().optional(),
     tagline: z.string(),
     bootStrip: z.string(),
     standardAuthors: z.array(z.string()).optional(),
@@ -393,6 +398,21 @@ const erc = defineCollection({
         headline: z.string().optional(),
         highlight: z.string().optional(),
         tocLabel: z.string().optional(),
+      })
+      .optional(),
+
+    // Optional per-section H2 overrides. Defaults render as answer-shaped
+    // sentences ("How ERC-20 came to be." rather than "The origin story."),
+    // which AI answer engines preferentially quote. Override on a page to
+    // tailor the phrasing when the default doesn't fit.
+    sectionHeadings: z
+      .object({
+        origin: z.string().optional(),
+        spec: z.string().optional(),
+        whatsBroken: z.string().optional(),
+        authorCriticism: z.string().optional(),
+        compare: z.string().optional(),
+        whenToUseWhich: z.string().optional(),
       })
       .optional(),
 
