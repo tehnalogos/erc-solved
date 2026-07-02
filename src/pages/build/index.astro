@@ -9,19 +9,40 @@ const migrations = await getCollection('migrate');
 const order = ['token-economics', 'dynamic-nfts', 'smart-wallet-ux', 'gasless-onboarding', 'profile-native-apps', 'extending-deployed-contracts'];
 verticals.sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug));
 
-const description =
+const displayTitle = 'Build with LUKSO';
+const seoTitle = 'Build with LUKSO: verticals, LSP stacks, migrations';
+const metaDescription =
+  'Pick what you\'re building. Six EVM verticals — tokens, dynamic NFTs, smart wallet UX, gasless onboarding, profile apps, extensions — with the minimum LSP stack.';
+const ogTitle = "Six verticals. The LSP stack for each. The reading path to ship it.";
+const ogDescription =
+  'Token economics → LSP7 + LSP4. Dynamic NFTs → LSP8 + ERC-725Y. Gasless onboarding → LSP25 + LSP6. Six builder verticals, each with the standards and the migration guide.';
+const summary =
   'Pick what you\'re building on Ethereum or LUKSO. Get a curated reading list — problems, standards, migrations — and the minimum LSP stack to reach for.';
+const aboutTopics = [
+  'EVM consumer app builders',
+  'Token economics',
+  'Dynamic NFTs',
+  'Smart wallet UX',
+  'Gasless onboarding',
+  'Profile-native apps',
+  'LUKSO LSP standards',
+];
 ---
 <Base
-  title="Build with LUKSO"
-  description={description}
+  title={displayTitle}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  summary={summary}
+  about={aboutTopics}
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Build with LUKSO',
-    description,
+    name: seoTitle,
+    description: summary,
     url: 'https://www.ercsolved.dev/build/',
-    about: ['Ethereum builders', 'EVM builders', 'LUKSO LSP standards'],
+    about: aboutTopics,
   }}
 >
   <section class="hub" data-pagefind-body data-pagefind-meta="title:Build with LUKSO">

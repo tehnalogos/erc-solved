@@ -7,19 +7,39 @@ const entries = (await getCollection('benchmarks')).sort((a, b) =>
   a.data.title.localeCompare(b.data.title),
 );
 
-const description =
+const displayTitle = 'Consumer Blockchain Benchmarks';
+const seoTitle = 'Consumer blockchain benchmarks: cited and reproducible';
+const metaDescription =
+  'Open benchmarks of consumer-app architecture across Ethereum, Base, Arbitrum, Optimism, Polygon, Solana, LUKSO. Every value cites the chain docs. CC-BY-4.0.';
+const ogTitle = "Every benchmark value on this site cites the chain doc it came from";
+const ogDescription =
+  'No trust-me numbers. Every consumer-blockchain benchmark ships a CSV, a JSON, and a per-metric derivation block that names the source. Licensed CC-BY-4.0 for citation.';
+const summary =
   'Open benchmarks of consumer-app architecture across Ethereum L1, Base, Arbitrum, Optimism, Polygon, Solana, and LUKSO. Every value cites the chain documentation it was derived from.';
+const aboutTopics = [
+  'Blockchain benchmarks',
+  'Consumer crypto architecture',
+  'Open datasets',
+  'Ethereum benchmark',
+  'Solana benchmark',
+  'LUKSO benchmark',
+  'CC-BY-4.0',
+];
 ---
 <Article
-  title="Consumer Blockchain Benchmarks"
-  description={description}
-  pageTitle="Open Benchmarks: Consumer Blockchain Architecture"
+  title={displayTitle}
+  summary={summary}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  about={aboutTopics}
   eyebrow="benchmarks · open research"
   author="ercs-solved maintainers"
   updated="2026-06-29"
   editPath="src/pages/benchmarks/index.astro"
 >
-  <p class="lede">{description}</p>
+  <p class="lede">{summary}</p>
   <p class="lede">
     Every benchmark publishes a readable report, downloadable CSV + JSON datasets, and a
     designated per-metric derivation section that cites the chain documentation each value

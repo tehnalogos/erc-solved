@@ -11,6 +11,11 @@ const seoTitle = 'Consumer crypto stack: EVM, Solana, LUKSO';
 const metaDescription =
   'Architecture comparisons and guides for consumer crypto apps — smart accounts, gasless onboarding, profiles, social primitives on EVM, Solana, LUKSO.';
 
+// Social layer — X/LinkedIn/Slack preview cards. Editorial hook, not summary.
+const ogTitle = "Every consumer crypto app rebuilds identity and UX. It shouldn't.";
+const ogDescription =
+  'Independent field manual for consumer crypto — smart accounts, gasless UX, onchain identity, permissions. Ethereum, Base, Solana, LUKSO compared on the decisions that actually bind.';
+
 // GEO / LLM layer — JSON-LD, llms-full.txt, answer-engine citation body.
 // Unbounded length; entity-rich and factual.
 const summary =
@@ -72,6 +77,8 @@ const commonPainPoints = [
   title={displayTitle}
   seoTitle={seoTitle}
   metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
   summary={summary}
   about={aboutTopics}
   jsonLd={{

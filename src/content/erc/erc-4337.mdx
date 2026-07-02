@@ -2,7 +2,22 @@
 id: "4337"
 title: "ERC-4337"
 headline: "What is ERC-4337?"
-seoTitle: "What is ERC-4337? Account Abstraction, Its Tradeoffs, and What Comes Next"
+seoTitle: "ERC-4337: parallel-mempool AA, and the LSP alternative"
+metaDescription: "ERC-4337 puts account abstraction above the protocol via UserOps, EntryPoint, bundlers, paymasters. See the moving parts and the LSP0+LSP6+LSP25 native stack."
+ogTitle: "ERC-4337 is an entire parallel network for account abstraction"
+ogDescription: "Bundlers. EntryPoint. Paymasters. A separate mempool. The infrastructure Ethereum bolted onto EOAs for smart-account UX — and the native LSP0+LSP6+LSP25 stack that ships it at the protocol level."
+about:
+  - "ERC-4337"
+  - "Ethereum account abstraction"
+  - "Vitalik Buterin"
+  - "UserOperation mempool"
+  - "EntryPoint contract"
+  - "Bundlers"
+  - "Paymasters"
+  - "LUKSO LSP0"
+  - "LUKSO LSP6"
+  - "LUKSO LSP25"
+  - "EIP-4337"
 summary: "ERC-4337 is Ethereum's account-abstraction standard, implemented entirely above the protocol via a parallel mempool of UserOperations, a singleton EntryPoint contract, bundlers, and paymasters. Proposed in September 2021 by Vitalik Buterin and co-authors, with mainnet activation in March 2023, it lets contract accounts behave like first-class transactors — at the cost of an entire parallel infrastructure. This page walks the history, the moving parts, the tradeoffs acknowledged by the spec's own authors, and the LUKSO LSP0 + LSP6 + LSP20 + LSP25 stack Fabian Vogelsteller designed as a native alternative."
 quotableAnswer: >-
   ERC-4337 is Ethereum's account abstraction standard, activated on mainnet March 2023 and originally proposed September 2021 by Vitalik Buterin, Yoav Weiss, Dror Tirosh, Kristof Gazso, and Tjaden Hess. Rather than modifying the protocol, it introduces a parallel UserOperation mempool, a singleton EntryPoint contract, bundlers that batch UserOps into transactions, and paymasters that can sponsor gas. Contract accounts get first-class transactor behavior — session keys, social recovery, gas sponsorship — at the cost of an entirely separate infrastructure layer. EIP-7702 (Pectra, 2025) later added protocol-level EOA delegation to close some gaps.

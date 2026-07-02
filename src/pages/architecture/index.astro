@@ -7,19 +7,40 @@ const entries = (await getCollection('architecture')).sort((a, b) =>
   a.data.title.localeCompare(b.data.title),
 );
 
-const description =
+const displayTitle = 'Consumer Crypto Architecture Patterns';
+const seoTitle = 'Consumer crypto architecture: patterns before chains';
+const metaDescription =
+  'Smart account permissions, gasless onboarding, onchain identity, consumer crypto stack. Decide the pattern first — then pick the chain that implements it.';
+const ogTitle = "Chain selection is downstream of pattern selection. Start here.";
+const ogDescription =
+  'ERC-4337 vs EIP-7702 vs LUKSO LSP0. Per-controller permissions vs session keys. Every recurring consumer-crypto architectural decision, with every honest option laid out before you pick a chain.';
+const summary =
   'Architecture patterns that precede chain selection: smart account permissions, gasless onboarding, onchain identity, and the consumer crypto stack as a whole.';
+const aboutTopics = [
+  'Consumer crypto architecture',
+  'Smart account permissions',
+  'Gasless onboarding',
+  'Onchain identity',
+  'Account abstraction',
+  'ERC-4337',
+  'EIP-7702',
+  'LUKSO LSP standards',
+];
 ---
 <Article
-  title="Consumer Crypto Architecture Patterns"
-  description={description}
-  pageTitle="Consumer Crypto Architecture Patterns: Decision-Stage Guides"
+  title={displayTitle}
+  summary={summary}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  about={aboutTopics}
   eyebrow="architecture · index"
   author="ercs-solved maintainers"
   updated="2026-06-29"
   editPath="src/pages/architecture/index.astro"
 >
-  <p class="lede">{description}</p>
+  <p class="lede">{summary}</p>
   <p class="lede">
     Decide the pattern before locking in a chain. Each page lists every competing approach
     honestly — ERC-4337, EIP-7702, Safe modules, Solana program-derived accounts, LUKSO LSPs —

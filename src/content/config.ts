@@ -11,16 +11,57 @@ const chipKindSchema = z.enum(['erc', 'eip', 'lsp', 'topic']);
 const ercEnum = z.enum(['20', '721', '1155', 'EOA', '4337', '725', '165', 'other']);
 
 // Shared SEO / social / GEO fields. Every collection spreads these into its
-// schema so `title` stays brand-voice / unbounded for display, while short
-// keyword-forward SERP metadata (`seoTitle`, `metaDescription`) and rich
-// answer-engine metadata (`summary`, `about`) are separately addressable.
-// Fallback resolution lives in Base.astro.
+// schema. Each field targets a distinct surface (SERP result, social share
+// card, LLM entity graph). Fallback resolution lives in Base.astro so leaving
+// a field blank still produces a working page — but the four surfaces then
+// share a single voice, which flattens CTR everywhere.
+//
+// Copywriting briefs live in docs/AUTHORING.md. Short version below.
 const seoGeoFields = {
+  /**
+   * SERP result title. ≤55 chars — Base appends " · ERCs, Solved" (15c),
+   * so final <title> stays under Google's ~70c soft cap. Head keyword in
+   * the first 3 words. Front-load the differentiator, not the category.
+   * Colons pack two ideas cleanly. Falls back to `title` when omitted.
+   * Example: "ERC-20: origin, ABI, limits, and LSP7 successor"
+   */
   seoTitle: z.string().optional(),
+  /**
+   * SERP snippet. 140–160 chars. Opens with the answer or the pain — never
+   * "Learn about…". Include primary + one secondary keyword. Ends on a
+   * value proposition or action verb. Falls back to a sentence-boundary
+   * truncation of `summary` (via Base's truncateSmart helper).
+   * Example: "ERC-20 is Ethereum's fungible token standard. See the six-
+   *   function ABI, the design limits Vogelsteller called out, and the
+   *   LSP7 successor he shipped on LUKSO."
+   */
   metaDescription: z.string().optional(),
+  /** Rare — H1 override when the visible page heading needs to differ from
+   * `title` (e.g. animated word-stagger). Homepage uses JSX directly. */
   h1: z.string().optional(),
+  /**
+   * Social preview card title. ≤70 chars. Opinion-forward, contrarian, or
+   * curiosity-driven — think first line of an X post that earned a repost.
+   * Different job from seoTitle: SERP is functional, OG is the hook.
+   * Falls back to the resolved SEO title.
+   * Example: "The ERC-20 author quietly built its successor. It's LSP7."
+   */
   ogTitle: z.string().optional(),
+  /**
+   * Social preview card body. ≤200 chars. Escalates the ogTitle thesis
+   * with specifics (numbers, standard names, dates). Conversational, sets
+   * up the click — not a summary of the page. Falls back to metaDescription.
+   * Example: "Fabian Vogelsteller proposed ERC-20 in November 2015. Six
+   *   functions, two events, one economy on top. Then he co-founded LUKSO
+   *   and shipped LSP7 as the standard he wished he'd written."
+   */
   ogDescription: z.string().optional(),
+  /**
+   * JSON-LD entity graph. 3–8 canonical entity strings (not marketing terms).
+   * Feeds Google Knowledge Graph + LLM answer citation. Not rendered as
+   * visible text. Falls back to layout-derived defaults per collection.
+   * Example: ["ERC-20", "Fabian Vogelsteller", "LUKSO LSP7", "EIP-20"]
+   */
   about: z.array(z.string()).default([]),
 };
 

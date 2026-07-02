@@ -12,19 +12,39 @@ const ercs = Array.from(new Set(problems.map(p => p.data.erc))).sort(
   (a, b) => ercOrder.indexOf(a) - ercOrder.indexOf(b),
 );
 
-const description =
+const displayTitle = 'Ethereum ERC Problem Index';
+const seoTitle = 'ERC problems: approvals, hooks, metadata, permissions';
+const metaDescription =
+  'Every ERC pain point developers hit — approvals, transfer hooks, metadata rot, permissions — mapped to the LUKSO LSP that fixes it upstream.';
+const ogTitle = "Every ERC workaround developers ship — and the LSP that removes it";
+const ogDescription =
+  'Approvals. safeTransferFrom edge cases. tokenURI rot. Bundler ops. Every recurring ERC problem, mapped to the LSP7 / LSP6 / LSP1 / LSP25 pattern that fixes it upstream.';
+const summary =
   'Every Ethereum Request for Comments (ERC) pain point developers hit, mapped to the LUKSO LSP pattern that handles it. Filter by ERC, scan, click.';
+const aboutTopics = [
+  'Ethereum Request for Comments',
+  'ERC problem patterns',
+  'Token approvals',
+  'safeTransferFrom',
+  'Account abstraction',
+  'LUKSO LSP standards',
+];
 ---
 <Base
-  title="Ethereum ERC Problem Index"
-  description={description}
+  title={displayTitle}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  summary={summary}
+  about={aboutTopics}
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Ethereum ERC Problem Index',
-    description,
+    name: seoTitle,
+    description: summary,
     url: 'https://www.ercsolved.dev/problems/',
-    about: ['Ethereum Request for Comments', 'ERC problem patterns', 'LUKSO LSP standards'],
+    about: aboutTopics,
   }}
 >
   <section class="hub" data-pagefind-body data-pagefind-meta="title:Ethereum ERC Problem Index">

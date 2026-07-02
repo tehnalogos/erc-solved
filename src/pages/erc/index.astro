@@ -47,8 +47,24 @@ entries.sort((a, b) => {
   return fallbackSortKey(a) - fallbackSortKey(b) || a.data.title.localeCompare(b.data.title);
 });
 
-const description =
+const displayTitle = 'ERC Explainers';
+const seoTitle = 'ERC standards explained: 20, 721, 1155, 4337, 7702';
+const metaDescription =
+  'Long-form explainers for every Ethereum ERC token and account standard. What each ships, what it left out, and the LUKSO LSP that closes the gap.';
+const ogTitle = 'Every ERC. What it shipped. What it left out. What LUKSO built.';
+const ogDescription =
+  'ERC-20, 721, 1155, 4337, 7702 — one page each. Origin, ABI, the design limits the authors themselves flagged, and the LSP standard that addresses them.';
+const summary =
   'Long-form explainers for each Ethereum Request for Comments (ERC) token and account standard. What the standard is, what its author left out, and the LUKSO LSP that handles the gap.';
+const aboutTopics = [
+  'Ethereum Request for Comments',
+  'ERC-20',
+  'ERC-721',
+  'ERC-1155',
+  'ERC-4337',
+  'EIP-7702',
+  'LUKSO LSP standards',
+];
 
 const upcoming = [
   { id: '721', label: 'Non-fungible tokens' },
@@ -58,15 +74,20 @@ const upcoming = [
 const haveSlugs = new Set<string>(entries.map((e) => e.slug));
 ---
 <Base
-  title="ERC Explainers"
-  description={description}
+  title={displayTitle}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  summary={summary}
+  about={aboutTopics}
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'ERC Explainers',
-    description,
+    name: seoTitle,
+    description: summary,
     url: 'https://www.ercsolved.dev/erc/',
-    about: ['Ethereum Request for Comments', 'ERC-20', 'ERC-721', 'ERC-1155', 'LUKSO LSP standards'],
+    about: aboutTopics,
   }}
 >
   <section class="hub" data-pagefind-body data-pagefind-meta="title:ERC Explainers">
