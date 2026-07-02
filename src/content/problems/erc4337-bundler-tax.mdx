@@ -2,7 +2,9 @@
 title: "The ERC-4337 stack is a parallel mempool."
 tagline: "UserOperations, EntryPoint, bundlers, paymasters. Most teams don't want to run any of that."
 query: "erc-4337 alternatives"
-description: "Account abstraction without ERC-4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles."
+summary: "Account abstraction without ERC-4337. Compare Safe + relayer, EIP-7702, native account contracts, and the LSP0 + LSP6 + LSP25 + LSP20 stack used by Universal Profiles."
+quotableAnswer: >-
+  Account abstraction without ERC-4337 in 2026 has four viable paths: Safe multisig plus a relayer service (Gelato, OpenZeppelin Defender) for gas sponsorship; ERC-2771 trusted forwarders with per-contract `ERC2771Context` inheritance; EIP-7702 delegation (Pectra) letting an existing EOA execute contract code without a bundler; and LSP0 + LSP6 + LSP20 + LSP25 on LUKSO, which puts the account, its permission system, and its relay-call function all on the normal L1 mempool. Each avoids the UserOperation alt-mempool at a different trade-off.
 erc: "4337"
 lsps: ["LSP0", "LSP6", "LSP25", "LSP20"]
 aliases: ["account abstraction without bundlers", "no entrypoint", "alternative to erc-4337", "eip-4337 alternatives", "smart account no bundler"]

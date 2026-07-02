@@ -49,7 +49,7 @@ async function resolveRelated() {
 }
 const related = await resolveRelated();
 const displayQuery = formatSearchQuery(data.query);
-const pageTitle = problemPageTitle(displayQuery, data.lsps);
+const derivedSeoTitle = data.seoTitle ?? problemPageTitle(displayQuery, data.lsps);
 const problemPath = `/problems/${slug}/`;
 const lspList = formatLspList(data.lsps);
 const about = [
@@ -63,16 +63,20 @@ const about = [
 ---
 <Article
   title={displayQuery}
-  description={data.description}
-  pageTitle={pageTitle}
+  summary={data.summary}
+  seoTitle={derivedSeoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : about}
   eyebrow={`problem · ${data.query}`}
   author={data.author}
   updated={data.updated}
   editPath={`src/content/problems/${slug}.mdx`}
   jsonLd={[
     techArticleJsonLd({
-      headline: pageTitle,
-      description: data.quotableAnswer ?? data.description,
+      headline: derivedSeoTitle,
+      description: data.quotableAnswer ?? data.summary,
       path: problemPath,
       updated: data.updated,
       author: data.author,

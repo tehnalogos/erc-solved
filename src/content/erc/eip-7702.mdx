@@ -3,8 +3,10 @@ id: "7702"
 title: "EIP-7702"
 standardKind: "EIP"
 headline: "What is EIP-7702?"
-pageTitle: "What is EIP-7702? EOA Delegation, Pectra, and the Residual-Key Problem"
-description: "EIP-7702 is Ethereum's Pectra-era account delegation primitive. It lets an externally owned account temporarily behave like a smart account by delegating execution to contract code. This page explains the authorization tuple, how it relates to ERC-4337, what it fixes, what it leaves open, and why the LSP account stack starts from a different premise."
+seoTitle: "What is EIP-7702? EOA Delegation, Pectra, and the Residual-Key Problem"
+summary: "EIP-7702 is Ethereum's Pectra-era account delegation primitive. It lets an externally owned account temporarily behave like a smart account by delegating execution to contract code. This page explains the authorization tuple, how it relates to ERC-4337, what it fixes, what it leaves open, and why the LSP account stack starts from a different premise."
+quotableAnswer: >-
+  EIP-7702 is an Ethereum protocol change activated in the Pectra fork (May 2025) that lets an externally owned account delegate execution to a smart contract without changing its address. The EOA signs an authorization tuple naming a delegate contract; subsequent transactions to the EOA execute the delegate's code in the account's context. This unlocks batching, session keys, gas sponsorship, and ERC-4337 tooling for pre-existing addresses. The residual ECDSA private key remains authoritative — a compromised key can sign a new delegation and override any recovery configuration. EIP-7851 is drafted to close that gap.
 tagline: "The protocol patch that lets EOAs borrow smart-account behavior — without removing the EOA root key."
 bootStrip: "core eip · proposed may 2024 · pectra account primitive · ready"
 standardAuthors:

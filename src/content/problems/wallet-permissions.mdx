@@ -2,7 +2,9 @@
 title: "Wallets don't know how to ask for less."
 tagline: "Connect a dapp and it gets the whole account. Session scoping isn't standard."
 query: "smart contract wallet permissions"
-description: "Session keys, ERC-4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps."
+summary: "Session keys, ERC-4337 validation modules, and LSP6 Key Manager compared. How smart accounts grant scoped, revocable, time-bound access to dapps."
+quotableAnswer: >-
+  Scoping a smart account controller to specific dApps, functions, or time windows — session keys — currently ships as per-wallet SDKs: ZeroDev Kernel, Biconomy Nexus, Coinbase Smart Wallet, Alchemy LightAccount, Safe modules. Each defines its own validator shape; cross-wallet session portability doesn't exist. ERC-7579 and ERC-6900 are the emerging Draft standards for a shared modular-account interface. LSP6 Key Manager on LUKSO is a standardized permission bitfield (CALL, SETDATA, TRANSFERVALUE, SIGN, ADDCONTROLLER, plus AllowedCalls target/selector, AllowedERC725YDataKeys, value caps) that every Universal Profile speaks.
 erc: "4337"
 lsps: ["LSP6", "LSP20"]
 aliases: ["session keys", "scoped wallet access", "dapp permissions", "smart account permissions"]

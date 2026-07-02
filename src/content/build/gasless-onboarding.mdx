@@ -1,7 +1,9 @@
 ---
 title: "Gasless onboarding."
 vertical: "Gasless onboarding"
-description: "Sponsored execution flows where a relayer pays gas and the user just signs. No bundler, no EntryPoint — relay execution lives on the account."
+summary: "Sponsored execution flows where a relayer pays gas and the user just signs. No bundler, no EntryPoint — relay execution lives on the account."
+quotableAnswer: >-
+  Building gasless onboarding on LUKSO uses LSP25 `executeRelayCall(signature, nonce, validityTimestamps, payload)` as a native function on the Universal Profile. A controller signs the payload; a relayer submits it (mocked via github.com/lukso-network/tools-mock-relayer or self-hosted per LSP15's standardized relayer API). No parallel UserOperation mempool, no EntryPoint singleton, no paymaster contract with its own ETH deposit. LSP6 permissions gate what the signed payload can do; relayer economics are policy at the relayer layer, not on-chain contract state.
 stack: ["LSP25", "LSP6", "LSP20"]
 updated: 2026-06-22
 reading:

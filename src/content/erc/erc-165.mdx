@@ -2,8 +2,10 @@
 id: "165"
 title: "ERC-165"
 headline: "What is ERC-165?"
-pageTitle: "What is ERC-165? Interface Detection on Ethereum"
-description: "ERC-165 defines supportsInterface(bytes4), the standard way contracts declare which interfaces they implement. ERC-721, ERC-1155, ERC-2981, and many LUKSO standards use it."
+seoTitle: "What is ERC-165? Interface Detection on Ethereum"
+summary: "ERC-165 defines supportsInterface(bytes4), the standard way contracts declare which interfaces they implement. ERC-721, ERC-1155, ERC-2981, and many LUKSO standards use it."
+quotableAnswer: >-
+  ERC-165 defines `supportsInterface(bytes4 interfaceId) → bool`, the standard way a contract declares which interfaces it implements. Finalized in January 2018 by Christian Reitwießner, Nick Johnson, Fabian Vogelsteller, Jordi Baylina, Konrad Feldmeier, and William Entriken, it's the runtime introspection primitive that ERC-721, ERC-1155, ERC-2981, ERC-1363, ERC-1271, and most LUKSO LSPs (LSP0, LSP7, LSP8) build on. Without it, callers have no on-chain way to know whether a contract will accept a safeTransferFrom, honor a royalty query, or validate a signature.
 tagline: "The tiny function behind interface detection for NFTs, multi-tokens, royalties, and LSPs."
 bootStrip: "standard · interface detection · small but everywhere · ready"
 standardAuthors:

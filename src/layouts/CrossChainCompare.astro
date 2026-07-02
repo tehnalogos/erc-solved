@@ -20,7 +20,7 @@ const { entry } = Astro.props;
 const { data, slug } = entry;
 const path = `/compare/${slug}/`;
 const canonical = absoluteUrl(path);
-const pageTitle = data.pageTitle ?? crossChainPageTitle(data.contenders, data.useCase);
+const derivedSeoTitle = data.seoTitle ?? crossChainPageTitle(data.contenders, data.useCase);
 
 const faqs = data.verdicts.map((v: any) => ({
   q: `When is ${v.contender} the right choice for ${data.useCase.toLowerCase()}?`,
@@ -30,8 +30,12 @@ const faqs = data.verdicts.map((v: any) => ({
 ---
 <Article
   title={data.title}
-  description={data.description}
-  pageTitle={pageTitle}
+  summary={data.summary}
+  seoTitle={derivedSeoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : data.contenders}
   eyebrow={`compare · ${data.useCase}`}
   author={data.author}
   updated={data.updated}
@@ -39,7 +43,7 @@ const faqs = data.verdicts.map((v: any) => ({
   jsonLd={[
     articleJsonLd({
       headline: data.title,
-      description: data.description,
+      description: data.summary,
       path,
       updated: data.updated,
       author: data.author,
@@ -56,7 +60,7 @@ const faqs = data.verdicts.map((v: any) => ({
 >
   <div slot="title">
     <h1>{data.title}</h1>
-    <p class="lede">{data.description}</p>
+    <p class="lede">{data.summary}</p>
   </div>
 
   <QuotableAnswer>

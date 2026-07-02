@@ -2,7 +2,9 @@
 title: "Migrate from Safe (Gnosis Safe) to Universal Profile"
 from: "Safe"
 to: "LSP0"
-description: "Move custody and ownership from a Safe multisig to a Universal Profile with LSP6 controllers. The permission model maps cleanly; the recovery model needs to be designed."
+summary: "Move custody and ownership from a Safe multisig to a Universal Profile with LSP6 controllers. The permission model maps cleanly; the recovery model needs to be designed."
+quotableAnswer: >-
+  Moving custody from a Safe multisig to a LUKSO Universal Profile maps the multisig-signer model to LSP6 Key Manager controllers. Each Safe owner becomes an LSP6 controller address with a permission bitfield (CALL, SETDATA, TRANSFERVALUE, ADDCONTROLLER, SIGN); threshold semantics become LSP6 policy or an inline verifier via LSP20. Assets and ENS transfer as normal (Universal Profiles are contracts, so ownership transfers change the account behind the address). Recovery is redesigned end-to-end — Safe's owner-management model doesn't map to LSP11 guardian-voting directly.
 estimate: "~1 day for a small Safe; longer if the Safe owns many assets"
 verdict: "Migrate when you want per-controller permission scoping in a standard vocabulary (LSP6 bitfield + AllowedCalls + AllowedERC725YDataKeys), profile-native metadata storage, or LSP25 relay execution on the account itself. Stay on Safe when the m-of-n multisig threshold is the primitive your product encodes — that pattern doesn't map 1:1 to LSP6 and needs a recovery contract layer to express."
 updated: 2026-06-22

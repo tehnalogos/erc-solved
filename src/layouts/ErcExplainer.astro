@@ -68,8 +68,8 @@ const faqsWithUrls = (data.faqs ?? []).map((f: any) => ({
 
 const jsonLd = [
   techArticleJsonLd({
-    headline: data.pageTitle,
-    description: data.quotableAnswer ?? data.description,
+    headline: data.seoTitle ?? data.title,
+    description: data.quotableAnswer ?? data.summary,
     path,
     updated: data.updated,
     author: data.author,
@@ -86,7 +86,7 @@ const jsonLd = [
   ...(faqsWithUrls.length ? [faqPageJsonLd(faqsWithUrls)] : []),
   definedTermJsonLd({
     name: data.title,
-    description: data.definition ?? data.description,
+    description: data.definition ?? data.summary,
     url: canonical,
     inDefinedTermSet: 'https://eips.ethereum.org/',
     ...(data.termCode ? { termCode: data.termCode } : {}),
@@ -197,8 +197,13 @@ const toc = [
 ---
 
 <Base
-  title={data.pageTitle}
-  description={data.description}
+  title={data.title}
+  summary={data.summary}
+  seoTitle={data.seoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : aboutTerms}
   ogType="article"
   ogImage={data.ogImage}
   jsonLd={jsonLd}

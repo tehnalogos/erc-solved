@@ -22,10 +22,19 @@ const { entry } = Astro.props;
 const { data, slug } = entry;
 const path = `/best-blockchain/${slug}/`;
 const canonical = absoluteUrl(path);
-const pageTitle = data.pageTitle ?? bestBlockchainPageTitle(data.useCase);
+const derivedSeoTitle = data.seoTitle ?? bestBlockchainPageTitle(data.useCase);
 const contenderChips = data.contenders.map((c: any) => c.chip);
 
-const faqs = [
+// Author-supplied FAQs (verbatim to real long-tail queries) go first so they
+// take the top slots in the FAQPage schema — that's what "People also ask"
+// and AI Overview extract from.
+const authoredFaqs = (data.faqs ?? []).map((f: any) => ({
+  q: f.q,
+  a: f.a,
+  url: `${canonical}#faq-${slugify(f.q)}`,
+}));
+
+const derivedFaqs = [
   ...data.criteria.map((c: any) => ({
     q: `${c.name}: how does each chain compare for ${data.useCase}?`,
     a: c.evaluates,
@@ -37,11 +46,17 @@ const faqs = [
     url: `${canonical}#verdict-${slugify(v.contender)}`,
   })),
 ];
+
+const faqs = [...authoredFaqs, ...derivedFaqs];
 ---
 <Article
   title={data.title}
-  description={data.description}
-  pageTitle={pageTitle}
+  summary={data.summary}
+  seoTitle={derivedSeoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : contenderChips}
   eyebrow={`best blockchain · ${data.useCase}`}
   author={data.author}
   updated={data.updated}
@@ -49,12 +64,12 @@ const faqs = [
   jsonLd={[
     articleJsonLd({
       headline: data.title,
-      description: data.description,
+      description: data.summary,
       path,
       updated: data.updated,
       author: data.author,
       about: contenderChips,
-      keywords: [data.useCase, ...contenderChips, 'consumer crypto', 'EVM', 'LUKSO'],
+      keywords: [data.useCase, ...contenderChips, ...(data.aliases ?? []), 'consumer crypto', 'EVM', 'LUKSO'],
     }),
     breadcrumbJsonLd([
       { name: 'ERCs, Solved', path: '/' },
@@ -66,8 +81,12 @@ const faqs = [
 >
   <div slot="title">
     <h1>{data.title}</h1>
-    <p class="lede">{data.description}</p>
+    <p class="lede">{data.summary}</p>
   </div>
+
+  {data.answerFirst && (
+    <p class="answer-first">{data.answerFirst}</p>
+  )}
 
   <QuotableAnswer>
     <p>{data.quotableAnswer}</p>
@@ -88,6 +107,22 @@ const faqs = [
   />
 
   <VerdictsBlock verdicts={data.verdicts} heading="When each wins" idPrefix="verdict-" />
+
+  {authoredFaqs.length > 0 && (
+    <section class="faq">
+      <h2>Frequently asked questions.</h2>
+      <dl>
+        {authoredFaqs.map((f: any) => (
+          <>
+            <dt id={`faq-${slugify(f.q)}`}>
+              <h3>{f.q}</h3>
+            </dt>
+            <dd><p>{f.a}</p></dd>
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
 
   {data.implementation?.length > 0 && (
     <section class="implementation">
@@ -129,6 +164,32 @@ const faqs = [
 
 <style>
   .lede { color: var(--ink-bone-dim); max-width: 72ch; margin-top: var(--s-3); }
+  .answer-first {
+    max-width: var(--reading);
+    padding: var(--s-4) var(--s-5);
+    border-left: 2px solid var(--signal-pink);
+    background: var(--ink-paper);
+    color: var(--ink-bone);
+    line-height: 1.6;
+    font-size: var(--t-body-md);
+  }
+  .faq {
+    max-width: var(--reading);
+    display: grid;
+    gap: var(--s-4);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--ink-line);
+  }
+  .faq h2 { font-size: var(--t-serif-1); }
+  .faq dl { display: grid; gap: var(--s-4); }
+  .faq dt h3 {
+    font-family: var(--font-serif);
+    font-variation-settings: 'opsz' 36;
+    font-size: clamp(18px, 2vw, 22px);
+    color: var(--ink-bone);
+    line-height: 1.3;
+  }
+  .faq dd { margin: var(--s-2) 0 0; color: var(--ink-bone-dim); line-height: 1.65; }
   .prose { max-width: var(--reading); display: grid; gap: var(--s-4); }
   .prose :global(h2) { font-size: var(--t-serif-1); }
   .prose :global(p) { color: var(--ink-bone-dim); line-height: 1.65; }

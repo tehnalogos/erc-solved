@@ -10,13 +10,28 @@ const chipKindSchema = z.enum(['erc', 'eip', 'lsp', 'topic']);
 
 const ercEnum = z.enum(['20', '721', '1155', 'EOA', '4337', '725', '165', 'other']);
 
+// Shared SEO / social / GEO fields. Every collection spreads these into its
+// schema so `title` stays brand-voice / unbounded for display, while short
+// keyword-forward SERP metadata (`seoTitle`, `metaDescription`) and rich
+// answer-engine metadata (`summary`, `about`) are separately addressable.
+// Fallback resolution lives in Base.astro.
+const seoGeoFields = {
+  seoTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  h1: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
+  about: z.array(z.string()).default([]),
+};
+
 const problems = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
+    ...seoGeoFields,
     tagline: z.string(),
     query: z.string(),
-    description: z.string(),
+    summary: z.string(),
     quotableAnswer: z.string().optional(),
     erc: ercEnum,
     lsps: z.array(z.string()),
@@ -36,8 +51,9 @@ const standards = defineCollection({
     kind: z.enum(['LSP', 'ERC']),
     id: z.string(),
     title: z.string(),
+    ...seoGeoFields,
     oneLine: z.string(),
-    description: z.string(),
+    summary: z.string(),
     purpose: z.enum(['Account', 'Token', 'Metadata', 'Social', 'Substrate', 'Permission', 'Execution']),
     abi: z.string(),
     solves: z.array(z.object({ pain: z.string(), href: z.string().optional() })).default([]),
@@ -54,9 +70,10 @@ const compare = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
+    ...seoGeoFields,
     left: z.object({ chip: z.string(), label: z.string() }),
     right: z.object({ chip: z.string(), label: z.string() }),
-    description: z.string(),
+    summary: z.string(),
     quotableAnswer: z.string().optional(),
     canonical: z.string().optional(),
     verdict: z.object({
@@ -86,9 +103,19 @@ const bestBlockchain = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
+    ...seoGeoFields,
     useCase: z.string(),
-    pageTitle: z.string(),
-    description: z.string(),
+    summary: z.string(),
+    // Answer-first paragraph — rendered above the body for featured-snippet /
+    // AI-Overview extraction. Repeat the head answer in 40-80 words using the
+    // exact tokens people search for (plurals, gerunds, product-vs-app noun).
+    answerFirst: z.string().optional(),
+    // Alternate query phrasings. Fed into JSON-LD alternateName + keywords so
+    // the crawler knows this page answers each variant.
+    aliases: z.array(z.string()).default([]),
+    // Question/answer pairs — rendered on-page as H3+P AND emitted as
+    // FAQPage JSON-LD. Winning question-form long-tail queries requires both.
+    faqs: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
     quotableAnswer: z.string(),
     criteria: z.array(z.object({ name: z.string(), evaluates: z.string() })),
     contenders: z.array(
@@ -120,9 +147,9 @@ const architecture = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
+    ...seoGeoFields,
     pattern: z.string(),
-    pageTitle: z.string(),
-    description: z.string(),
+    summary: z.string(),
     quotableAnswer: z.string(),
     approaches: z.array(
       z.object({
@@ -148,10 +175,10 @@ const crossChainCompare = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    pageTitle: z.string(),
+    ...seoGeoFields,
     contenders: z.array(z.string()),
     useCase: z.string(),
-    description: z.string(),
+    summary: z.string(),
     quotableAnswer: z.string(),
     matrix: z.array(
       z.object({
@@ -171,8 +198,8 @@ const benchmarks = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    pageTitle: z.string(),
-    description: z.string(),
+    ...seoGeoFields,
+    summary: z.string(),
     quotableAnswer: z.string(),
     chains: z.array(z.string()),
     datasetCsv: z.string(),
@@ -215,8 +242,8 @@ const research = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    pageTitle: z.string(),
-    description: z.string(),
+    ...seoGeoFields,
+    summary: z.string(),
     kind: z.enum(['methodology', 'kpis', 'evals', 'note']).default('note'),
     related: z.array(z.string()).default([]),
     author: z.string().default('ercs-solved maintainers'),
@@ -228,9 +255,10 @@ const migrate = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
+    ...seoGeoFields,
     from: z.string(),
     to: z.string(),
-    description: z.string(),
+    summary: z.string(),
     quotableAnswer: z.string().optional(),
     estimate: z.string(),
     verdict: z.string(),
@@ -247,8 +275,9 @@ const build = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
+    ...seoGeoFields,
     vertical: z.string(),
-    description: z.string(),
+    summary: z.string(),
     quotableAnswer: z.string().optional(),
     stack: z.array(z.string()),
     reading: z.array(z.object({ chip: z.string(), label: z.string(), href: z.string() })).default([]),
@@ -263,10 +292,10 @@ const erc = defineCollection({
   schema: z.object({
     id: z.string(),
     title: z.string(),
+    ...seoGeoFields,
     standardKind: z.enum(['ERC', 'EIP', 'Topic']).default('ERC'),
     headline: z.string(),
-    pageTitle: z.string(),
-    description: z.string(),
+    summary: z.string(),
     quotableAnswer: z.string().optional(),
     tagline: z.string(),
     bootStrip: z.string(),

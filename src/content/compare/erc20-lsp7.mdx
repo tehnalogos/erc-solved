@@ -2,7 +2,9 @@
 title: "ERC-20 vs LSP7"
 left: { chip: "ERC-20", label: "fungible token" }
 right: { chip: "LSP7", label: "Digital Asset" }
-description: "ERC-20 made fungible tokens composable on EVM. LSP7 keeps the model, then adds receiver hooks, transfer context, scoped operators, and ERC-725Y-backed metadata."
+summary: "ERC-20 made fungible tokens composable on EVM. LSP7 keeps the model, then adds receiver hooks, transfer context, scoped operators, and ERC-725Y-backed metadata."
+quotableAnswer: >-
+  ERC-20 is Ethereum's fungible token minimum interface: six functions, two events, no receiver hook, no structured metadata, no per-transfer context. LSP7 on LUKSO keeps the mental model but adds LSP1 `universalReceiver` hooks on both sides of every transfer, a `data` payload for transfer context, operator authorization scoped through LSP6 Key Manager permissions at the account, and LSP4 metadata under ERC-725Y typed keys instead of separate `name()`/`symbol()` calls. Same conceptual role, less integration tax on top.
 updated: 2026-06-22
 verdict:
   useLeft: "When the minimum-interface property is the design goal. Pull payments via approve / transferFrom, fixed metadata of name / symbol / decimals, and zero recipient code execution on transfer are features. Contracts that ABI-check for ERC-20 selectors only dispatch to ERC-20."

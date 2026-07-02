@@ -8,21 +8,25 @@ import { breadcrumbJsonLd, migrationPageTitle, techArticleJsonLd } from '~/lib/s
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
-const pageTitle = migrationPageTitle(data.from, data.to);
+const derivedSeoTitle = data.seoTitle ?? migrationPageTitle(data.from, data.to);
 const migratePath = `/build/migrate/${slug}/`;
 ---
 <Article
-  title={pageTitle}
-  description={data.description}
-  pageTitle={pageTitle}
+  title={data.title}
+  summary={data.summary}
+  seoTitle={derivedSeoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : [data.from, data.to, 'Ethereum', 'EVM', 'LUKSO Standards']}
   eyebrow={`migration · ${data.from} → ${data.to}`}
   author={data.author}
   updated={data.updated}
   editPath={`src/content/migrate/${slug}.mdx`}
   jsonLd={[
     techArticleJsonLd({
-      headline: pageTitle,
-      description: data.quotableAnswer ?? data.description,
+      headline: derivedSeoTitle,
+      description: data.quotableAnswer ?? data.summary,
       path: migratePath,
       updated: data.updated,
       author: data.author,

@@ -2,7 +2,9 @@
 title: "Migrate ERC-1155 multi-asset contracts to LSP7 + LSP8"
 from: "ERC-1155"
 to: "LSP7+LSP8"
-description: "A migration plan when the ERC-1155 token-id semantics are starting to leak. Split the contract by asset shape: LSP7 for fungible, LSP8 for identifiable."
+summary: "A migration plan when the ERC-1155 token-id semantics are starting to leak. Split the contract by asset shape: LSP7 for fungible, LSP8 for identifiable."
+quotableAnswer: >-
+  Migrating from ERC-1155 to LSP7 + LSP8 splits the contract along asset semantics: fungible token IDs become an LSP7 contract each; identifiable token IDs become an LSP8 contract. Transfer receivers dispatch through LSP1 `universalReceiver(typeId, data)`; the type-bit decoding convention disappears because type is at the contract layer. The rewrite is heaviest on marketplace and indexer integrations that assumed a single contract per collection. Effort scales with how much of the code assumed the ERC-1155 type-bit convention rather than reading semantics from the standard.
 estimate: "~1 week for a game / edition contract"
 verdict: "Migrate when downstream code needs to dispatch on asset shape (fungible vs identifiable) by interface — without per-collection decoding rules. Keep ERC-1155 when atomic cross-id batch transfers are a primitive your protocol relies on, or when per-id semantics are an integral part of your contract's state machine."
 updated: 2026-06-22

@@ -2,7 +2,9 @@
 title: "ERC-721 vs LSP8"
 left: { chip: "ERC-721", label: "identifiable NFT" }
 right: { chip: "LSP8", label: "Identifiable Digital Asset" }
-description: "ERC-721 standardized NFT ownership. LSP8 keeps the ownership model, then upgrades token IDs to bytes32, replaces tokenURI with typed per-token data, and routes every transfer through LSP1."
+summary: "ERC-721 standardized NFT ownership. LSP8 keeps the ownership model, then upgrades token IDs to bytes32, replaces tokenURI with typed per-token data, and routes every transfer through LSP1."
+quotableAnswer: >-
+  ERC-721 standardized NFT ownership: `uint256 tokenId`, one owner, one `tokenURI` per token. LSP8 on LUKSO keeps the ownership model but upgrades the primitives: `bytes32 tokenId` for hashes/structured IDs, per-token data under ERC-725Y typed keys instead of one URI string, LSP1 universal receiver on every transfer instead of the opt-in ERC-721 safe-transfer, and per-token operators without a collection-wide `setApprovalForAll`. The mental model transfers; the integration-tax patches are baked into the standard.
 updated: 2026-06-22
 verdict:
   useLeft: "When IDs are sequential, metadata is immutable, and the contract is built to be consumed by code that hardcodes the ERC-721 ABI. ERC-721 is the smaller surface — fewer bytes, simpler reasoning, no force flag or data payload to decide on."

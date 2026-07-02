@@ -2,7 +2,9 @@
 title: "EOA vs Universal Profile"
 left: { chip: "EOA", label: "externally owned account" }
 right: { chip: "LSP0", label: "Universal Profile" }
-description: "EOAs are foundational and portable. Universal Profiles are contract accounts that ship with metadata, permissions, hooks, and relay execution. The right answer depends on whether you're shipping a portable signer or an account-shaped product."
+summary: "EOAs are foundational and portable. Universal Profiles are contract accounts that ship with metadata, permissions, hooks, and relay execution. The right answer depends on whether you're shipping a portable signer or an account-shaped product."
+quotableAnswer: >-
+  An EOA (externally owned account) is one private key plus one address, portable across every EVM chain but with no metadata, no per-app permissions, no recovery, no receiver hooks. A LUKSO Universal Profile is a smart contract implementing LSP0 ERC-725 Account: LSP6 Key Manager for controller permissions, LSP11 for social recovery, LSP1 for asset receipt, LSP3 for profile metadata, LSP20 for inline call verification. The right choice depends on whether you're shipping a signer (EOA wins on portability) or an account-shaped product (Universal Profile wins on structure).
 updated: 2026-06-22
 verdict:
   useLeft: "Pure signer use cases. Cross-chain plumbing, hardware-wallet-anchored signing, applications where 'one private key controls one address' is a feature."

@@ -9,12 +9,15 @@ interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
 const path = `/research/${slug}/`;
-const pageTitle = data.pageTitle ?? data.title;
 ---
 <Article
   title={data.title}
-  description={data.description}
-  pageTitle={pageTitle}
+  summary={data.summary}
+  seoTitle={data.seoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about}
   eyebrow={`research · ${data.kind}`}
   author={data.author}
   updated={data.updated}
@@ -22,7 +25,7 @@ const pageTitle = data.pageTitle ?? data.title;
   jsonLd={[
     articleJsonLd({
       headline: data.title,
-      description: data.description,
+      description: data.summary,
       path,
       updated: data.updated,
       author: data.author,
@@ -35,7 +38,7 @@ const pageTitle = data.pageTitle ?? data.title;
     ]),
   ]}
 >
-  <p class="lede">{data.description}</p>
+  <p class="lede">{data.summary}</p>
 
   <section class="prose" data-pagefind-body>
     <slot />

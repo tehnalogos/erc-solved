@@ -1,7 +1,9 @@
 ---
 title: "Token economics."
 vertical: "Token economics"
-description: "Fungible tokens, market mechanics, distribution. The minimum LSP stack for an asset that's part of a profile-aware app, not just a balance sheet."
+summary: "Fungible tokens, market mechanics, distribution. The minimum LSP stack for an asset that's part of a profile-aware app, not just a balance sheet."
+quotableAnswer: >-
+  Fungible token economics for a profile-aware app on LUKSO uses LSP7 Digital Asset (transfer with LSP1 receiver hooks, operator authorization, transfer context) plus LSP4 Digital Asset Metadata (typed keys under ERC-725Y for name, symbol, icon, description, verified links). The token's holders are Universal Profiles by default, so distribution, airdrops, and holder-gated features naturally integrate with LSP3 profile identity, LSP5 received-assets, and LSP26 follower graph — instead of a balance sheet detached from user identity.
 stack: ["LSP7", "LSP4", "ERC-725Y"]
 updated: 2026-06-22
 reading:

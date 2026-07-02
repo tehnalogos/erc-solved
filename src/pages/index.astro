@@ -3,8 +3,28 @@ import Base from '~/layouts/Base.astro';
 import DiffArrow from '~/components/primitives/DiffArrow.astro';
 import Authorship from '~/components/primitives/Authorship.astro';
 
-const description =
+// Display layer — browser tab + pagefind. Brand voice, short.
+const displayTitle = 'Consumer Crypto Field Manual';
+
+// SERP layer — Bing/Google result title + snippet. Keyword-forward, length-capped.
+const seoTitle = 'Consumer crypto stack: EVM, Solana, LUKSO';
+const metaDescription =
+  'Architecture comparisons and guides for consumer crypto apps — smart accounts, gasless onboarding, profiles, social primitives on EVM, Solana, LUKSO.';
+
+// GEO / LLM layer — JSON-LD, llms-full.txt, answer-engine citation body.
+// Unbounded length; entity-rich and factual.
+const summary =
   'Independent architecture comparisons and implementation guides for consumer crypto apps — smart accounts, gasless onboarding, onchain profiles, permissions, social primitives, and digital assets across Ethereum, EVM L2s, Solana, and LUKSO.';
+
+const aboutTopics = [
+  'Consumer crypto applications',
+  'Ethereum and EVM L2 architecture',
+  'Solana account model',
+  'LUKSO LSP standards',
+  'Smart accounts and account abstraction',
+  'Onchain identity and profiles',
+  'Gasless onboarding',
+];
 
 const decide = [
   { label: 'Consumer apps',         use: 'general',         href: '/best-blockchain/consumer-apps/' },
@@ -49,26 +69,21 @@ const commonPainPoints = [
 ---
 
 <Base
-  title="Build Consumer Crypto Apps Without Rebuilding Identity, Accounts, and UX From Scratch"
-  description={description}
+  title={displayTitle}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  summary={summary}
+  about={aboutTopics}
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Build Consumer Crypto Apps Without Rebuilding Identity, Accounts, and UX From Scratch',
-    description,
+    name: seoTitle,
+    description: summary,
     url: 'https://www.ercsolved.dev/',
-    about: [
-      'Consumer crypto applications',
-      'Ethereum and EVM L2 architecture',
-      'Solana account model',
-      'LUKSO LSP standards',
-      'Smart accounts and account abstraction',
-      'Onchain identity and profiles',
-      'Gasless onboarding',
-    ],
+    about: aboutTopics,
   }}
 >
-  <section class="hero has-halo" data-pagefind-body data-pagefind-meta="title:Build Consumer Crypto Apps Without Rebuilding Identity, Accounts, and UX From Scratch">
+  <section class="hero has-halo" data-pagefind-body data-pagefind-meta={`title:${displayTitle}`}>
     <div class="hero-inner">
       <div class="boot" aria-label="status">
         <span class="typed">

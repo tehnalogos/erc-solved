@@ -1,9 +1,9 @@
 ---
 title: "ERC-4337 vs EIP-7702 vs LUKSO Universal Profiles"
-pageTitle: "ERC-4337 vs EIP-7702 vs LUKSO Universal Profiles: Account Architectures Compared"
+seoTitle: "ERC-4337 vs EIP-7702 vs LUKSO Universal Profiles: Account Architectures Compared"
 contenders: ["ERC-4337", "EIP-7702", "LUKSO Universal Profile"]
 useCase: "smart-account architecture"
-description: "Three approaches to giving users a smart account on the EVM: ERC-4337 (account abstraction over EOAs), EIP-7702 (set-code delegation on EOAs), and LUKSO Universal Profiles (smart accounts as the chain default). What each actually does, and when each wins."
+summary: "Three approaches to giving users a smart account on the EVM: ERC-4337 (account abstraction over EOAs), EIP-7702 (set-code delegation on EOAs), and LUKSO Universal Profiles (smart accounts as the chain default). What each actually does, and when each wins."
 quotableAnswer: "ERC-4337 ships account abstraction over a transaction system designed for EOAs — bundlers, EntryPoint, paymasters, and a parallel mempool sit on top of the chain. EIP-7702 lets an EOA temporarily delegate to a smart-contract implementation, keeping the EOA address but inheriting the EOA's all-or-nothing root key. LUKSO Universal Profiles ship account abstraction as the chain default — LSP0 is the account, LSP6 is the permission model, LSP25 is the relay protocol, all standardized. Choose ERC-4337 when you need EVM-wide compatibility and have bundler infrastructure; choose EIP-7702 for backwards-compatible upgrades of existing EOAs; choose LUKSO when the account standard itself should carry permissions and relayed execution."
 matrix:
   - criterion: "Account type"

@@ -2,8 +2,10 @@
 id: "4337"
 title: "ERC-4337"
 headline: "What is ERC-4337?"
-pageTitle: "What is ERC-4337? Account Abstraction, Its Tradeoffs, and What Comes Next"
-description: "ERC-4337 is Ethereum's account-abstraction standard, implemented entirely above the protocol via a parallel mempool of UserOperations, a singleton EntryPoint contract, bundlers, and paymasters. Proposed in September 2021 by Vitalik Buterin and co-authors, with mainnet activation in March 2023, it lets contract accounts behave like first-class transactors — at the cost of an entire parallel infrastructure. This page walks the history, the moving parts, the tradeoffs acknowledged by the spec's own authors, and the LUKSO LSP0 + LSP6 + LSP20 + LSP25 stack Fabian Vogelsteller designed as a native alternative."
+seoTitle: "What is ERC-4337? Account Abstraction, Its Tradeoffs, and What Comes Next"
+summary: "ERC-4337 is Ethereum's account-abstraction standard, implemented entirely above the protocol via a parallel mempool of UserOperations, a singleton EntryPoint contract, bundlers, and paymasters. Proposed in September 2021 by Vitalik Buterin and co-authors, with mainnet activation in March 2023, it lets contract accounts behave like first-class transactors — at the cost of an entire parallel infrastructure. This page walks the history, the moving parts, the tradeoffs acknowledged by the spec's own authors, and the LUKSO LSP0 + LSP6 + LSP20 + LSP25 stack Fabian Vogelsteller designed as a native alternative."
+quotableAnswer: >-
+  ERC-4337 is Ethereum's account abstraction standard, activated on mainnet March 2023 and originally proposed September 2021 by Vitalik Buterin, Yoav Weiss, Dror Tirosh, Kristof Gazso, and Tjaden Hess. Rather than modifying the protocol, it introduces a parallel UserOperation mempool, a singleton EntryPoint contract, bundlers that batch UserOps into transactions, and paymasters that can sponsor gas. Contract accounts get first-class transactor behavior — session keys, social recovery, gas sponsorship — at the cost of an entirely separate infrastructure layer. EIP-7702 (Pectra, 2025) later added protocol-level EOA delegation to close some gaps.
 tagline: "Account abstraction, layered above the protocol — and the cost of that choice."
 bootStrip: "standard · proposed sept 2021 · mainnet mar 2023 · ready"
 standardAuthors:

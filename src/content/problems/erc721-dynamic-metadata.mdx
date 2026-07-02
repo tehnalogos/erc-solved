@@ -2,7 +2,9 @@
 title: "The tokenURI trap."
 tagline: "tokenURI returns one string. Dynamic NFTs depend on whatever server is hosting the JSON."
 query: "erc721 dynamic metadata"
-description: "tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC-4906, fully onchain SVG, and LSP8 plus ERC-725Y key/value metadata."
+summary: "tokenURI returns a single URI per token. Dynamic NFTs need refresh logic, off-chain servers, and marketplace cooperation. Compare ERC-4906, fully onchain SVG, and LSP8 plus ERC-725Y key/value metadata."
+quotableAnswer: >-
+  ERC-721's `tokenURI(tokenId)` returns one string per token — updating metadata after mint means changing what that string resolves to off-chain, then hoping marketplaces refresh their caches. Standardized attempts include ERC-4906 (`MetadataUpdate` event to signal a change), on-chain SVG generation (costly but self-contained), and Arweave/IPFS with on-chain hash anchors. LSP8 on LUKSO stores per-token data under ERC-725Y typed keys: `getDataForTokenId(tokenId, key)` returns typed bytes, and LSP4's `VerifiableURI` includes an on-chain hash so silent off-chain swaps become detectable.
 erc: "721"
 lsps: ["LSP8", "LSP4"]
 aliases: ["dynamic nft metadata", "tokenuri refresh", "nft metadata server", "erc4906", "onchain svg nft"]

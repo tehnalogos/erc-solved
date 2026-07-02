@@ -2,7 +2,9 @@
 title: "ERC-4337 vs the LSP account stack"
 left: { chip: "ERC-4337", label: "account abstraction over EOAs" }
 right: { chip: "LSP0+LSP6+LSP20+LSP25", label: "native smart account" }
-description: "ERC-4337 puts account abstraction on top of EOAs via a parallel mempool, EntryPoint, and bundlers. The LSP stack puts the account contract on the normal call path, with permissions and relay execution as composed standards."
+summary: "ERC-4337 puts account abstraction on top of EOAs via a parallel mempool, EntryPoint, and bundlers. The LSP stack puts the account contract on the normal call path, with permissions and relay execution as composed standards."
+quotableAnswer: >-
+  ERC-4337 puts account abstraction on top of the Ethereum protocol via a parallel UserOperation mempool, an EntryPoint singleton, bundlers, and paymaster contracts — the design deliberately avoided protocol changes. The LUKSO LSP stack puts an account contract (LSP0 ERC-725 Account) on the normal L1 call path, with LSP6 as the standardized permission vocabulary, LSP20 for inline call verification, and LSP25 for relay execution. The two are structurally different bets: ERC-4337 optimizes for compatibility with existing EOAs; the LSP stack is substrate-level account-native.
 updated: 2026-06-22
 verdict:
   useLeft: "When you need account abstraction to layer onto a chain whose native transaction model is EOA-anchored, with pluggable per-account validators and a separate aggregation/sponsorship plane that's decoupled from the account itself."

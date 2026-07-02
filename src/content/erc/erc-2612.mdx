@@ -2,8 +2,10 @@
 id: "2612"
 title: "ERC-2612"
 headline: "What is ERC-2612?"
-pageTitle: "What is ERC-2612? Permit, Gasless Approvals, and the Remaining Allowance Risk"
-description: "ERC-2612 adds permit to ERC-20, letting a holder set allowance with an EIP-712 signature instead of an on-chain approve transaction."
+seoTitle: "What is ERC-2612? Permit, Gasless Approvals, and the Remaining Allowance Risk"
+summary: "ERC-2612 adds permit to ERC-20, letting a holder set allowance with an EIP-712 signature instead of an on-chain approve transaction."
+quotableAnswer: >-
+  ERC-2612 adds `permit(owner, spender, value, deadline, v, r, s)` to ERC-20, letting a token holder authorize a spender via an EIP-712 signature instead of a separate `approve` transaction. The signature is submitted alongside the transferFrom call, collapsing two user-facing steps into one and eliminating the need for the owner to hold ETH for gas. Proposed by Martin Lundfall in April 2020, it ships with USDC, DAI, and most modern tokens. Uniswap's Permit2 provides equivalent UX for pre-2612 tokens at the cost of introducing a widely-trusted intermediary contract.
 tagline: "Gasless ERC-20 approval by signature - useful, but still allowance."
 bootStrip: "standard · permit · erc-20 extension · ready"
 standardAuthors:

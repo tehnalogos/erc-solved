@@ -2,7 +2,9 @@
 title: "An EOA is one key for everything."
 tagline: "Identity, custody, signing, recovery — all bound to a single private key."
 query: "eoa wallet limits"
-description: "EOAs are simple, portable, and foundational, but they bind identity, funds, and authority to one private key. Universal Profiles separate the account from controllers and add metadata, permissions, hooks, and relay execution."
+summary: "EOAs are simple, portable, and foundational, but they bind identity, funds, and authority to one private key. Universal Profiles separate the account from controllers and add metadata, permissions, hooks, and relay execution."
+quotableAnswer: >-
+  An externally owned account binds identity, funds, and authority to a single ECDSA private key: if it's lost, everything is unrecoverable; if it's stolen, everything is drained. Standards trying to mitigate this include ERC-4337 smart accounts (add recovery modules but keep an EOA on top for gas), EIP-7702 delegation (adds programmable behavior but the ECDSA key remains authoritative), and LSP11 social recovery on LUKSO Universal Profiles (guardians authorize new controllers with no residual key). Recovery is only real when there's no key above the permission system.
 erc: "EOA"
 lsps: ["LSP0", "LSP3", "LSP6"]
 aliases: ["seed phrase risk", "single key risk", "eoa account model", "private key recovery"]

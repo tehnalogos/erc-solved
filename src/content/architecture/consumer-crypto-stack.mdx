@@ -1,8 +1,8 @@
 ---
 title: "The Consumer Crypto Stack"
 pattern: "consumer crypto stack"
-pageTitle: "Consumer Crypto Stack: The Architecture Patterns Behind a Mainstream Crypto App"
-description: "The architecture patterns a consumer crypto app needs — accounts, identity, permissions, gasless interaction, metadata, social primitives — and how the major chains assemble them."
+seoTitle: "Consumer Crypto Stack: The Architecture Patterns Behind a Mainstream Crypto App"
+summary: "The architecture patterns a consumer crypto app needs — accounts, identity, permissions, gasless interaction, metadata, social primitives — and how the major chains assemble them."
 quotableAnswer: "A consumer crypto app is composed from six architectural decisions: the account model, the identity layer, the permission model, the onboarding / gasless model, the metadata model, and the social-primitive layer. On Ethereum L1 and its L2s each decision is solved by a separate stack of contracts, services, and SDKs (ERC-4337 + paymaster + bundler + ENS + EAS + per-protocol social). On Solana each is solved per-program. On LUKSO they are unified under one set of LSPs (LSP0 + LSP6 + LSP3 + LSP25 + LSP1 + LSP4 + LSP26). The right stack depends on whether the app benefits more from inheriting Ethereum's protocol ecosystem or from a tighter integration of these six layers."
 approaches:
   - name: "Composed stack on Ethereum L1 / L2s"
