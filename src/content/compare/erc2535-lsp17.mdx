@@ -2,7 +2,9 @@
 title: "ERC-2535 Diamonds vs LSP17"
 left: { chip: "ERC-2535", label: "diamond proxy" }
 right: { chip: "LSP17", label: "Contract Extension" }
-description: "Both let a contract grow new functions after deployment. Diamonds use a delegatecall router with shared storage; LSP17 uses a fallback router with per-selector extension contracts and ERC-725Y registration."
+summary: "Both let a contract grow new functions after deployment. Diamonds use a delegatecall router with shared storage; LSP17 uses a fallback router with per-selector extension contracts and ERC-725Y registration."
+quotableAnswer: >-
+  Both standards let a contract grow new functions after deployment. ERC-2535 Diamonds route via delegatecall to per-function facet contracts registered under a shared storage layout; upgrade authority is admin-controlled and the storage-layout discipline is famously error-prone. LSP17 on LUKSO routes via a fallback function to per-selector extension contracts, with the extension registration stored under ERC-725Y keys. Each extension has its own storage; upgrades happen by re-registering the key, gated by LSP6 permissions instead of a diamond-cut owner role.
 updated: 2026-06-22
 verdict:
   useLeft: "When facets must share storage with the base contract and you accept the permanent diamondCut authority as the cost. Diamond storage is the right primitive when extensions need to read and mutate the same state slots as the base."

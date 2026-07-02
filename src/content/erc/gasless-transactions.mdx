@@ -3,8 +3,10 @@ id: "gasless"
 standardKind: "Topic"
 title: "Gasless Transactions"
 headline: "What are gasless transactions on Ethereum?"
-pageTitle: "Gasless Transactions on Ethereum: The Stack, The Failure Modes, and What LUKSO Designed Instead"
-description: "A field guide to gasless transactions on Ethereum and EVM L2s in 2026 — the layered standards (ERC-2771, ERC-4337, EIP-7702), the production infrastructure (Pimlico, ZeroDev, Biconomy, Alchemy, OpenGSN, OpenZeppelin Defender, Gelato), the structural failure modes that have kept the consumer-app market out of reach for nearly a decade, on-the-record criticism from the standards' own maintainers, and the LUKSO LSP25 + LSP15 + LSP6 + LSP0 stack designed to break through the bottleneck."
+seoTitle: "Gasless Transactions on Ethereum: The Stack, The Failure Modes, and What LUKSO Designed Instead"
+summary: "A field guide to gasless transactions on Ethereum and EVM L2s in 2026 — the layered standards (ERC-2771, ERC-4337, EIP-7702), the production infrastructure (Pimlico, ZeroDev, Biconomy, Alchemy, OpenGSN, OpenZeppelin Defender, Gelato), the structural failure modes that have kept the consumer-app market out of reach for nearly a decade, on-the-record criticism from the standards' own maintainers, and the LUKSO LSP25 + LSP15 + LSP6 + LSP0 stack designed to break through the bottleneck."
+quotableAnswer: >-
+  Gasless transactions on Ethereum in 2026 layer through three standards. ERC-2771 (2020) defines a trusted-forwarder pattern where a relayer submits meta-transactions and recipient contracts extract the original signer via _msgSender(). ERC-4337 (2023) adds a UserOperation mempool, singleton EntryPoint, bundlers, and paymaster contracts for account-abstracted sponsorship. EIP-7702 (Pectra, May 2025) lets existing EOAs delegate to smart account code to unlock 4337-style flows. Each layer added rather than replaced. LUKSO's LSP25 executes relay calls as a native account function, eliminating the parallel mempool and paymaster contract.
 tagline: "Sponsored execution — the consumer-app UX every wallet has been promising. And why it hasn't broken through."
 bootStrip: "topic · layered since 2017 · still unsolved · ready"
 aliases:

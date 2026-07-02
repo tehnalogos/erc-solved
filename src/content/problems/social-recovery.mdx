@@ -2,7 +2,9 @@
 title: "Recovery shouldn't be one phrase to lose."
 tagline: "Express recovery as a permission graph — guardians, thresholds, time locks — not a seed."
 query: "social recovery smart wallets"
-description: "Guardian models, multisig recovery, and ERC-4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase."
+summary: "Guardian models, multisig recovery, and ERC-4337 recovery modules compared. How smart accounts let users recover access without storing a seed phrase."
+quotableAnswer: >-
+  Social recovery replaces seed-phrase custody with a set of trusted guardians who authorize a new controller when the original key is lost. Implementations in 2026 include Argent's guardian model (bespoke contract), Safe's recovery modules (multisig-based), ERC-4337 validator modules (per-wallet SDK), and LSP11 Basic Social Recovery on LUKSO (guardian addresses vote to install a new controller, subject to LSP6 permissions). Recovery is only authoritative when there's no residual EOA key above the permission system — otherwise, a stolen key can override any recovery configuration.
 erc: "EOA"
 lsps: ["LSP6"]
 aliases: ["guardian wallet", "account recovery", "lost seed phrase", "wallet recovery"]

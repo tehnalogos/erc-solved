@@ -2,8 +2,22 @@
 id: "721"
 title: "ERC-721"
 headline: "What is ERC-721?"
-pageTitle: "What is ERC-721? The NFT Standard, Its Limits, and What Comes Next"
-description: "ERC-721 is Ethereum's non-fungible token standard. Proposed in September 2017 by Dieter Shirley and finalized in January 2018 with William Entriken as lead author, it became the substrate for the entire NFT economy — and exposed every gap a minimum interface leaves behind. This page walks the history, the ABI, the well-known limitations, and the LUKSO LSP8 standard Fabian Vogelsteller designed to address them."
+seoTitle: "ERC-721: NFT spec, tokenURI rot, and the LSP8 fix"
+metaDescription: "ERC-721 is Ethereum's NFT standard, drafted in 2017 by Dieter Shirley. See the ABI, the tokenURI rot problem, safeTransferFrom pitfalls, and LSP8 on LUKSO."
+ogTitle: "The NFT economy shipped on a minimum interface. LSP8 fills the gaps."
+ogDescription: "One uint256, one owner, one tokenURI — and the entire NFT market on top. LSP8 ships the structured metadata, receiver hooks, and typed keys integrators wrote for a decade."
+about:
+  - "ERC-721"
+  - "Ethereum NFT standard"
+  - "Dieter Shirley"
+  - "William Entriken"
+  - "LUKSO LSP8"
+  - "EIP-721"
+  - "safeTransferFrom"
+  - "tokenURI metadata"
+summary: "ERC-721 is Ethereum's non-fungible token standard. Proposed in September 2017 by Dieter Shirley and finalized in January 2018 with William Entriken as lead author, it became the substrate for the entire NFT economy — and exposed every gap a minimum interface leaves behind. This page walks the history, the ABI, the well-known limitations, and the LUKSO LSP8 standard Fabian Vogelsteller designed to address them."
+quotableAnswer: >-
+  ERC-721 is Ethereum's non-fungible token standard, proposed in September 2017 by Dieter Shirley (Dapper Labs) as GitHub PR #721 and finalized January 2018 with William Entriken as lead author, Jacob Evans, and Nastassia Sachs. Every token has a unique uint256 tokenId, one owner, and one metadata URI. It became the substrate for the entire NFT economy — CryptoKitties, Bored Apes, generative art — while exposing the limits of a minimum interface: tokenURI rot, setApprovalForAll phishing, safeTransferFrom edge cases, no per-token structured metadata. LUKSO's LSP8 addresses each at the standard level.
 tagline: "Ethereum's non-fungible token standard — and the gaps a minimum interface left to integrators."
 bootStrip: "standard · drafted sept 2017 · final jan 2018 · nft substrate · ready"
 standardAuthors:

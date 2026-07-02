@@ -2,7 +2,9 @@
 title: "ERC-4337 vs EIP-7702"
 left: { chip: "ERC-4337", label: "alt-mempool smart accounts" }
 right: { chip: "EIP-7702", label: "EOA delegation" }
-description: "ERC-4337 and EIP-7702 are complementary account-abstraction paths: 4337 defines the UserOperation, EntryPoint, bundler, and paymaster architecture; 7702 lets existing EOAs delegate execution to contract code."
+summary: "ERC-4337 and EIP-7702 are complementary account-abstraction paths: 4337 defines the UserOperation, EntryPoint, bundler, and paymaster architecture; 7702 lets existing EOAs delegate execution to contract code."
+quotableAnswer: >-
+  ERC-4337 and EIP-7702 are complementary paths to account abstraction. ERC-4337 (mainnet 2023) defines the UserOperation, EntryPoint singleton, bundler, and paymaster architecture — smart accounts get first-class transactor behavior via a parallel mempool. EIP-7702 (Pectra, 2025) lets existing EOAs delegate execution to smart account code via a signed authorization tuple, unlocking 4337-style flows without migrating addresses. Together: EOAs can behave like smart accounts (7702) inside the AA infrastructure (4337). The trade-off is that 7702's ECDSA key remains authoritative even after delegation.
 canonical: "/compare/erc-4337-vs-eip-7702-vs-lukso/"
 updated: 2026-06-29
 verdict:

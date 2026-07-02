@@ -58,7 +58,7 @@ export const GET: APIRoute = async () => {
     })),
     ...research.map((e) => ({
       title: e.data.title,
-      description: e.data.description,
+      description: e.data.summary,
       path: `/research/${e.slug}/`,
       updated: new Date(e.data.updated),
     })),

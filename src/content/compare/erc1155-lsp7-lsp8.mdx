@@ -2,7 +2,9 @@
 title: "ERC-1155 vs LSP7 + LSP8"
 left: { chip: "ERC-1155", label: "multi-asset contract" }
 right: { chip: "LSP7+LSP8", label: "split by asset shape" }
-description: "ERC-1155 packs many token types into one contract; LSP7 + LSP8 split the same surface by asset semantics. The boundary shows up in code — batch primitives, receiver dispatch, and per-id branching."
+summary: "ERC-1155 packs many token types into one contract; LSP7 + LSP8 split the same surface by asset semantics. The boundary shows up in code — batch primitives, receiver dispatch, and per-id branching."
+quotableAnswer: >-
+  ERC-1155 packs fungible, semi-fungible, and non-fungible token IDs into one contract; type semantics are conventionally encoded in the token ID and must be decoded by every integrator. LSP7 (fungible) and LSP8 (identifiable) on LUKSO split the same surface at the standard level: LSP7 handles divisible balances with LSP1 receiver hooks; LSP8 handles unique items with bytes32 IDs and per-token ERC-725Y typed data. Two contracts instead of one, with type semantics at the contract layer rather than the ID layer.
 updated: 2026-06-22
 verdict:
   useLeft: "When batch transfer is a primitive your code relies on (cross-id atomic moves), or when one deployment must hold a large mix of token types and the per-id semantics live in your contract logic."

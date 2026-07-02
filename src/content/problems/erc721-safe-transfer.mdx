@@ -2,7 +2,9 @@
 title: "safeTransferFrom is only half a hook."
 tagline: "It checks IERC721Receiver — only, only, only. Every other asset type strands silently."
 query: "erc721 safe transfer problems"
-description: "safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types."
+summary: "safeTransferFrom only checks one specific receiver interface. NFTs still get stuck in contracts, and ERC20s still strand silently. Universal receiver hooks generalize the fix across asset types."
+quotableAnswer: >-
+  ERC-721's `safeTransferFrom` checks `onERC721Received` on the recipient — but the check is opt-in (non-safe `transferFrom` still ships), and every asset standard defines its own receiver: `IERC721Receiver`, `IERC1155Receiver`, `IERC1155BatchReceiver`, ERC-777 `tokensReceived`. A multi-asset contract implements four interfaces; a legacy contract silently strands ERC-20s and un-safe ERC-721 transfers. LSP1 on LUKSO defines one interface — `universalReceiver(bytes32 typeId, bytes data)` — that LSP7, LSP8, and value transfers all call, with typeId as the discriminator.
 erc: "721"
 lsps: ["LSP1", "LSP7", "LSP8"]
 aliases: ["safetransferfrom problems", "nfts stuck in contract", "ierc721receiver", "ierc1155receiver", "tokens stranded"]

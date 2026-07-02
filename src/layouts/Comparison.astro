@@ -8,16 +8,20 @@ import { breadcrumbJsonLd, comparisonPageTitle, techArticleJsonLd } from '~/lib/
 interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
-const pageTitle = comparisonPageTitle(data.left.chip, data.right.chip);
+const derivedSeoTitle = data.seoTitle ?? comparisonPageTitle(data.left.chip, data.right.chip);
 const comparePath = `/standards/compare/${slug}/`;
 const canonical = data.canonical
   ? new URL(data.canonical, Astro.site).toString()
   : undefined;
 ---
 <Article
-  title={pageTitle}
-  description={data.description}
-  pageTitle={pageTitle}
+  title={data.title}
+  summary={data.summary}
+  seoTitle={derivedSeoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : [data.left.chip, data.right.chip, 'Ethereum', 'EVM', 'LUKSO Standards']}
   eyebrow="comparison · spec-grade diff"
   author={data.author}
   updated={data.updated}
@@ -25,8 +29,8 @@ const canonical = data.canonical
   canonical={canonical}
   jsonLd={[
     techArticleJsonLd({
-      headline: pageTitle,
-      description: data.quotableAnswer ?? data.description,
+      headline: derivedSeoTitle,
+      description: data.quotableAnswer ?? data.summary,
       path: comparePath,
       updated: data.updated,
       author: data.author,
@@ -46,7 +50,7 @@ const canonical = data.canonical
       <span class="right">{data.right.chip}</span>
       <span class="scope">Ethereum/EVM standard comparison</span>
     </h1>
-    <p class="lede">{data.description}</p>
+    <p class="lede">{data.summary}</p>
   </div>
 
   {data.quotableAnswer && (

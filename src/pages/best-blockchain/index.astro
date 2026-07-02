@@ -7,19 +7,41 @@ const entries = (await getCollection('bestBlockchain')).sort((a, b) =>
   a.data.title.localeCompare(b.data.title),
 );
 
-const description =
+const displayTitle = 'Best Blockchain for Consumer Crypto — Decision Guides';
+const seoTitle = 'Best blockchain by use case: 8 decision guides';
+const metaDescription =
+  'Ethereum L1, Base, Arbitrum, Optimism, Polygon, Solana, LUKSO scored across 10 criteria per use case. Pick by binding constraint, not by hype.';
+const ogTitle = "The \"which chain\" question, broken down by what you ship";
+const ogDescription =
+  'Consumer apps, social apps, creator platforms, loyalty, mobile, NFT marketplaces, digital identity — each with its own binding constraint. Same seven chains, different verdict per use case.';
+const summary =
   'Decision guides comparing Ethereum L1, Base, Arbitrum, Optimism, Polygon, Solana and LUKSO across the architecture criteria that matter for consumer crypto apps.';
+const aboutTopics = [
+  'Consumer crypto applications',
+  'Blockchain selection',
+  'Ethereum L1',
+  'Base',
+  'Arbitrum',
+  'Optimism',
+  'Polygon',
+  'Solana',
+  'LUKSO',
+];
 ---
 <Article
-  title="Best Blockchain for Consumer Crypto — Decision Guides"
-  description={description}
-  pageTitle="Best Blockchain for Consumer Crypto: Decision Guides by Use Case"
+  title={displayTitle}
+  summary={summary}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  about={aboutTopics}
   eyebrow="best blockchain · index"
   author="ercs-solved maintainers"
   updated="2026-06-29"
   editPath="src/pages/best-blockchain/index.astro"
 >
-  <p class="lede">{description}</p>
+  <p class="lede">{summary}</p>
   <p class="lede">
     Each page applies a fixed 10-criterion framework — account model, identity, permissions,
     onboarding, metadata, extensibility, social primitives, EVM compatibility, infrastructure

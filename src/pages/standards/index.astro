@@ -13,19 +13,40 @@ const groups = order
   }))
   .filter(g => g.entries.length > 0);
 
-const description =
+const displayTitle = 'LUKSO Standards for EVM Builders';
+const seoTitle = 'LUKSO LSPs: accounts, tokens, permissions, relayer';
+const metaDescription =
+  'Every LUKSO Standard Proposal grouped by purpose — LSP0 accounts, LSP6 permissions, LSP7 tokens, LSP8 NFTs, LSP25 relayer. ABI, what it solves, what it skips.';
+const ogTitle = "Every LUKSO LSP, grouped by what it actually replaces";
+const ogDescription =
+  'Not "the LUKSO stack" as a slogan. The individual standards — LSP0, LSP6, LSP7, LSP8, LSP25, LSP1 — each with its ABI, the ERC it succeeds, and the specific integration tax it removes.';
+const summary =
   'The LUKSO standard set for EVM builders, grouped by purpose. Each explainer ships an ABI block, what it solves, and what it deliberately does not solve.';
+const aboutTopics = [
+  'LUKSO Standard Proposals',
+  'LSP0 ERC725Account',
+  'LSP6 Key Manager',
+  'LSP7 Digital Asset',
+  'LSP8 Identifiable Digital Asset',
+  'LSP25 Execute Relay Call',
+  'EVM contract standards',
+];
 ---
 <Base
-  title="LUKSO Standards for EVM Builders"
-  description={description}
+  title={displayTitle}
+  seoTitle={seoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  summary={summary}
+  about={aboutTopics}
   jsonLd={{
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'LUKSO Standards for EVM Builders',
-    description,
+    name: seoTitle,
+    description: summary,
     url: 'https://www.ercsolved.dev/standards/',
-    about: ['LUKSO standards', 'EVM contract standards', 'Ethereum ERC substrate'],
+    about: aboutTopics,
   }}
 >
   <section class="hub" data-pagefind-body data-pagefind-meta="title:LUKSO Standards for EVM Builders">

@@ -3,8 +3,10 @@ id: "erc-721a"
 standardKind: "Topic"
 title: "ERC-721A"
 headline: "What is ERC-721A?"
-pageTitle: "What is ERC-721A? Azuki's Gas-Optimized ERC-721 Implementation"
-description: "ERC-721A is Azuki's gas-optimized implementation of ERC-721 for batch minting. It is not an Ethereum ERC standard, but it is a widely referenced NFT contract pattern."
+seoTitle: "What is ERC-721A? Azuki's Gas-Optimized ERC-721 Implementation"
+summary: "ERC-721A is Azuki's gas-optimized implementation of ERC-721 for batch minting. It is not an Ethereum ERC standard, but it is a widely referenced NFT contract pattern."
+quotableAnswer: >-
+  ERC-721A is Azuki's gas-optimized ERC-721 implementation, released January 2022 by Chiru Labs. It's not a formal Ethereum ERC — it's an alternative library-level implementation that batch-mints multiple tokens for the gas cost of one, by lazy-initializing per-token ownership on first transfer instead of at mint. Widely adopted by NFT drops in the 2022–24 cycle. The gas savings at mint are real, but the storage model produces surprising `tokenOfOwnerByIndex` cost and pushes subsequent transfers to bear the initialization cost. LSP8 on LUKSO addresses the same use case with a bytes32 tokenId and per-token typed data.
 tagline: "The NFT mint optimization everyone calls an ERC, even though it is an implementation."
 bootStrip: "topic · azuki implementation · batch minting · production"
 updated: 2026-06-26

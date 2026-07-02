@@ -10,7 +10,7 @@ interface Props { entry: any; }
 const { entry } = Astro.props;
 const { data, slug } = entry;
 const chipKind = data.kind === 'LSP' ? 'lsp' : 'erc';
-const pageTitle = standardPageTitle(data.kind, data.id, data.title);
+const derivedSeoTitle = data.seoTitle ?? standardPageTitle(data.kind, data.id, data.title);
 const standardPath = `/standards/${slug}/`;
 const standardLabel = formatStandardLabel(data.kind, data.id);
 
@@ -29,17 +29,21 @@ function companionHref(chip: string): string {
 }
 ---
 <Article
-  title={pageTitle}
-  description={data.description}
-  pageTitle={pageTitle}
+  title={data.title}
+  summary={data.summary}
+  seoTitle={derivedSeoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : [standardLabel, 'Ethereum', 'EVM', 'LUKSO Standards', data.purpose]}
   eyebrow={`standard · ${data.purpose.toLowerCase()}`}
   author={data.author}
   updated={data.updated}
   editPath={`src/content/standards/${slug}.mdx`}
   jsonLd={[
     techArticleJsonLd({
-      headline: pageTitle,
-      description: data.description,
+      headline: derivedSeoTitle,
+      description: data.summary,
       path: standardPath,
       updated: data.updated,
       author: data.author,

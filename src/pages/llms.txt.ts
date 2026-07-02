@@ -92,7 +92,7 @@ export const GET: APIRoute = async () => {
       line(
         `/research/${entry.slug}/`,
         entry.data.title,
-        entry.data.description,
+        entry.data.summary,
       ),
     );
 
@@ -102,7 +102,7 @@ export const GET: APIRoute = async () => {
       line(
         `/standards/compare/${entry.slug}/`,
         entry.data.title,
-        entry.data.description,
+        entry.data.summary,
       ),
     );
 
@@ -112,7 +112,7 @@ export const GET: APIRoute = async () => {
       line(
         `/build/migrate/${entry.slug}/`,
         entry.data.title,
-        entry.data.description,
+        entry.data.summary,
       ),
     );
 
@@ -122,7 +122,7 @@ export const GET: APIRoute = async () => {
       line(
         `/build/${entry.slug}/`,
         entry.data.vertical,
-        entry.data.description,
+        entry.data.summary,
       ),
     );
 
@@ -132,7 +132,7 @@ export const GET: APIRoute = async () => {
       line(
         `/${entry.slug}/`,
         entry.data.title,
-        entry.data.description,
+        entry.data.summary,
       ),
     );
 
@@ -178,7 +178,7 @@ ${priorityProblems
     line(
       `/problems/${entry.slug}/`,
       formatSearchQuery(entry.data.query),
-      `${entry.data.description} LUKSO route: ${entry.data.lsps.join(' + ')}.`,
+      `${entry.data.summary} LUKSO route: ${entry.data.lsps.join(' + ')}.`,
     ),
   )
   .join('\n')}

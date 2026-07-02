@@ -2,7 +2,9 @@
 title: "New users need gas before they can do anything."
 tagline: "EIP-2771 forwarders, ERC-4337 paymasters, LSP25 relay calls — three families, three costs."
 query: "gasless transactions smart accounts"
-description: "EIP-2771 forwarders, ERC-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys."
+summary: "EIP-2771 forwarders, ERC-4337 paymasters, and LSP25 relay calls compared. How smart accounts let someone else pay gas without exposing user keys."
+quotableAnswer: >-
+  Gasless onboarding — new users signing transactions without holding ETH — has three architectures in 2026. ERC-2771 trusted forwarders require every recipient contract to inherit `ERC2771Context` and use `_msgSender()`. ERC-4337 paymasters sponsor gas via a separate contract with its own EntryPoint deposit and `validatePaymasterUserOp`, rented from Pimlico / Alchemy / Biconomy / ZeroDev / Stackup. LSP25 on LUKSO exposes `executeRelayCall(signature, nonce, validityTimestamps, payload)` as a native account function, so a relayer submits signed payloads without a bundler mempool or paymaster contract.
 erc: "4337"
 lsps: ["LSP25", "LSP6", "LSP20"]
 aliases: ["meta transactions", "sponsored transactions", "gasless onboarding", "pay user gas", "relay call"]

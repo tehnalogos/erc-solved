@@ -2,7 +2,9 @@
 title: "Migrate ERC-721 NFT collections to LSP8"
 from: "ERC-721"
 to: "LSP8"
-description: "A step-by-step migration from an ERC-721 collection to LSP8. Map token IDs, ownership, tokenURI metadata, and safe transfers."
+summary: "A step-by-step migration from an ERC-721 collection to LSP8. Map token IDs, ownership, tokenURI metadata, and safe transfers."
+quotableAnswer: >-
+  Migrating an ERC-721 collection to LSP8 maps `tokenId: uint256` to `tokenId: bytes32` (sequential IDs cast losslessly); `ownerOf(tokenId)` and `balanceOf(owner)` map directly; `tokenURI(tokenId)` becomes `getDataForTokenId(tokenId, LSP4Metadata)` returning typed bytes. Per-token `approve` maps to `authorizeOperator(operator, tokenId, data)`; there is no `setApprovalForAll`. Receiver hooks change from optional `IERC721Receiver` to always-called LSP1 `universalReceiver`. Snapshotting existing owner state and re-minting on the LSP8 contract is the typical migration path.
 estimate: "~3 days for a 10k collection with dynamic metadata"
 verdict: "Migrate when the collection needs bytes32 IDs, per-token data, or LUKSO marketplace integration. Keep ERC-721 when the marketplace surface is mainnet NFT venues that don't yet speak LSP8."
 updated: 2026-06-22

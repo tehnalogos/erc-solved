@@ -9,26 +9,67 @@ import Footer from '~/components/nav/Footer.astro';
 import CommandK from '~/components/search/CommandK.tsx';
 import Analytics from '@vercel/analytics/astro';
 
+// The four content layers this layout resolves:
+//   Display  → `title` (browser tab / RSS / pagefind fallback)
+//   SERP     → `seoTitle` + `metaDescription`  (Google/Bing SERP + <title>)
+//   Social   → `ogTitle`  + `ogDescription`    (OG / Twitter card overrides)
+//   GEO/LLM  → `summary`  + `about[]`          (JSON-LD, llms-full.txt)
+// Each layer falls back to the previous, so authors typically only fill
+// `title` + `summary` and the rest resolves automatically.
 interface Props {
   title: string;
-  description: string;
+  summary?: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  about?: string[];
   canonical?: string;
   ogType?: 'website' | 'article';
   ogImage?: string | false;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** @deprecated use `metaDescription` (SERP) or `summary` (GEO). Kept for
+   * transitional call sites; forwarded as `metaDescription` when set. */
+  description?: string;
 }
 const {
   title,
-  description,
+  summary,
+  seoTitle,
+  metaDescription,
+  ogTitle,
+  ogDescription,
+  about = [],
   canonical = new URL(Astro.url.pathname, Astro.site).toString(),
   ogType = 'website',
   ogImage = '/og/ercs-solved.png',
   jsonLd,
+  description,
 } = Astro.props;
 
-const fullTitle = title.endsWith('ERCs, Solved') || title.endsWith('ERCs, Solved.')
-  ? title
-  : `${title} · ERCs, Solved`;
+const seoTitleResolved = seoTitle ?? title;
+const fullTitle = seoTitleResolved.endsWith('ERCs, Solved') || seoTitleResolved.endsWith('ERCs, Solved.')
+  ? seoTitleResolved
+  : `${seoTitleResolved} · ERCs, Solved`;
+
+// Sentence-boundary truncator for auto-derived meta descriptions. Keeps
+// snippets from ending mid-word when authors haven't hand-written one.
+function truncateSmart(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const slice = text.slice(0, max);
+  const lastSentence = Math.max(slice.lastIndexOf('. '), slice.lastIndexOf('! '), slice.lastIndexOf('? '));
+  if (lastSentence > max * 0.6) return slice.slice(0, lastSentence + 1);
+  const lastSpace = slice.lastIndexOf(' ');
+  return (lastSpace > 0 ? slice.slice(0, lastSpace) : slice) + '…';
+}
+
+const metaDescriptionResolved =
+  metaDescription ??
+  description ??
+  (summary ? truncateSmart(summary, 160) : '');
+const ogTitleResolved = ogTitle ?? fullTitle;
+const ogDescriptionResolved = ogDescription ?? metaDescriptionResolved;
+const jsonLdDescription = summary ?? metaDescriptionResolved;
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.ercsolved.dev';
 const absoluteOgImage = ogImage ? new URL(ogImage, Astro.site).toString() : undefined;
@@ -66,13 +107,13 @@ const jsonLdPayload = jsonLd
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescriptionResolved} />
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#0a0b0d" />
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large" />
 
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={ogTitleResolved} />
+    <meta property="og:description" content={ogDescriptionResolved} />
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="ERCs, Solved" />
@@ -86,8 +127,8 @@ const jsonLdPayload = jsonLd
       </>
     )}
     <meta name="twitter:card" content={absoluteOgImage ? 'summary_large_image' : 'summary'} />
-    <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:title" content={ogTitleResolved} />
+    <meta name="twitter:description" content={ogDescriptionResolved} />
     {absoluteOgImage && (
       <>
         <meta name="twitter:image" content={absoluteOgImage} />

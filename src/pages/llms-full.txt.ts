@@ -63,7 +63,8 @@ export const GET: APIRoute = async () => {
       if (d.proposed) lines.push(`Proposed: ${d.proposed}`);
       if (d.standardAuthors?.length) lines.push(`Authors: ${d.standardAuthors.join(', ')}`);
       lines.push('');
-      lines.push(`Description: ${truncate(d.description, 400)}`);
+      if (d.quotableAnswer) lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 700)}`);
+      lines.push(`\nDescription: ${truncate(d.summary, 400)}`);
       if (d.definition) lines.push(`\nDefinition: ${truncate(d.definition, 400)}`);
       if (d.tldr) lines.push(`\nTL;DR: ${truncate(d.tldr, 400)}`);
       if (d.limits?.length) {
@@ -106,7 +107,7 @@ export const GET: APIRoute = async () => {
       lines.push(`Standard: ${d.kind}${d.id} — ${d.purpose}`);
       lines.push('');
       lines.push(`One-liner: ${truncate(d.oneLine, 260)}`);
-      lines.push(`\nDescription: ${truncate(d.description, 500)}`);
+      lines.push(`\nDescription: ${truncate(d.summary, 500)}`);
       if (d.solves?.length) {
         lines.push(`\nSolves:`);
         lines.push(bullets(d.solves.slice(0, 4).map((p: any) => truncate(p.pain, 200))));
@@ -130,8 +131,9 @@ export const GET: APIRoute = async () => {
       lines.push(`Query: ${formatSearchQuery(d.query)}`);
       lines.push(`LUKSO route: ${formatLspList(d.lsps)}`);
       lines.push('');
+      if (d.quotableAnswer) lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 700)}\n`);
       lines.push(`Tagline: ${truncate(d.tagline, 300)}`);
-      lines.push(`\nDescription: ${truncate(d.description, 500)}`);
+      lines.push(`\nDescription: ${truncate(d.summary, 500)}`);
       lines.push(`\nVerdict: ${truncate(d.verdict, 400)}`);
       return block(d.title, lines.join('\n'));
     })
@@ -146,7 +148,8 @@ export const GET: APIRoute = async () => {
       lines.push(`Updated: ${iso(d.updated)}`);
       lines.push(`Comparing: ${d.left.chip} vs ${d.right.chip}`);
       lines.push('');
-      lines.push(`Description: ${truncate(d.description, 400)}`);
+      if (d.quotableAnswer) lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 700)}\n`);
+      lines.push(`Description: ${truncate(d.summary, 400)}`);
       lines.push(`\nUse ${d.left.chip} when: ${truncate(d.verdict.useLeft, 300)}`);
       lines.push(`Use ${d.right.chip} when: ${truncate(d.verdict.useRight, 300)}`);
       if (d.verdict.neither) lines.push(`Neither: ${truncate(d.verdict.neither, 300)}`);
@@ -174,7 +177,8 @@ export const GET: APIRoute = async () => {
       lines.push(`From: ${d.from} → To: ${d.to}`);
       lines.push(`Effort estimate: ${d.estimate}`);
       lines.push('');
-      lines.push(`Description: ${truncate(d.description, 400)}`);
+      if (d.quotableAnswer) lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 700)}\n`);
+      lines.push(`Description: ${truncate(d.summary, 400)}`);
       lines.push(`\nVerdict: ${truncate(d.verdict, 300)}`);
       if (d.gotchas?.length) {
         lines.push(`\nGotchas:`);
@@ -194,7 +198,8 @@ export const GET: APIRoute = async () => {
       lines.push(`Vertical: ${d.vertical}`);
       lines.push(`Stack: ${d.stack.join(', ')}`);
       lines.push('');
-      lines.push(`Description: ${truncate(d.description, 500)}`);
+      if (d.quotableAnswer) lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 700)}\n`);
+      lines.push(`Description: ${truncate(d.summary, 500)}`);
       return block(d.title, lines.join('\n'));
     })
     .join('\n');
@@ -210,7 +215,7 @@ export const GET: APIRoute = async () => {
       lines.push(`Contenders: ${d.contenders.map((c: any) => c.chip).join(', ')}`);
       lines.push('');
       lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 600)}`);
-      lines.push(`\nDescription: ${truncate(d.description, 400)}`);
+      lines.push(`\nDescription: ${truncate(d.summary, 400)}`);
       if (d.verdicts?.length) {
         lines.push(`\nWhen each wins:`);
         lines.push(
@@ -231,7 +236,7 @@ export const GET: APIRoute = async () => {
       lines.push(`Pattern: ${d.pattern}`);
       lines.push('');
       lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 600)}`);
-      lines.push(`\nDescription: ${truncate(d.description, 400)}`);
+      lines.push(`\nDescription: ${truncate(d.summary, 400)}`);
       if (d.approaches?.length) {
         lines.push(`\nApproaches:`);
         lines.push(
@@ -258,7 +263,7 @@ export const GET: APIRoute = async () => {
       lines.push(`Contenders: ${d.contenders.join(', ')}`);
       lines.push('');
       lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 600)}`);
-      lines.push(`\nDescription: ${truncate(d.description, 400)}`);
+      lines.push(`\nDescription: ${truncate(d.summary, 400)}`);
       if (d.verdicts?.length) {
         lines.push(`\nWhen each wins:`);
         lines.push(
@@ -280,7 +285,7 @@ export const GET: APIRoute = async () => {
       lines.push(`Chains: ${d.chains.join(', ')}`);
       lines.push('');
       lines.push(`Quotable answer: ${truncate(d.quotableAnswer, 600)}`);
-      lines.push(`\nDescription: ${truncate(d.description, 400)}`);
+      lines.push(`\nDescription: ${truncate(d.summary, 400)}`);
       if (d.tests?.length) {
         lines.push(`\nTests:`);
         lines.push(
@@ -310,7 +315,7 @@ export const GET: APIRoute = async () => {
       lines.push(`Updated: ${iso(d.updated)}`);
       lines.push(`Kind: ${d.kind}`);
       lines.push('');
-      lines.push(`Description: ${truncate(d.description, 500)}`);
+      lines.push(`Description: ${truncate(d.summary, 500)}`);
       return block(d.title, lines.join('\n'));
     })
     .join('\n');

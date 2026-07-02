@@ -2,7 +2,9 @@
 title: "Deployed contracts can't grow without a key holder."
 tagline: "UUPS makes the upgrade authority permanent. Diamonds make storage your problem."
 query: "contract extension after deployment"
-description: "Upgradeable proxies, ERC-2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority."
+summary: "Upgradeable proxies, ERC-2535 diamonds, Safe modules, and LSP17 extensions compared. How to add functionality to a deployed contract without redeploying or surrendering upgrade authority."
+quotableAnswer: >-
+  Adding new function selectors to an already-deployed contract in 2026 has four mainstream paths: upgradeable proxies (transparent, UUPS) that swap the implementation behind a stable address; ERC-2535 Diamonds that route selectors via a facet registry with shared storage; Safe module architecture that installs sandboxed logic; and LSP17 on LUKSO, which uses a fallback router with per-selector extension contracts registered under ERC-725Y keys. Each trades a different property — proxies retain admin authority, diamonds fragment storage, modules scope to one account. LSP17 extensions have isolated storage and no admin key.
 erc: "other"
 lsps: ["LSP17"]
 aliases: ["upgradeable contracts", "lsp17 extensions", "erc2535 alternative", "add function after deploy"]

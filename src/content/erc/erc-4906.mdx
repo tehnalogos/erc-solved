@@ -2,8 +2,10 @@
 id: "4906"
 title: "ERC-4906"
 headline: "What is ERC-4906?"
-pageTitle: "What is ERC-4906? NFT Metadata Update Events"
-description: "ERC-4906 adds MetadataUpdate and BatchMetadataUpdate events so NFT contracts can signal that token metadata changed."
+seoTitle: "What is ERC-4906? NFT Metadata Update Events"
+summary: "ERC-4906 adds MetadataUpdate and BatchMetadataUpdate events so NFT contracts can signal that token metadata changed."
+quotableAnswer: >-
+  ERC-4906 adds `event MetadataUpdate(uint256 tokenId)` and `event BatchMetadataUpdate(uint256 fromTokenId, uint256 toTokenId)` to ERC-721 and ERC-1155, letting NFT contracts signal that off-chain metadata has changed. Finalized in April 2022, it's what dynamic NFTs and metadata-refresh mechanisms rely on. The event signals *that* something changed — it doesn't carry the new state, name the affected field, or guarantee the pinning host is still up. LSP8 on LUKSO stores per-token data under ERC-725Y typed keys, so metadata changes are structured state, not fire-and-forget events.
 tagline: "The refresh-metadata button, turned into an event."
 bootStrip: "standard · nft metadata updates · event signal · ready"
 standardAuthors:

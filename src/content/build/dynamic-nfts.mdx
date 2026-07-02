@@ -1,7 +1,9 @@
 ---
 title: "Dynamic NFTs."
 vertical: "Dynamic NFTs"
-description: "Stateful, evolving, generative NFTs. Per-token data without a metadata server, dynamic updates without marketplace refresh buttons."
+summary: "Stateful, evolving, generative NFTs. Per-token data without a metadata server, dynamic updates without marketplace refresh buttons."
+quotableAnswer: >-
+  Building stateful, evolving, generative NFTs on LUKSO uses LSP8 (per-token bytes32 IDs), LSP4 (metadata under ERC-725Y typed keys), and LSP1 (transfer receiver hooks). Each token's attributes, traits, image reference, and provenance live under typed keys on the token contract; updates go through `setDataForTokenId(tokenId, key, value)` gated by LSP6 permissions. No metadata refresh button, no off-chain server required for state changes, no ERC-4906 event bolted on — dynamic behavior is built into the standard rather than patched over it.
 stack: ["LSP8", "LSP4", "ERC-725Y"]
 updated: 2026-06-22
 reading:

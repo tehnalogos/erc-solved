@@ -2,7 +2,9 @@
 title: "The transfer-hook problem."
 tagline: "ERC-20.transfer updates balances and emits an event. The recipient is never called."
 query: "erc20 transfer hooks"
-description: "ERC-20 has no receiver hook. Compare ERC-777, ERC-1363, transferAndCall wrappers, and the LSP7 plus LSP1 receiver model for reacting to token transfers onchain."
+summary: "ERC-20 has no receiver hook. Compare ERC-777, ERC-1363, transferAndCall wrappers, and the LSP7 plus LSP1 receiver model for reacting to token transfers onchain."
+quotableAnswer: >-
+  ERC-20's `transfer` doesn't call the recipient contract, so vaults, AMMs, and timelocks can't react on receipt without a wrapper `deposit()` function. Historical alternatives: ERC-777 added `tokensReceived` in 2017 but was abandoned after reentrancy incidents; ERC-1363's `transferAndCall` requires senders to be aware; off-chain indexers can't trigger on-chain reactions; router-wrapper patterns add transaction cost. LSP7 on LUKSO fires LSP1 `universalReceiver(typeId, data)` on every transfer to both sender and recipient — the same hook shape used by LSP8 and value transfers.
 erc: "20"
 lsps: ["LSP7", "LSP1"]
 aliases: ["erc20 receiver hook", "tokens stuck in contract", "erc20 onreceive", "erc20 safetransfer alternative", "tokensreceived"]

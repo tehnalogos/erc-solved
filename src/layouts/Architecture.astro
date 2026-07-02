@@ -19,7 +19,7 @@ const { entry } = Astro.props;
 const { data, slug } = entry;
 const path = `/architecture/${slug}/`;
 const canonical = absoluteUrl(path);
-const pageTitle = data.pageTitle ?? architecturePageTitle(data.pattern);
+const derivedSeoTitle = data.seoTitle ?? architecturePageTitle(data.pattern);
 
 const faqs = data.approaches.map((a: any) => ({
   q: `What is the ${a.name} approach to ${data.pattern.toLowerCase()}?`,
@@ -29,8 +29,12 @@ const faqs = data.approaches.map((a: any) => ({
 ---
 <Article
   title={data.title}
-  description={data.description}
-  pageTitle={pageTitle}
+  summary={data.summary}
+  seoTitle={derivedSeoTitle}
+  metaDescription={data.metaDescription}
+  ogTitle={data.ogTitle}
+  ogDescription={data.ogDescription}
+  about={data.about?.length ? data.about : data.approaches.map((a: any) => a.name)}
   eyebrow={`architecture · ${data.pattern}`}
   author={data.author}
   updated={data.updated}
@@ -38,7 +42,7 @@ const faqs = data.approaches.map((a: any) => ({
   jsonLd={[
     articleJsonLd({
       headline: data.title,
-      description: data.description,
+      description: data.summary,
       path,
       updated: data.updated,
       author: data.author,
@@ -55,7 +59,7 @@ const faqs = data.approaches.map((a: any) => ({
 >
   <div slot="title">
     <h1>{data.title}</h1>
-    <p class="lede">{data.description}</p>
+    <p class="lede">{data.summary}</p>
   </div>
 
   <QuotableAnswer>

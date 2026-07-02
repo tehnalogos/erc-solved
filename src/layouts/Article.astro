@@ -4,8 +4,17 @@ import Authorship from '~/components/primitives/Authorship.astro';
 
 interface Props {
   title: string;
-  description: string;
+  summary?: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  h1?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  about?: string[];
+  /** @deprecated legacy call sites — pass `seoTitle` instead. */
   pageTitle?: string;
+  /** @deprecated legacy call sites — pass `summary` instead. */
+  description?: string;
   eyebrow?: string;
   author?: string;
   updated?: Date | string;
@@ -17,8 +26,15 @@ interface Props {
 }
 const {
   title,
+  summary,
+  seoTitle,
+  metaDescription,
+  h1,
+  ogTitle,
+  ogDescription,
+  about,
+  pageTitle,
   description,
-  pageTitle = title,
   eyebrow,
   author,
   updated,
@@ -32,14 +48,30 @@ const {
 const editHref = editPath
   ? `https://github.com/tehnalogos/erc-solved/edit/main/${editPath}`
   : undefined;
+
+const resolvedSeoTitle = seoTitle ?? pageTitle;
+const visibleH1 = h1 ?? title;
 ---
-<Base title={pageTitle} description={description} canonical={canonical} ogType={ogType} ogImage={ogImage} jsonLd={jsonLd}>
-  <article class="article" data-pagefind-body data-pagefind-meta={`title:${title}`}>
-    {(eyebrow || title) && (
+<Base
+  title={title}
+  summary={summary}
+  seoTitle={resolvedSeoTitle}
+  metaDescription={metaDescription}
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  about={about}
+  description={description}
+  canonical={canonical}
+  ogType={ogType}
+  ogImage={ogImage}
+  jsonLd={jsonLd}
+>
+  <article class="article" data-pagefind-body data-pagefind-meta={`title:${visibleH1}`}>
+    {(eyebrow || visibleH1) && (
       <header class="page-head">
         {eyebrow && <span class="eyebrow">{eyebrow}</span>}
         <slot name="title">
-          {title && <h1>{title}</h1>}
+          {visibleH1 && <h1>{visibleH1}</h1>}
         </slot>
         <slot name="header-extras" />
       </header>

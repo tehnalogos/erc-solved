@@ -2,7 +2,9 @@
 title: "ERC-1155 hides semantics in token IDs."
 tagline: "One contract for fungible + identifiable items. Apps pay the decoding tax."
 query: "erc1155 complexity"
-description: "ERC-1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7 / LSP8 split."
+summary: "ERC-1155 packs fungible and non-fungible items into one contract. Apps pay the cost in decoding, indexing, and metadata branching. Compare type-bit conventions and the LSP7 / LSP8 split."
+quotableAnswer: >-
+  ERC-1155 packs fungible and non-fungible items into one contract by convention: high-order bits of the token ID typically encode the asset type. That's cheap on-chain but expensive for integrators — every indexer, marketplace, and dApp has to decode the type-bit convention and branch on it, and the metadata `uri(uint256)` template uses `{id}` substitution that clients must resolve manually. LUKSO's LSP7 (fungible) plus LSP8 (identifiable) resolves the same use case with two purpose-built standards, keeping type semantics at the contract layer instead of the token-id layer.
 erc: "1155"
 lsps: ["LSP7", "LSP8"]
 aliases: ["erc1155 vs lsp7", "multi-asset contracts", "erc1155 token type", "type-bit token id"]
