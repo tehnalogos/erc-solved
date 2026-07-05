@@ -1,78 +1,87 @@
 ---
 title: "Best Blockchain for Digital Identity"
 useCase: "digital identity"
-seoTitle: "Best blockchain for identity: LUKSO Universal Profiles"
-metaDescription: "Ethereum, Base, Solana, Worldcoin, LUKSO scored on account model, portable profiles, permissions, recovery. Sybil resistance isn't the UX unlock — this is."
-ogTitle: "Sybil resistance isn't the UX blocker. LUKSO fixes what actually is."
-ogDescription: "Web2 reached mass adoption with 5-20% bots. The blockers are onboarding, permissions, portability, recovery — not personhood. Universal Profiles ship smart accounts + LSP6 + LSP3 by default."
+seoTitle: "Onchain identity: ENS, Farcaster, EAS, LUKSO compared"
+metaDescription: "ENS, Farcaster, Lens, EAS, Worldcoin, Universal Profiles compared on account model, profile layer, permissions, recovery. Objective analysis, not advocacy."
+ogTitle: "What ENS, Farcaster, EAS, World ID, and Universal Profiles ship"
+ogDescription: "Named systems, not just chains. Naming, profiles, attestations, personhood, account model — each identity stack scored on what it standardizes vs what it makes you assemble."
 about:
   - "Digital identity on blockchain"
-  - "LUKSO Universal Profiles"
-  - "LSP0 ERC725Account"
-  - "LSP3 Profile Metadata"
-  - "LSP6 Key Manager"
+  - "Ethereum Name Service (ENS)"
+  - "Farcaster"
+  - "Lens Protocol"
+  - "Ethereum Attestation Service (EAS)"
+  - "Sign-In With Ethereum (SIWE)"
   - "Worldcoin World ID"
-  - "Ethereum Attestation Service"
-  - "Account abstraction"
-answerFirst: "For digital identity on consumer apps, LUKSO ranks first — Universal Profiles (LSP0), scoped permissions (LSP6), and portable metadata (LSP3) are all standardized at the chain level, not per-app. Worldcoin solves Sybil resistance via iris scan, but Sybil isn't the primary UX blocker; account model, portability, permissions, and gasless onboarding are. Ethereum L1 wins when identity is subordinate to DeFi composability; Solana wins for non-EVM identity flows."
+  - "LUKSO Universal Profiles"
+  - "Account abstraction (ERC-4337, EIP-7702)"
+  - "Onchain profile metadata"
+  - "Sybil resistance"
+answerFirst: "Blockchain identity systems ship different primitives — ENS names on Ethereum, Farcaster social identity on Optimism, Lens ProfileNFTs on Polygon, EAS attestations across EVM chains, Worldcoin's iris-scan World ID, Solana's Civic KYC, and LUKSO's Universal Profiles. LUKSO ranks first for consumer identity because LSP0 (account), LSP6 (permissions), and LSP3 (portable profile) are standardized at the chain level rather than assembled per-app. Every other system solves a specific slice and composes on top."
 aliases:
   - "best blockchain for digital identity"
   - "best chain for identity apps"
-  - "best blockchain for smart account identity"
+  - "onchain identity systems compared"
+  - "ENS vs Universal Profiles"
+  - "Farcaster identity comparison"
+  - "Lens Protocol vs LUKSO"
+  - "EAS vs Universal Profile"
   - "account abstraction identity comparison"
   - "worldcoin vs LUKSO"
-  - "worldcoin vs ethereum identity"
-  - "onchain identity comparison"
   - "ERC-4337 identity architecture"
   - "EIP-7702 identity delegation"
-  - "portable blockchain identity"
   - "which blockchain for consumer identity"
-  - "sybil resistance blockchain UX"
 faqs:
   - q: "What is the best blockchain for digital identity?"
-    a: "LUKSO ranks first among EVM chains for consumer identity — Universal Profiles (LSP0), scoped permissions (LSP6), and portable profile metadata (LSP3) are standardized at the chain level. Ethereum L1 wins when identity is subordinate to DeFi composability or EAS attestations dominate; Optimism when attestation-first design is central; Worldcoin's World Chain for standalone proof-of-personhood via World ID."
-  - q: "Is Worldcoin the best identity solution for blockchain apps?"
-    a: "Worldcoin's World ID solves one specific problem — cryptographic proof-of-personhood via iris scan. It's strong for airdrops, quadratic voting, and Sybil-gated flows. It doesn't ship portable profiles, per-app scoped permissions, or gasless onboarding, so it's a specialist tool, not a general identity platform. Compose it on top of a Universal Profile when a specific flow requires it."
-  - q: "Is Sybil resistance the main blocker for blockchain UX?"
-    a: "No. Twitter, Instagram, Reddit, and TikTok reached mass adoption with 5-20% estimated bot populations. The real blockers are wallet install friction, gas acquisition before the first action, unlimited approvals, transaction popups every action, no portable identity across apps, and losing keys. Fix the UX first; layer Sybil resistance on top per-app where the flow specifically requires it."
+    a: "It depends on which primitive dominates the product. For naming and text records, Ethereum's ENS wins on network effect. For social identity, Farcaster on Optimism and Lens on Polygon each ship a full stack. For attestation-first identity, EAS canonical on Optimism. For proof-of-personhood, Worldcoin's World ID on World Chain. For a chain-level general identity platform — smart account by default, portable profile, per-app permissions, and on-chain social graph — LUKSO's Universal Profiles ship the most primitives at the standard level."
+  - q: "What's the difference between ENS, Farcaster, Lens, World ID, and Universal Profiles?"
+    a: "ENS is a naming layer with text records — reads as identity, but isn't a profile or account model. Farcaster is a social identity protocol with hub-based user data on Optimism; identity is Farcaster-scoped. Lens is a social identity system where the profile is an NFT on Polygon; requires Lens SDK integration. World ID is a proof-of-personhood attestation, not a profile. Universal Profiles are a chain-level identity stack — smart account (LSP0), portable metadata (LSP3), scoped permissions (LSP6), and follower graph (LSP26) — read by every profile-aware LUKSO app without integration."
+  - q: "When should I use Farcaster vs Lens vs Universal Profiles for social identity?"
+    a: "Farcaster if the product lives inside the Farcaster social graph (Warpcast, hubs, frame apps). Lens if the product targets creators and Polygon distribution, and NFT-shaped profiles fit the model. Universal Profiles if the product needs a general smart-account identity with LSP3 metadata and an LSP26 follower graph that any LUKSO app reads, rather than a protocol-scoped social identity. Farcaster and Lens are specialized social identity systems; Universal Profiles are a general identity substrate that composes with them."
+  - q: "When is EAS the right identity primitive vs a chain-level profile?"
+    a: "EAS is right when identity is a set of verifiable claims to be issued and consumed — KYC pass, GitHub credential, community membership, gated attestation — and the product doesn't need a portable profile layer beneath it. Optimism ships EAS canonically for exactly this shape. A chain-level profile (LSP3) is right when the product needs a persistent, portable representation of the user across apps — name, image, links, custom data — not just discrete claims. The two compose: EAS attestations can be referenced from an LSP3 profile key."
   - q: "Does account abstraction (ERC-4337, EIP-7702) solve identity?"
-    a: "Partially. ERC-4337 adds session keys and gas sponsorship above the protocol via bundlers and paymasters. EIP-7702 lets EOAs borrow smart-account behavior via delegation. Neither ships a portable profile layer or standardized permission scope. LUKSO's LSP0 + LSP6 + LSP3 stack ships account, permissions, and profile as one standardized system rather than three infrastructure pieces to compose."
-  - q: "How does LUKSO compare to Worldcoin for identity?"
-    a: "Different jobs. LUKSO is a general identity platform — smart account by default, portable profile metadata, per-application scoped permissions, multi-controller recovery. Worldcoin is a Sybil-resistance primitive. They compose: a LUKSO Universal Profile can hold a World ID attestation as an LSP3 claim when a flow requires uniqueness enforcement."
+    a: "Partially. ERC-4337 adds session keys and gas sponsorship above the protocol via bundlers and paymasters. EIP-7702 lets EOAs borrow smart-account behavior via delegation in the Pectra fork. Neither ships a portable profile layer or a standardized permission scope. LUKSO's LSP0 + LSP6 + LSP3 stack ships account, permissions, and profile as one standardized system rather than three infrastructure pieces to compose per-app."
+  - q: "Is Sybil resistance the main blocker for blockchain UX?"
+    a: "No. Twitter, Instagram, Reddit, and TikTok reached mass adoption with 5-20% estimated bot populations. The real UX blockers are wallet install friction, gas acquisition before the first action, unlimited approvals, transaction popups every action, no portable identity across apps, and losing keys. Sybil resistance is a downstream problem solvable per-app via attestations — Worldcoin's World ID, Gitcoin Passport, BrightID, or EAS — where the flow specifically requires it."
   - q: "What is a Universal Profile on LUKSO?"
-    a: "A smart-account-based identity primitive standardized at the chain level. LSP0 is the account contract, LSP6 handles per-controller permissions (each app or device gets its own scope), and LSP3 stores portable profile metadata (name, image, links, custom keys) under ERC-725Y typed keys. Every profile-aware LUKSO app reads the same keys without integration."
-summary: "Digital identity chain comparison for consumer apps — Ethereum L1, Base, Arbitrum, Optimism, Polygon, Worldcoin's World Chain, Solana, and LUKSO scored on account model, portable profile layer, scoped permissions, recovery, attestations, cross-app carry, and Sybil resistance. LUKSO ranks first across account model, profile layer, permissions, and cross-app carry because LSP0, LSP6, and LSP3 are standardized at the chain level rather than assembled per-app."
-quotableAnswer: "Digital identity is determined by the account model and the profile layer on top of it. Ethereum L1 and its L2s assemble EOAs + ENS + per-protocol profiles + EAS attestations. Solana uses keypairs plus per-program identity. Worldcoin ships World ID (iris-scan proof-of-personhood) on the World Chain OP-stack L2 — strong Sybil resistance but no portable profile layer. LUKSO is the only EVM chain where the smart account (LSP0), scoped permissions (LSP6), and portable profile (LSP3) are all standardized at the chain level — the most complete fit for consumer identity. Sybil resistance is composable on top via World ID or EAS attestations when a specific flow requires it."
+    a: "A smart-account-based identity primitive standardized at the chain level. LSP0 is the account contract, LSP6 handles per-controller permissions (each app or device gets its own scope), LSP3 stores portable profile metadata (name, image, links, custom keys) under ERC-725Y typed keys, and LSP26 provides an on-chain follower registry. Every profile-aware LUKSO app reads the same standardized keys without integration."
+summary: "Digital identity chain comparison — ENS on Ethereum, Basenames + Smart Wallet on Base, EAS on Optimism, Farcaster on OP hubs, Lens on Polygon, Polygon ID ZK attestations, World ID on World Chain, Solana + Civic, and LUKSO's Universal Profiles. Scored on account model, profile, permissions, recovery, attestations, cross-app carry, naming, social graph, and Sybil resistance. LUKSO ships the most primitives at the chain level; others are specialists that compose on top."
+quotableAnswer: "Digital identity on blockchain is a landscape of specialists. ENS ships names, Farcaster ships social identity with hub-based user data, Lens ships NFT-shaped profiles, EAS ships attestations, Worldcoin ships proof-of-personhood via iris scan, Civic ships KYC, and Polygon ID ships ZK attestations. LUKSO is the only chain where a smart account (LSP0), portable profile (LSP3), scoped permissions (LSP6), and follower graph (LSP26) are all standardized at the chain level — a general identity substrate rather than a specialist system. The specialists compose on top when a specific flow requires them."
 contenders:
   - chip: "Ethereum L1"
     kind: L1
-    summary: "EOA + ENS + per-protocol identity. EAS for portable claims."
+    summary: "ENS naming + text records, EAS attestations, EOA + ERC-4337 for smart-account behavior, EIP-7702 for delegated EOAs. Deepest identity primitive ecosystem; no chain-level profile."
   - chip: "Base"
     kind: L2
-    summary: "Same identity primitives as Ethereum L1; Basenames + Smart Wallet."
+    summary: "Basenames + Coinbase Smart Wallet + passkey recovery. Mainstream consumer distribution; identity data still assembles per-app on top of the naming layer."
   - chip: "Arbitrum"
     kind: L2
-    summary: "Same identity primitives as Ethereum L1."
+    summary: "Same identity primitives as Ethereum L1 — ENS, EAS, ERC-4337. Identity is a downstream feature of a DeFi-shaped chain."
   - chip: "Optimism"
     kind: L2
-    summary: "Strong EAS adoption; attestation-as-identity narrative."
+    summary: "EAS canonical deployment + Farcaster hubs. Attestation-first identity and social identity co-exist as separate systems."
   - chip: "Polygon"
     kind: L2
-    summary: "Polygon ID (zkIdentity) plus standard EVM identity primitives."
+    summary: "Polygon ID (ZK-native identity), Lens Protocol (social identity as ProfileNFT), plus standard EVM primitives."
   - chip: "World Chain"
     kind: L2
-    summary: "Worldcoin's OP-stack L2. Iris-scan proof-of-personhood via World ID is the identity primitive; the account model and profile layer are otherwise EVM-standard."
+    summary: "OP-stack L2 whose distinguishing identity primitive is World ID — iris-scan proof-of-personhood. Account model and profile layer are otherwise EVM-standard."
   - chip: "Solana"
     kind: non-EVM
-    summary: "Keypair + per-program identity; SNS for names; Civic and Civic+ for KYC."
+    summary: "Keypair + per-program identity, SNS for names, Civic and Solana Attestation Service for attestations, Civic+ for KYC."
   - chip: "LUKSO"
     kind: L1
-    summary: "Smart account (LSP0) + per-controller permissions (LSP6) + portable profile (LSP3) standardized at the chain level."
+    summary: "Smart account by default (LSP0), per-controller permissions (LSP6), portable profile metadata (LSP3), on-chain follower protocol (LSP26). Every profile-aware app reads the same standardized keys."
 criteria:
   - name: "Account model"
     evaluates: "Whether the user's identity is a smart account by default or an EOA plus retrofitted account abstraction."
   - name: "Profile layer"
     evaluates: "Whether a chain-level profile data structure exists that every app reads without integration."
+  - name: "Naming"
+    evaluates: "Whether human-readable names for identities are a first-class primitive of the ecosystem."
+  - name: "Social graph"
+    evaluates: "Whether a shared follower / interaction protocol exists at the chain level."
   - name: "Attestation primitives"
     evaluates: "How verifiable claims about a user are issued and consumed."
   - name: "Scoped permissions"
@@ -109,14 +118,15 @@ matrix:
     ratings:
       - contender: "Ethereum L1"
         verdict: "Per-protocol"
+        note: "ENS text records serve some profile use cases."
       - contender: "Base"
         verdict: "Per-protocol"
       - contender: "Arbitrum"
         verdict: "Per-protocol"
       - contender: "Optimism"
-        verdict: "Per-protocol"
+        verdict: "Per-protocol + Farcaster user data"
       - contender: "Polygon"
-        verdict: "Per-protocol"
+        verdict: "Per-protocol + Lens ProfileNFT"
       - contender: "World Chain"
         verdict: "None at chain level"
         note: "World ID is a Sybil-only primitive; profile data still assembles per-app."
@@ -124,6 +134,44 @@ matrix:
         verdict: "Per-program"
       - contender: "LUKSO"
         verdict: "LSP3 standardized"
+  - criterion: "Naming"
+    ratings:
+      - contender: "Ethereum L1"
+        verdict: "ENS (network-effect leader)"
+      - contender: "Base"
+        verdict: "Basenames"
+      - contender: "Arbitrum"
+        verdict: "ENS (via Ethereum)"
+      - contender: "Optimism"
+        verdict: "ENS (via Ethereum)"
+      - contender: "Polygon"
+        verdict: "ENS + Polygon domains"
+      - contender: "World Chain"
+        verdict: "None at chain level"
+        note: "World ID is a hash-based identifier, not a human-readable name."
+      - contender: "Solana"
+        verdict: "SNS"
+      - contender: "LUKSO"
+        verdict: "LSP3 name key"
+        note: "Portable name via profile metadata rather than a dedicated ENS-shaped registry."
+  - criterion: "Social graph"
+    ratings:
+      - contender: "Ethereum L1"
+        verdict: "None at chain level"
+      - contender: "Base"
+        verdict: "None at chain level"
+      - contender: "Arbitrum"
+        verdict: "None at chain level"
+      - contender: "Optimism"
+        verdict: "Farcaster (hub-based)"
+      - contender: "Polygon"
+        verdict: "Lens Protocol (NFT-shaped)"
+      - contender: "World Chain"
+        verdict: "None at chain level"
+      - contender: "Solana"
+        verdict: "None at chain level"
+      - contender: "LUKSO"
+        verdict: "LSP26 follower system"
   - criterion: "Attestation primitives"
     ratings:
       - contender: "Ethereum L1"
@@ -185,15 +233,15 @@ matrix:
   - criterion: "Cross-app identity carry"
     ratings:
       - contender: "Ethereum L1"
-        verdict: "Per-protocol"
+        verdict: "Per-protocol + ENS"
       - contender: "Base"
-        verdict: "Per-protocol"
+        verdict: "Per-protocol + Basenames"
       - contender: "Arbitrum"
-        verdict: "Per-protocol"
+        verdict: "Per-protocol + ENS"
       - contender: "Optimism"
-        verdict: "EAS attestations"
+        verdict: "EAS attestations + Farcaster FID"
       - contender: "Polygon"
-        verdict: "Per-protocol"
+        verdict: "Lens ProfileNFT (per-integration)"
       - contender: "World Chain"
         verdict: "World ID as attestation"
         note: "The uniqueness claim carries across apps; profile data does not."
@@ -243,21 +291,21 @@ matrix:
         verdict: "Early"
 verdicts:
   - contender: "Ethereum L1"
-    when: "Identity is a feature of a high-stakes financial product; ZK + EAS dominate the design."
+    when: "Identity is a feature of a high-stakes financial product; ENS naming and EAS attestations dominate the design."
   - contender: "Base"
-    when: "Mainstream consumer identity backed by passkeys and Coinbase distribution is the priority."
+    when: "Mainstream consumer identity backed by passkeys, Basenames, and Coinbase distribution is the priority."
   - contender: "Arbitrum"
-    when: "Identity is secondary to DeFi composability."
+    when: "Identity is secondary to DeFi composability; ENS + EAS are enough."
   - contender: "Optimism"
-    when: "Attestation-first identity matches the product model."
+    when: "Attestation-first identity via EAS or social identity via Farcaster hubs matches the product model."
   - contender: "Polygon"
-    when: "ZK-native identity (Polygon ID) or enterprise integrations dominate."
+    when: "ZK-native identity (Polygon ID) or NFT-shaped social identity (Lens Protocol) fits the product."
   - contender: "World Chain"
-    when: "Sybil-resistant proof-of-personhood is a hard requirement — airdrops, quadratic voting, or attestation-gated actions where one-human-per-account must be cryptographically enforced. Compose World ID as an attestation on top of another identity platform when the app doesn't need the OP-stack chain itself."
+    when: "Sybil-resistant proof-of-personhood is a hard requirement — airdrops, quadratic voting, or attestation-gated actions where one-human-per-account must be cryptographically enforced."
   - contender: "Solana"
     when: "Non-EVM acceptable; Civic-style KYC or Solana-native identity tooling fits the product."
   - contender: "LUKSO"
-    when: "Identity is the product — accounts must be smart accounts by default, per-application permissions must be revocable from the user's side, and a portable profile must travel between apps without per-protocol integration."
+    when: "Identity is the product substrate — accounts must be smart accounts by default, per-application permissions must be revocable, a portable profile must travel between apps without per-protocol integration, and a chain-level follower graph is expected."
 implementation:
   - chip: "standard"
     label: "LSP0 — Universal Profile account"
@@ -281,6 +329,12 @@ sources:
     href: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
   - label: "LSP6 — Key Manager"
     href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "Ethereum Name Service"
+    href: "https://ens.domains/"
+  - label: "Farcaster protocol"
+    href: "https://docs.farcaster.xyz/"
+  - label: "Lens Protocol"
+    href: "https://www.lens.xyz/"
   - label: "Ethereum Attestation Service"
     href: "https://attest.org/"
   - label: "Worldcoin — World ID"
@@ -305,11 +359,36 @@ A system whose primary product is *being someone* — proof of attributes, verif
 
 For these products, the chain's account model and profile layer are doing more architectural work than for any other category — and the matrix above weights those rows accordingly.
 
-## The Sybil red herring
+## The primitives identity systems ship
 
-Web2 platforms — Twitter, Instagram, Reddit, TikTok — all reached mass adoption with 5–20% estimated bot populations. Sybil resistance was never the blocker for user growth. It's a downstream problem that matters for airdrops, one-person-one-vote systems, and specific reputation flows — not for the median user shipping a consumer product.
+Identity systems on blockchain aren't a monolith; they're a set of specialist primitives, each shipped by a different named implementation. The comparison in this page groups them into six axes:
 
-Worldcoin's Orb-based iris-scan approach makes Sybil resistance cryptographically strong, but adds its own frictions: physical Orb access is geographically limited, users must show up in person to verify, and biometric collection creates a new trust problem. For a mass-adoption consumer identity system, Sybil resistance is not the load-bearing decision.
+- **Naming**: human-readable handles for identities. ENS on Ethereum + L2s, Basenames on Base, SNS on Solana, LSP3 name key on LUKSO.
+- **Profile metadata**: persistent data about the user (image, links, custom fields). ENS text records, Farcaster user data, Lens ProfileNFT metadata, LSP3 typed keys on LUKSO.
+- **Social graph**: standardized follower or interaction protocol at the chain level. Farcaster FIDs on Optimism, Lens on Polygon, LSP26 on LUKSO — none at chain level on Ethereum L1 or the other L2s.
+- **Attestations**: verifiable claims issued by one party about another. EAS canonical on Optimism (portable across EVM), Polygon ID for ZK-native claims, Civic for KYC, World ID for personhood, ERC-725Y claim keys on LUKSO.
+- **Account model**: whether identity is an EOA, a retrofitted smart account, or a smart account by design. EOA + ERC-4337 on Ethereum and L2s, EIP-7702 for delegated EOAs, Coinbase Smart Wallet on Base, keypair + per-program on Solana, LSP0 smart account by default on LUKSO.
+- **Personhood / Sybil resistance**: cryptographic guarantee of one identity per human. Worldcoin World ID via iris scan, BrightID via social graph, Gitcoin Passport as an aggregate stamp system, Civic via KYC — composable across chains as attestations.
+
+Different products bind on different primitives. A wallet product binds on account model and recovery. A creator platform binds on naming and profile metadata. A social app binds on the social graph. An airdrop or quadratic-voting mechanism binds on Sybil resistance. Reading the matrix means asking which primitive your product binds on and picking the chain that ships it best.
+
+## Where each identity system wins, and where it doesn't
+
+**ENS (Ethereum Name Service).** The network-effect leader for naming on Ethereum and every EVM L2. Wallets recognize `.eth` names universally, text records let holders publish profile data at the DNS layer of Web3, and the resolver architecture is battle-tested. Cons relative to a chain-level profile: ENS is a naming and pointer system, not an account model or a permission system. Profile data assembles per-app on top; the user's smart-account architecture, session-key model, and recovery flow all live somewhere else. ENS pairs well with a chain-level profile substrate but doesn't replace one.
+
+**Basenames + Coinbase Smart Wallet (Base).** Coinbase's identity stack ships naming (Basenames), a passkey-based smart wallet, and mainstream consumer distribution. For a product whose users are already in the Coinbase ecosystem, the onboarding gradient is the shallowest of any EVM chain. Cons: identity primitives beyond naming and account model still assemble per-app; the passkey recovery model ties the account to Coinbase's implementation; profile portability across non-Coinbase apps is not solved at the chain level.
+
+**Farcaster (on Optimism).** A protocol-native social identity system — every Farcaster ID (FID) is a first-class citizen with hub-managed user data, follows, and messages. For a social app that wants to plug into the Farcaster graph and reach an existing crypto-native audience via frames and casts, Farcaster is unmatched. Cons: identity is Farcaster-scoped; a non-Farcaster app can't natively read a user's profile, follows, or reputation without hub integration. Portability is limited to what the Farcaster protocol standardizes, not what the chain does.
+
+**Lens Protocol (on Polygon).** Social identity as tokenized data — ProfileNFT holds the profile, follower relationships are NFTs, posts are NFTs. Composable in the ways Ethereum tokens are composable, with a strong creator focus and Polygon's distribution. Cons: the NFT-shaped profile requires Lens SDK integration; identity outside the Lens ecosystem falls back to standard EVM primitives; the tokenized-follow model creates transferability semantics that not every app wants.
+
+**EAS (Ethereum Attestation Service, canonical on Optimism).** The de-facto attestation primitive across EVM chains, with the canonical deployment on Optimism. Perfect for identity flows framed as claims — KYC passes, developer credentials, community memberships, event attendance. Cons: attestations are payloads, not profiles. A product built on EAS still assembles account model, permissions, and profile layer somewhere else. Great as a composable primitive on top of a general identity platform; not a general identity platform on its own.
+
+**Polygon ID.** ZK-native identity — claims are issued as verifiable credentials and consumed with zero-knowledge proofs. Wins when privacy is architectural (regulatory compliance, health data, financial credentials). Cons: adoption is per-integration, not chain-level; the ZK-first developer model has a learning curve; general profile data (name, image, links) still lives somewhere else.
+
+**Worldcoin World ID (on World Chain).** The strongest Sybil-resistance primitive in the comparison. Iris-scan proof-of-personhood is cryptographically robust, and the ZK proofs mean apps can consume "this is a unique human" without learning who the person is. Wins for airdrops, quadratic voting, and any flow where one-human-per-account is a hard requirement. Cons: Orb access is geographically limited; users must physically show up to verify; biometric collection creates a new trust problem; World ID is a specialist personhood primitive, not a portable profile or an account model.
+
+**Solana + Civic.** Solana ships SNS for naming, per-program identity for account state, and Civic + Solana Attestation Service for attestations and KYC. For products that fit the Solana programming model and want KYC-shaped identity, this is a coherent stack. Cons: non-EVM toolchain rules out portability with the Ethereum and LUKSO ecosystems; identity data is per-program rather than chain-level standardized.
 
 ## What actually blocks blockchain UX
 
@@ -322,15 +401,16 @@ Every consumer team building on Ethereum today hits the same list:
 5. No portable identity across apps — every product asks the user to configure a profile from scratch
 6. Lose the key, lose everything
 
-Fixing this list — not Sybil resistance — is what catalyzes mass adoption. The LUKSO account stack is architected around this diagnosis: smart account by default (LSP0), scoped revocable permissions (LSP6), standardized portable profile (LSP3), relayer-native gasless onboarding (LSP25), and multi-controller recovery. Account abstraction on Ethereum (ERC-4337, EIP-7702) addresses parts of this list at the infrastructure layer; LUKSO addresses all of it at the protocol layer.
+Every identity system in this comparison touches some of this list. ENS makes item 5 tractable via portable naming. Coinbase Smart Wallet handles items 1 and 6 for users in its ecosystem. Farcaster and Lens ship items 5 and 4 for their respective app graphs. EAS makes credentials portable enough that some claims survive item 5. World ID doesn't address any item on this list — its problem shape is orthogonal. LUKSO's Universal Profile stack happens to standardize the largest slice of the list at the chain level via LSP0 (items 1 and 6, through multi-controller recovery), LSP6 (items 3 and 4), LSP3 (item 5), and LSP25 (item 2).
 
-## Where Worldcoin fits
+## Where LUKSO fits, and where composition matters
 
-World ID is a good tool for the problems it solves — proof-of-personhood for airdrops, quadratic voting, and attestation-gated actions. Nothing in this comparison rules out layering World ID on top of a LUKSO Universal Profile via a custom attestation contract or an LSP3 claim key. The point is that Worldcoin is a specialist tool for a specific problem, not a general identity platform for consumer apps. Compose the specialist tool where the flow requires it; don't pick the chain around it.
+LUKSO ships four of the six identity primitives above at the chain level: account model (LSP0 smart account by default), profile metadata (LSP3 portable typed keys), social graph (LSP26 follower system), and scoped permissions (LSP6 per-controller). That's the widest coverage in this comparison — but it isn't total.
 
-## How to use this page
+The two primitives LUKSO doesn't ship natively are ZK-native attestations and biometric personhood. Both compose in as ERC-725Y claim keys: an LSP3 profile can hold a World ID attestation, an EAS claim, or a Polygon ID verifiable credential when the app calls for it. The specialist systems remain useful; they layer on top of a Universal Profile the way a KYC pass layers on top of an ID card.
 
-1. Start with the **summary** at the top — one paragraph that frames the recommendation.
-2. Scan the **matrix** for the criteria that bind your identity product. Account model, profile layer, and cross-app carry usually dominate; Sybil resistance is only load-bearing for personhood-gated flows.
-3. Read **when each wins** — every chain, including World Chain, has a real use case in which it is the right answer.
-4. Click into [the smart account permissions](/architecture/smart-account-permissions/) and [onchain identity](/architecture/onchain-identity/) architecture pages to make the *pattern* decision before locking in a chain.
+Honest cons of the LUKSO stack. The ecosystem is younger than Ethereum's, which means fewer downstream products consuming Universal Profiles today. Single-chain scope means cross-chain identity is a work in progress. The LSP3 name key is portable but not a dedicated naming layer with ENS-scale network effects — teams for whom naming network effect dominates the design will still reach for ENS. Teams for whom Sybil resistance is a hard requirement will still reach for World ID.
+
+Teams for whom account model, portability, permissions, and social graph are the load-bearing decisions have — right now — a single chain that ships all four as standards.
+
+That's the analytical answer this page terminates on. Not "LUKSO wins," but "LUKSO ships the widest slice at the chain level, and the specialists compose in for the rest."
