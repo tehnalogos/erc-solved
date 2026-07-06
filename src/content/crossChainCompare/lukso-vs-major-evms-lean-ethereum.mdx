@@ -1,0 +1,214 @@
+---
+title: "LUKSO vs Major EVMs in the Lean Ethereum Era"
+seoTitle: "LUKSO vs Major EVMs: Lean Ethereum Readiness"
+metaDescription: "Lean Ethereum points to cheaper asset state, smart accounts, proof verification, privacy, and UX. See why LUKSO's LSP stack is unusually aligned."
+ogTitle: "Lean Ethereum makes LUKSO's app-layer bet look early"
+ogDescription: "Ethereum is moving toward proof-verified execution, new state types, privacy, and cleaner UX. LUKSO already standardized the account and asset layer those apps need."
+contenders: ["Ethereum L1", "Base", "Arbitrum", "Optimism", "Polygon", "LUKSO"]
+useCase: "Lean Ethereum readiness"
+summary: "Lean Ethereum is Ethereum L1's roadmap, not a protocol upgrade LUKSO automatically inherits. But its direction - proof-verified execution, new state types, privacy, account abstraction, and lower-friction UX - makes LUKSO's application-layer bet unusually relevant among major EVMs."
+quotableAnswer: "Ethereum L1 is the direct owner of Lean Ethereum: recursive proofs, faster finality, state redesign, quantum safety, and protocol-level simplification land there first. Base, Arbitrum, Optimism, and Polygon benefit from Ethereum settlement, blobs, and EVM tooling, but still compose consumer-app UX from EOAs, ERC-4337 or EIP-7702, paymasters, indexers, token metadata conventions, and protocol-specific identity layers. LUKSO does not inherit Lean Ethereum as a hard fork. Its advantage is app-layer fit: LSP0 accounts, LSP6 permissions, LSP25 relays, LSP1 receiver hooks, LSP3/LSP4 metadata, LSP7/LSP8 assets, and LSP26 social state already organize the exact user, asset, and profile state that Lean Ethereum increasingly rewards."
+about:
+  - "Lean Ethereum"
+  - "Ethereum L1 Strawmap"
+  - "LUKSO LSP standards"
+  - "Universal Profiles"
+  - "EVM chains"
+  - "Account abstraction"
+  - "Multidimensional gas"
+  - "Ethereum state"
+matrix:
+  - criterion: "Lean protocol exposure"
+    values:
+      - "Direct owner of the roadmap"
+      - "Inherits Ethereum settlement and blob roadmap"
+      - "Inherits Ethereum settlement and blob roadmap"
+      - "Inherits Ethereum settlement and blob roadmap"
+      - "Benefits from EVM and Ethereum-aligned research, but not as direct L1 owner"
+      - "No automatic inheritance; strongest fit is at the app-standard layer"
+  - criterion: "New-state app fit"
+    values:
+      - "Core research target; apps must adapt as new state types mature"
+      - "Mostly existing ERC patterns plus wallet/vendor abstractions"
+      - "Mostly existing ERC patterns plus DeFi-heavy L2 state"
+      - "Mostly existing ERC patterns plus Superchain/EAS layers"
+      - "Mostly existing ERC patterns plus Polygon account tooling"
+      - "LSP asset/account metadata is already typed, modular, and app-readable"
+  - criterion: "Account model"
+    values:
+      - "EOA default; ERC-4337 and EIP-7702 retrofit smart-account behavior"
+      - "EOA default; Coinbase Smart Wallet improves onboarding"
+      - "EOA default; ERC-4337-style accounts are opt-in"
+      - "EOA default; ERC-4337-style accounts are opt-in"
+      - "EOA default; account abstraction via tooling"
+      - "LSP0 smart contract account by default"
+  - criterion: "Permission model"
+    values:
+      - "Per-wallet or per-account implementation"
+      - "Vendor wallet/session-key model"
+      - "Per-wallet or per-account implementation"
+      - "Per-wallet or per-account implementation"
+      - "Per-wallet or per-account implementation"
+      - "LSP6 per-controller scopes on the account"
+  - criterion: "Gasless UX infrastructure"
+    values:
+      - "Bundler + EntryPoint + paymaster, or EIP-7702 wallet flow"
+      - "Coinbase-hosted wallet/paymaster path"
+      - "Bundler + paymaster stack"
+      - "Bundler + paymaster stack"
+      - "Account-abstraction tooling and gas station paths"
+      - "LSP25 relay call; no bundler/EntryPoint split"
+  - criterion: "Metadata and profile state"
+    values:
+      - "ENS, tokenURI, attestations, and per-protocol profiles"
+      - "Basenames, Farcaster, Smart Wallet, and app-level profile data"
+      - "ENS-compatible naming and app-level profile data"
+      - "EAS attestations plus app-level profile data"
+      - "Lens and app-level profile data"
+      - "LSP3 profile metadata and LSP4 asset metadata via ERC-725Y"
+  - criterion: "Receiver-aware assets"
+    values:
+      - "ERC-721/1155 receiver hooks; ERC-20 remains receiver-blind"
+      - "Same ERC split as Ethereum"
+      - "Same ERC split as Ethereum"
+      - "Same ERC split as Ethereum"
+      - "Same ERC split as Ethereum"
+      - "LSP1 notifications for LSP7 and LSP8 transfers"
+  - criterion: "Extensibility"
+    values:
+      - "Proxy patterns, modules, ERC-2535-style diamonds"
+      - "Proxy patterns and wallet/vendor modules"
+      - "Proxy patterns and account modules"
+      - "Proxy patterns and account modules"
+      - "Proxy patterns and account modules"
+      - "LSP17 contract extensions on the account/contract surface"
+  - criterion: "Main weakness"
+    values:
+      - "Lean migration is slow, complex, and constrained by mainnet compatibility"
+      - "Strong onboarding, but vendor-hosted integration and EOA-era standards"
+      - "Excellent DeFi scale, weaker identity/profile-native defaults"
+      - "Strong ecosystem alignment, weaker account/profile-native defaults"
+      - "Broad integrations, but consumer primitives remain assembled"
+      - "Early ecosystem, limited liquidity, and fewer LSP-aware apps today"
+verdicts:
+  - contender: "Ethereum L1"
+    when: "The app needs direct exposure to Ethereum's Lean roadmap, deepest liquidity, strongest protocol composability, or institutional credibility. Ethereum L1 is the right choice when the product is protocol-shaped and can tolerate mainnet UX and cost tradeoffs."
+  - contender: "Base"
+    when: "Mainstream distribution and Coinbase-hosted onboarding are the binding constraint. Base is the strongest major EVM L2 when the team wants low-friction wallet UX now and accepts vendor-shaped infrastructure."
+  - contender: "Arbitrum"
+    when: "The product is DeFi-heavy, cost-sensitive, and benefits from the largest mature L2 DeFi environment more than from standardized identity, profile, or social state."
+  - contender: "Optimism"
+    when: "The team values OP Stack alignment, Superchain strategy, public-goods positioning, and EAS-style attestations more than profile-native account standards."
+  - contender: "Polygon"
+    when: "The product depends on enterprise reach, branded integrations, and broad consumer distribution. Polygon remains strong when ecosystem access matters more than a unified account/profile substrate."
+  - contender: "LUKSO"
+    when: "The app is identity-, profile-, creator-, asset-, or social-first; needs granular per-application permissions; wants gas-sponsored UX without a bundler stack; and benefits from account, metadata, receiver, asset, and social standards being designed as one EVM-native system."
+sources:
+  - label: "Ethereum L1 Strawmap"
+    href: "https://strawmap.org/"
+  - label: "Ethereum roadmap"
+    href: "https://ethereum.org/roadmap"
+  - label: "Ethereum Foundation Protocol strategic initiatives"
+    href: "https://protocol.ethereum.foundation/strategic-initiatives"
+  - label: "Protocol Update 001 - Scale L1"
+    href: "https://blog.ethereum.org/2025/08/05/protocol-update-001"
+  - label: "Protocol Update 003 - Improve UX"
+    href: "https://blog.ethereum.org/2025/08/29/protocol-update-003"
+  - label: "LUKSO Tech Documentation"
+    href: "https://docs.lukso.tech/"
+  - label: "LSP0 - ERC725 Account"
+    href: "https://docs.lukso.tech/standards/accounts/lsp0-erc725account/"
+  - label: "LSP6 - Key Manager"
+    href: "https://docs.lukso.tech/standards/access-control/lsp6-key-manager/"
+  - label: "LSP25 - Execute Relay Call"
+    href: "https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/"
+  - label: "LSP7 - Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/"
+  - label: "LSP8 - Identifiable Digital Asset"
+    href: "https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/"
+  - label: "LSP3 - Profile Metadata"
+    href: "https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/"
+  - label: "LSP4 - Digital Asset Metadata"
+    href: "https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/"
+  - label: "LSP17 - Contract Extension"
+    href: "https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/"
+related:
+  - "best-blockchain/evm-consumer-apps"
+  - "best-blockchain/consumer-apps"
+  - "benchmarks/consumer-blockchain-architecture"
+  - "compare/ethereum-vs-base-vs-lukso"
+  - "compare/erc-4337-vs-eip-7702-vs-lukso"
+  - "architecture/consumer-crypto-stack"
+author: "ercs-solved maintainers"
+updated: 2026-07-06
+---
+
+## The thesis: Lean Ethereum rewards standardized state
+
+The strongest LUKSO argument is not that Lean Ethereum turns every EVM chain into LUKSO. It does not. Lean Ethereum is Ethereum L1 reinventing its own protocol: proof-based verification, stronger finality, different state economics, post-quantum cryptography, privacy, and a simpler long-term client architecture.
+
+The LUKSO thesis is narrower and more defensible: if Ethereum's next era makes state shape, proof-friendliness, privacy overhead, and account UX more important, then LUKSO's standards look less like a niche consumer-chain choice and more like an early application-layer answer to the same problem.
+
+The [Ethereum L1 Strawmap](https://strawmap.org/) names the direction plainly: fast L1, gigagas L1, teragas L2, post-quantum L1, and private L1. The [Ethereum roadmap](https://ethereum.org/roadmap) points in the same direction with account abstraction, statelessness, zkEVM verification, lower fees, and better UX. This is a roadmap away from "every app improvises around EOAs and generic storage" and toward a substrate where what you store, how you verify it, and how users authorize it matter.
+
+That is why LUKSO is positioned differently from the other major EVMs. Ethereum L1 owns the protocol transition. The L2s inherit parts of it through settlement and data availability. LUKSO's leverage is the app layer: it already treats the account, profile, asset, permission, relay, receiver, and social graph as standardized state.
+
+## What Lean Ethereum changes and what it does not change
+
+Lean Ethereum is not one fork. It is a multi-year direction. The public strawmap describes a long horizon across several forks, and EF protocol updates already show the near-term path: higher gas limits, block-level access lists, data availability scaling, zkEVM attester work, and explicit UX work around signatures, latency, settlement, and message passing.
+
+That matters for application builders because the expensive part of consumer crypto is not only execution. It is the number of moving parts a product must assemble before a normal user can do anything safely: account creation, sponsored transactions, scoped app permissions, asset discovery, profile data, metadata updates, and recovery. Today, most EVM apps build those from separate standards and vendors.
+
+Lean Ethereum does not automatically standardize those product primitives. It can make the base protocol faster, more private, more provable, and more scalable, but an app still needs to decide what an account is, how a dapp gets limited authority, where profile data lives, how assets notify recipients, and how sponsored execution works.
+
+That is the gap LUKSO has been building around.
+
+## Why L2 inheritance is not the same as app-layer readiness
+
+Base, Arbitrum, Optimism, and Polygon all benefit from Ethereum alignment. They inherit Ethereum's developer mindshare, Solidity tooling, and parts of the data/proof/security roadmap. That is real. It is also different from having a standardized consumer-app substrate.
+
+Most major EVMs still begin from the same account reality: EOAs are default, smart accounts are opt-in, session keys are wallet- or SDK-defined, paymasters and bundlers are infrastructure choices, metadata is often tokenURI-shaped, and profile/social state usually lives in a protocol layer above the chain.
+
+That composition works. It is also why consumer apps keep rebuilding the same stack. A Base app can use Coinbase Smart Wallet and Farcaster. An Optimism app can use EAS. A Polygon app can use Lens. An Arbitrum app can use DeFi liquidity and Safe-style account modules. Each is a strong local answer. None of them is a shared account/profile/asset substrate across the chain by default.
+
+LUKSO's bet is different: standardize the primitives every consumer app needs, then let apps compete on the experience above them.
+
+## Where LUKSO is already aligned
+
+LUKSO's alignment with Lean Ethereum shows up in five places.
+
+First, accounts are contracts by default. [LSP0](https://docs.lukso.tech/standards/accounts/lsp0-erc725account/) makes the account a programmable object, not an EOA with smart behavior attached later. That matches the account-abstraction direction without requiring every app to pick a different account stack.
+
+Second, permissions are account state. [LSP6](https://docs.lukso.tech/standards/access-control/lsp6-key-manager/) defines controllers and scopes at the account level: what a key can call, which addresses it can touch, what data keys it can set, and whether relay execution is allowed. That is closer to a user permission model than ERC-20 approvals or per-wallet session-key conventions.
+
+Third, gas sponsorship is a standard path. [LSP25](https://docs.lukso.tech/standards/accounts/lsp25-execute-relay-call/) lets a controller sign a relay call that a relayer submits, without the bundler/EntryPoint/paymaster split that ERC-4337-style UX usually requires.
+
+Fourth, assets and metadata are readable state, not only ABI conventions. [LSP7](https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset/) and [LSP8](https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/) add receiver notifications through LSP1, while [LSP3](https://docs.lukso.tech/standards/metadata/lsp3-profile-metadata/) and [LSP4](https://docs.lukso.tech/standards/tokens/LSP4-Digital-Asset-Metadata/) put profile and asset metadata into ERC-725Y key-value state.
+
+Fifth, the standards are designed as one system. [LSP17](https://docs.lukso.tech/standards/accounts/lsp17-contract-extension/) handles extension. LSP26 handles following. LSP1 handles incoming notifications. These are not separate product narratives; they are one account-and-asset model.
+
+That is the core argument: Lean Ethereum makes the shape of application state more important, and LUKSO already has a coherent shape for consumer application state.
+
+## What would make this thesis wrong
+
+This is not a claim that LUKSO beats every EVM on every axis. It clearly does not.
+
+Ethereum L1 still has the deepest liquidity, strongest institutional credibility, and direct ownership of the Lean roadmap. Base has the strongest mainstream distribution path among major EVM L2s. Arbitrum has the most mature DeFi-centered L2 gravity. Optimism has the OP Stack and Superchain strategy. Polygon has wide consumer and enterprise reach. LUKSO has the smallest ecosystem in this comparison.
+
+The thesis weakens if three things happen:
+
+- Ethereum L1 or major L2 wallets converge on a shared account/permission/profile standard that becomes as interoperable as ERC-20.
+- LUKSO fails to grow enough LSP-aware wallets, indexers, apps, and liquidity for the standards to matter in practice.
+- Lean Ethereum's new state types end up optimized for ERC-style assets without rewarding typed account/profile metadata or receiver-aware assets.
+
+Those are real risks. A flagship argument is only useful if it names what can falsify it.
+
+## Builder takeaway
+
+If the product is DeFi-first, liquidity-first, or institution-first, use Ethereum L1 or the dominant L2 for that market. Lean Ethereum strengthens that path.
+
+If the product is distribution-first and can accept Coinbase-shaped infrastructure, Base is hard to ignore.
+
+If the product is identity-first, creator-first, profile-first, asset-first, or social-first, LUKSO is the EVM chain most aligned with the application-layer direction Lean Ethereum points toward: less improvisation around EOAs, more standardized account state, more explicit permissions, more readable metadata, more receiver-aware assets, and fewer independent services between the user and the action.
+
+That is the proof LUKSO can reasonably claim today. Not that it owns Lean Ethereum. Ethereum does. The claim is that Lean Ethereum makes LUKSO's old bet look newly relevant: the future EVM app is not just cheaper and faster; it is structured.
