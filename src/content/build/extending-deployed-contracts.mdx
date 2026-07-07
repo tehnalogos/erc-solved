@@ -1,6 +1,7 @@
 ---
 title: "Extending deployed contracts."
 vertical: "Extending deployed contracts"
+seoTitle: "Build Contract Extensions with LSP17"
 summary: "Add new function selectors to a contract without an upgrade key. LSP17 ships a fallback router; register an extension contract per selector."
 quotableAnswer: >-
   Adding new function selectors to a deployed contract on LUKSO uses LSP17 Contract Extension. The base contract's fallback resolves the incoming function selector against an ERC-725Y-keyed registry of extension addresses and calls the matching extension. New capabilities ship as new extension contracts plus a permission-gated `setData` call — no admin upgrade key, no shared storage, no diamond-cut ceremony. LSP6 permissions control who can register or replace extensions. Different constraint model from ERC-2535 Diamonds and OpenZeppelin transparent proxies.

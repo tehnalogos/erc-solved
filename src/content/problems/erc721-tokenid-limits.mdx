@@ -2,6 +2,7 @@
 title: "uint256 tokenIds were always a compromise."
 tagline: "Efficient for counters, awkward for hashes, serials, or anything you'd actually want to encode."
 query: "erc721 tokenid uint256 limitation"
+seoTitle: "ERC-721 Token IDs: LSP8"
 summary: "uint256 token IDs are efficient but force you into a single integer namespace. LSP8 uses bytes32, which can represent hashes, serials, encoded references, or numeric IDs."
 quotableAnswer: >-
   ERC-721's `uint256 tokenId` is cheap and predictable for sequential mints, but any semantic meaning — a content hash, an off-chain serial, a structured reference — has to be encoded into 256 bits or looked up via a side mapping. LSP8 on LUKSO uses `bytes32 tokenId`, so hashes fit natively and structured references (encoded serials, ownership provenance, off-chain resource IDs) become first-class. Sequential IDs still work via a `uint256`-to-`bytes32` cast. The ID becomes self-describing rather than opaque.

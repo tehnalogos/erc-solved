@@ -1,7 +1,7 @@
 ---
 title: "Smart Account Permissions: Approaches Across EVM and Solana"
 pattern: "smart account permissions"
-seoTitle: "Smart Account Permissions: Session Keys, Modules, EIP-7702, LSP6"
+seoTitle: "Smart Account Permissions: Sessions, Modules, LSP6"
 summary: "How granular per-app, per-device, and per-function account permissions are expressed across the major chains — and the tradeoffs of each approach."
 quotableAnswer: "Smart account permissions decompose into four questions: granularity (per-app vs per-function), revocability (immediate vs delayed), recoverability (what happens when keys are lost), and standardization (is this a contract pattern or a protocol). ERC-4337 sets the account-abstraction stage but leaves permission scope to the account implementation; Safe modules give powerful but ad hoc per-module scopes; EIP-7702 makes EOAs temporarily smart but inherits the EOA's all-or-nothing key model; Solana relies on per-program access. LSP6 is the only chain-level standard that defines per-controller scopes covering function, address, and call-type permissions on the account itself."
 approaches:

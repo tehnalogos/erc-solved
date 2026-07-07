@@ -25,7 +25,7 @@ const seoGeoFields = {
    * Colons pack two ideas cleanly. Falls back to `title` when omitted.
    * Example: "ERC-20: origin, ABI, limits, and LSP7 successor"
    */
-  seoTitle: z.string().optional(),
+  seoTitle: z.string().max(55).optional(),
   /**
    * SERP snippet. 140–160 chars. Opens with the answer or the pain — never
    * "Learn about…". Include primary + one secondary keyword. Ends on a

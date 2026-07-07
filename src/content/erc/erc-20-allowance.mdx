@@ -3,7 +3,7 @@ id: "erc-20-allowance"
 standardKind: "Topic"
 title: "ERC-20 Allowance"
 headline: "ERC-20 allowance, explained"
-seoTitle: "ERC-20 Allowance: approve, transferFrom, Permit, Permit2, and Safer Alternatives"
+seoTitle: "ERC-20 Allowance: approve, Permit, Permit2 Risks"
 summary: "ERC-20 allowance is the approve / transferFrom mechanism that lets a spender move tokens from an owner. It powers DeFi, but max approvals and split intent create one of Ethereum's most common user-risk surfaces."
 quotableAnswer: >-
   ERC-20 allowance is the two-step `approve(spender, amount)` + `transferFrom(spender, from, to, amount)` mechanism that lets a spender move tokens from an owner without holding the owner's private key. It's the substrate for every DEX, lending protocol, and NFT marketplace on EVM. The failure mode is well-documented: max-uint approvals persist forever, upgraded spender contracts inherit standing authority, and phishing signatures grant blanket withdrawal rights. Mitigations layer up — EIP-2612 Permit, Uniswap Permit2, revoke.cash — but the underlying primitive stays vulnerable to intent-context loss.

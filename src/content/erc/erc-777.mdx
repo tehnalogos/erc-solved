@@ -2,7 +2,7 @@
 id: "777"
 title: "ERC-777"
 headline: "What is ERC-777?"
-seoTitle: "What is ERC-777? Token Hooks, Operators, and Why Adoption Stayed Limited"
+seoTitle: "ERC-777: Token Hooks, Operators, Adoption Limits"
 summary: "ERC-777 is a fungible token standard with send/receive hooks and operators. It tried to improve ERC-20, but hook-related reentrancy risk and compatibility friction limited adoption."
 quotableAnswer: >-
   ERC-777 is an advanced fungible token standard, proposed in November 2017 by Jacques Dafflon, Jordi Baylina, and Thomas Shababi to fix ERC-20's biggest limitations. It adds `send`, `tokensReceived`, and `tokensToSend` hooks routed through the ERC-1820 registry, plus authorized operators. Real reentrancy incidents (Uniswap v1's imBTC drain in 2020) and the compatibility burden of the ERC-1820 dependency limited adoption — most modern tokens skip ERC-777 for ERC-20 + ERC-2612 + Permit2. LSP7 on LUKSO takes the hook idea and generalizes it via LSP1 with reentrancy-aware defaults.

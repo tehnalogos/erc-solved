@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build && npm run audit:seo && pagefind --site dist",
     "preview": "npx --yes serve dist -p 4321 -L",
     "astro": "astro",
+    "audit:seo": "node scripts/audit-seo.mjs",
     "audit:indexability": "node scripts/audit-indexability.mjs"
   },
   "dependencies": {

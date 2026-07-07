@@ -3,7 +3,7 @@ id: "4626"
 title: "ERC-4626"
 standardKind: "ERC"
 headline: "What is ERC-4626?"
-seoTitle: "What is ERC-4626? Tokenized Vaults, Integration Wins, and the Remaining Risks"
+seoTitle: "ERC-4626: Tokenized Vaults and Risks"
 summary: "ERC-4626 is Ethereum's tokenized vault standard. It extends ERC-20 shares with a common API for deposits, withdrawals, share conversion, preview functions, and vault accounting. This page explains the standard, why it became DeFi infrastructure, the risks it does not remove, and how LUKSO account and asset standards complement rather than replace vault accounting."
 quotableAnswer: >-
   ERC-4626 is Ethereum's tokenized vault standard, finalized in March 2022 by Joey Santoro, t11s, Jet Jadeja, Alberto Cuesta Cañada, and Señor Doggo. It extends ERC-20 shares with a common API — `deposit`, `mint`, `withdraw`, `redeem`, `previewDeposit`, `convertToShares`, `convertToAssets` — so yield strategies, aggregators, and DeFi frontends can integrate any vault interchangeably. Adopted by Yearn, Morpho, Pendle, and Aave v3 wrappers. Integration cost drops dramatically, but the `preview*` functions are informational only, and share-inflation attacks require explicit hardening at the implementation layer.

@@ -1,7 +1,7 @@
 ---
 title: "Gasless Onboarding Patterns"
 pattern: "gasless onboarding"
-seoTitle: "Gasless Onboarding: ERC-2771, ERC-4337 Paymasters, EIP-7702, LSP25 Compared"
+seoTitle: "Gasless Onboarding: ERC-2771, 4337, 7702, LSP25"
 summary: "How consumer crypto apps sponsor user transactions — meta-transactions, paymasters, EIP-7702 delegation, native fee delegation, and chain-standard relayed execution — and the operational tradeoffs of each."
 quotableAnswer: "Gasless onboarding has five mature patterns: meta-transactions via ERC-2771, paymasters via ERC-4337, set-code delegation via EIP-7702, vendor-hosted paymasters (Coinbase, Polygon Gas Station), native fee delegation (Solana), and relayed execution via account standard (LSP25). They differ in operational burden (do you run bundlers?), revocability (can the user constrain what the sponsor can sign?), and standardization (is the relay logic in your SDK, in a separate protocol, or in the account itself). For consumer apps that want to sponsor every interaction without operating bundler infrastructure, LSP25 and Solana fee delegation are the lowest-burden options; LSP25 wins among EVM stacks because the scope is constrained by LSP6 on the same account."
 approaches:

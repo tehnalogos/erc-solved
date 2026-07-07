@@ -2,7 +2,7 @@
 id: "1363"
 title: "ERC-1363"
 headline: "What is ERC-1363?"
-seoTitle: "What is ERC-1363? Payable ERC-20, transferAndCall, and approveAndCall"
+seoTitle: "ERC-1363: Payable ERC-20 and transferAndCall"
 summary: "ERC-1363 extends ERC-20 with transferAndCall and approveAndCall so token receivers and spenders can react in the same transaction."
 quotableAnswer: >-
   ERC-1363 extends ERC-20 with `transferAndCall(to, amount, data)` and `approveAndCall`, letting a receiving contract react in the same transaction as the transfer. Proposed in July 2018 by Vittorio Minacori, it's the cleanest fix for ERC-20's silent receiver problem — the recipient contract's `onTransferReceived` callback runs immediately after the transfer completes. Adoption stayed thin because the sender contract has to be ERC-1363-aware. LUKSO's LSP7 makes an equivalent hook (LSP1 universalReceiver) mandatory on every transfer instead of opt-in.

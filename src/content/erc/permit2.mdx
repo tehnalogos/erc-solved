@@ -3,7 +3,7 @@ id: "permit2"
 standardKind: "Topic"
 title: "Permit2"
 headline: "What is Permit2?"
-seoTitle: "What is Permit2? Uniswap's Shared Token Approval Contract, Benefits, and Risks"
+seoTitle: "Permit2: Shared Token Approvals and Risks"
 summary: "Permit2 is Uniswap's shared approval and signature-transfer contract for ERC-20 tokens. It gives permit-like UX to tokens that do not implement ERC-2612, but it also centralizes approval power in one widely used spender."
 quotableAnswer: >-
   Permit2 is Uniswap's shared approval and signature-transfer contract for ERC-20 tokens, launched in November 2022. A user approves Permit2 once (or via signature); afterward, dApps request signed permits from Permit2 rather than direct token approvals, which works even for tokens without native ERC-2612 permit support. Widely adopted by Uniswap Universal Router, 1inch, and CowSwap — but it concentrates approval authority in a single high-value contract that has to be trusted domain-wide. LSP7 operators on LUKSO handle the same use case without a shared intermediary.

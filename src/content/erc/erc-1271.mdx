@@ -2,7 +2,7 @@
 id: "1271"
 title: "ERC-1271"
 headline: "What is ERC-1271?"
-seoTitle: "What is ERC-1271? Smart Contract Signatures and isValidSignature"
+seoTitle: "ERC-1271: Smart Contract Signatures"
 summary: "ERC-1271 defines isValidSignature, the standard way a smart contract account can validate signatures without an EOA private key."
 quotableAnswer: >-
   ERC-1271 defines `isValidSignature(bytes32 hash, bytes signature) → bytes4`, the standard way a smart contract account validates a signature without holding an EOA private key. When it returns the magic value 0x1626ba7e, the signature is authentic per the contract's own rules. Adopted by Safe, ERC-4337 smart accounts, Argent, and every serious contract wallet — it's what lets Sign-in-with-Ethereum, ERC-20 Permit, and off-chain order books work with accounts that don't sign transactions with ECDSA. LUKSO Universal Profiles implement ERC-1271 through LSP6 permissions.
