@@ -1,4 +1,4 @@
-const SITE_URL = 'https://www.ercsolved.dev';
+export const SITE_URL = 'https://www.ercsolved.dev';
 const SITE_NAME = 'ERCs, Solved';
 const AUTHOR_NAME = 'ercs-solved maintainers';
 

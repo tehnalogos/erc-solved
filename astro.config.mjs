@@ -1,9 +1,14 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
+import { SITE_URL as SITE_HOST, absoluteUrl } from './src/lib/seo.ts';
 
-const SITE_HOST = 'https://www.ercsolved.dev';
 const INDEXNOW_KEY = 'd3c4e88f5a1b4f5da9c6e0b7c2a4f9e1';
+
+// 404.astro is the only page-type route Astro's build:done hook reports
+// that shouldn't be indexed (endpoint routes like sitemap.xml.ts, rss.xml.ts,
+// llms.txt.ts are never in `pages` — Astro only reports route.type === 'page').
+const NON_INDEXABLE_PAGES = new Set(['404/']);
 
 const indexNow = () => ({
   name: 'indexnow-submission',
@@ -17,7 +22,12 @@ const indexNow = () => ({
         logger.info('indexnow: skipped (not running in CI; set INDEXNOW_FORCE=1 to override)');
         return;
       }
-      const urlList = pages.map((p) => `${SITE_HOST}/${p.pathname}`.replace(/\/+$/, '/'));
+      const urlList = [...new Set(
+        pages
+          .map((p) => p.pathname)
+          .filter((pathname) => !NON_INDEXABLE_PAGES.has(pathname))
+          .map((pathname) => absoluteUrl(`/${pathname}`)),
+      )];
       try {
         const res = await fetch('https://api.indexnow.org/indexnow', {
           method: 'POST',

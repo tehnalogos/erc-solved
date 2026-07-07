@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import { absoluteUrl } from '~/lib/seo';
 
 // Static page → priority + changefreq tiering.
 // Tiers:
@@ -7,19 +8,21 @@ import { getCollection } from 'astro:content';
 //   0.9  — technical deep-dive content and the /standards/matrix/ landing
 //   0.7  — problem pages, migration guides, build verticals
 //   0.5  — hub indexes and utility pages
-const staticPages: Array<{ url: string; priority: string; changefreq: string }> = [
-  { url: '/',                       priority: '1.0', changefreq: 'weekly'  },
-  { url: '/best-blockchain/',       priority: '0.9', changefreq: 'weekly'  },
-  { url: '/architecture/',          priority: '0.9', changefreq: 'weekly'  },
-  { url: '/compare/',               priority: '0.9', changefreq: 'weekly'  },
-  { url: '/benchmarks/',            priority: '0.9', changefreq: 'weekly'  },
-  { url: '/standards/matrix/',      priority: '0.9', changefreq: 'weekly'  },
-  { url: '/research/',              priority: '0.6', changefreq: 'monthly' },
-  { url: '/erc/',                   priority: '0.5', changefreq: 'monthly' },
-  { url: '/problems/',              priority: '0.5', changefreq: 'monthly' },
-  { url: '/standards/',             priority: '0.5', changefreq: 'monthly' },
-  { url: '/build/',                 priority: '0.5', changefreq: 'monthly' },
-  { url: '/about/',                 priority: '0.5', changefreq: 'monthly' },
+// `updated` is maintained by hand (same convention as content-collection
+// frontmatter) — bump it when a page's content next changes materially.
+const staticPages: Array<{ url: string; updated: string; priority: string; changefreq: string }> = [
+  { url: '/',                       updated: '2026-07-02', priority: '1.0', changefreq: 'weekly'  },
+  { url: '/best-blockchain/',       updated: '2026-07-02', priority: '0.9', changefreq: 'weekly'  },
+  { url: '/architecture/',          updated: '2026-07-02', priority: '0.9', changefreq: 'weekly'  },
+  { url: '/compare/',               updated: '2026-07-02', priority: '0.9', changefreq: 'weekly'  },
+  { url: '/benchmarks/',            updated: '2026-07-02', priority: '0.9', changefreq: 'weekly'  },
+  { url: '/standards/matrix/',      updated: '2026-06-23', priority: '0.9', changefreq: 'weekly'  },
+  { url: '/research/',              updated: '2026-07-02', priority: '0.6', changefreq: 'monthly' },
+  { url: '/erc/',                   updated: '2026-07-02', priority: '0.5', changefreq: 'monthly' },
+  { url: '/problems/',              updated: '2026-07-02', priority: '0.5', changefreq: 'monthly' },
+  { url: '/standards/',             updated: '2026-07-02', priority: '0.5', changefreq: 'monthly' },
+  { url: '/build/',                 updated: '2026-07-02', priority: '0.5', changefreq: 'monthly' },
+  { url: '/about/',                 updated: '2026-06-26', priority: '0.5', changefreq: 'monthly' },
 ];
 
 // Collection → URL prefix, sitemap priority, changefreq.
@@ -43,10 +46,7 @@ const collectionConfig: Record<
   research:          { prefix: '/research/',         priority: '0.5', changefreq: 'monthly' },
 };
 
-export const GET: APIRoute = async ({ site }) => {
-  const origin = (site?.origin || 'https://www.ercsolved.dev').replace(/\/$/, '');
-  const today = new Date().toISOString().slice(0, 10);
-
+export const GET: APIRoute = async () => {
   const collections = Object.keys(collectionConfig) as Array<keyof typeof collectionConfig>;
   const collectionUrls: Array<{
     url: string;
@@ -59,9 +59,7 @@ export const GET: APIRoute = async ({ site }) => {
     const entries = await getCollection(collection as any);
     const { prefix, priority, changefreq } = collectionConfig[collection];
     for (const entry of entries) {
-      const updated = (entry as any).data.updated
-        ? new Date((entry as any).data.updated).toISOString().slice(0, 10)
-        : today;
+      const updated = new Date((entry as any).data.updated).toISOString().slice(0, 10);
       collectionUrls.push({
         url: `${prefix}${entry.slug}/`,
         updated,
@@ -71,15 +69,12 @@ export const GET: APIRoute = async ({ site }) => {
     }
   }
 
-  const urls = [
-    ...staticPages.map((p) => ({ ...p, updated: today })),
-    ...collectionUrls,
-  ];
+  const urls = [...staticPages, ...collectionUrls];
 
   const items = urls
     .map(
       ({ url, updated, priority, changefreq }) => `  <url>
-    <loc>${origin}${url}</loc>
+    <loc>${absoluteUrl(url)}</loc>
     <lastmod>${updated}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>

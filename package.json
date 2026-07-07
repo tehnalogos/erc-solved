@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "npx --yes serve dist -p 4321 -L",
-    "astro": "astro"
+    "astro": "astro",
+    "audit:indexability": "node scripts/audit-indexability.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

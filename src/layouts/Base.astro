@@ -28,6 +28,7 @@ interface Props {
   ogType?: 'website' | 'article';
   ogImage?: string | false;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
   /** @deprecated use `metaDescription` (SERP) or `summary` (GEO). Kept for
    * transitional call sites; forwarded as `metaDescription` when set. */
   description?: string;
@@ -45,6 +46,7 @@ const {
   ogImage = '/og/ercs-solved.png',
   jsonLd,
   description,
+  noindex = false,
 } = Astro.props;
 
 const seoTitleResolved = seoTitle ?? title;
@@ -110,7 +112,7 @@ const jsonLdPayload = jsonLd
     <meta name="description" content={metaDescriptionResolved} />
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#0a0b0d" />
-    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large" />
+    <meta name="robots" content={noindex ? 'noindex,follow' : 'index,follow,max-snippet:-1,max-image-preview:large'} />
 
     <meta property="og:title" content={ogTitleResolved} />
     <meta property="og:description" content={ogDescriptionResolved} />
